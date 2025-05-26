@@ -42,6 +42,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## Version History
 # 🛠️ AstroAuction Patch 0.9.020
+📅 **Release Date:** February 3rd, 2026
+
+## 📢 Developer's Notes
+
+- Bug: Creating a listing without an (optional) image resulted in error code 500
+  - Fix: Use a conditional to determine if a file is uploaded vs uploading as the default
+- Todo: categories & detailed auction page
+
+  ---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.9.020
 📅 **Release Date:** January 30th, 2026
 
 ## 📢 Developer's Notes - Automatic emails w/ verification
