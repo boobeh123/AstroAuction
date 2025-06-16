@@ -49,6 +49,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 - Updated the business email on several anchors on static website and web application
 - I'm back to work irl, worked on this project during the time off
 - The `/viewAuction/:id` landing page now renders dynamic data
+  - Guest users & registered users may view detailed listings
 
   ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.021
