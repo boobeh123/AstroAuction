@@ -46,7 +46,8 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## 📢 Developer's Notes
 
-- Added before/after slider
+- Added before/after slider 
+  - Now viewable/functional on mobile viewports
 - Changed nav anchor text to an `<i>` element with font awesome icons
 
   ---------------------------------------------------------------------------------------------------------------------------
