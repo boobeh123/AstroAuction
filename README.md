@@ -17,13 +17,17 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * User profiles & profile pictures
 
 ## Optimizations
-* Design/develop landing on `/auction` route
+* ~~Design/develop landing on `/auction` route~~
   * ~~Attach a user to listings~~
-  * Detailed listing page
+  * ~~Detailed listing page~~
   * A scrolling red banner which is displayed to all users
-    * May need to research how
+    * ~~May need to research how~~
+      * Websockets
   * Embed a video player which represents a livestream or an anchor href to the livestream?
     * May need to research if allowed/TOS
+      * Safest bet would be to use scrolling red banner to link to Instagram site/live feed
+    * Craigslist style QR Code 
+      * May need to research how
 * ~~Design/develop landing & functionality on `/profile` route~~
   * Administrator control panel
     * To moderate the listings/images from users
@@ -49,6 +53,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 - Added before/after slider 
   - Now viewable/functional on mobile viewports
 - Changed nav anchor text to an `<i>` element with font awesome icons
+
 
   ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.022
