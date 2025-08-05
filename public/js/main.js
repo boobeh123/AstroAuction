@@ -1,40 +1,38 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
 
     initializeNavigation();
-    
-    function initializeNavigation() {
-        const navToggle = document.getElementById('nav-toggle');
-        const navMenu = document.getElementById('nav-menu');
+
+    async function initializeNavigation() {
+        
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
         const navLinks = document.querySelectorAll('.nav-link');
 
-        // Mobile menu toggle
+        // Mobile menu toggle & prevent body scroll
         if (navToggle && navMenu) {
-            navToggle.addEventListener('click', function() {
+            navToggle.addEventListener('click', () => {
                 navToggle.classList.toggle('active');
                 navMenu.classList.toggle('active');
-                
-                // Prevent body scroll when menu is open
                 document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
             });
 
             // Close mobile menu when clicking on nav links
             navLinks.forEach(link => {
-                link.addEventListener('click', function() {
+                link.addEventListener('click', () => {
                     navToggle.classList.remove('active');
                     navMenu.classList.remove('active');
                     document.body.style.overflow = '';
                 });
             });
 
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+            // Close mobile menu when clicking outside of menu
+            document.addEventListener('click', (event) => {
+                if (!navToggle.contains(event.target) && !navMenu.contains(event.target)) {
                     navToggle.classList.remove('active');
                     navMenu.classList.remove('active');
                     document.body.style.overflow = '';
                 }
             });
-        }
+        }        
     }
-    
-});
+})
