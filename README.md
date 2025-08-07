@@ -8,7 +8,7 @@ Website is deployed live on Netlify: https://astroauction.netlify.app/
 * Responsive to mobile viewports
 * Accessible to screen readers / Semantic HTML & ARIA
 * SEO Meta tags
-* Functional Contact Form 
+<!-- * Functional Contact Form  -->
 * WebP image format
 
 ## Optimizations
@@ -22,6 +22,15 @@ Website is deployed live on Netlify: https://astroauction.netlify.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.2 — Hero section
+📅 **Release Date:** August 4th 
+
+---
+
+## 📢 Developer's Notes - **Hero section & image, etc**
+
+- The business owner provided the hero image and a few others
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.1 — Initial Commit
 📅 **Release Date:** July 30th & August 4th, 2025
