@@ -4,7 +4,7 @@
   "description": "Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount.",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon src/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
     "start": "node server.js",
     "lint": "eslint .",
     "format": "prettier -w .",
@@ -33,6 +33,7 @@
   "dependencies": {
     "connect-mongo": "^5.1.0",
     "dotenv": "^17.2.1",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "method-override": "^3.0.0",
