@@ -1,7 +1,9 @@
 ## Description
 Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount. 
 
-Website is deployed live on Netlify: https://astroauction.netlify.app/
+Phase 2~3 of the Web application is deployed live on Railway and is under development: https://astroauction-production.up.railway.app/
+
+Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify.app/ (use Railway, this link was deployed for a static/landing page)
 
 ## Features
 * Static webpage deployed with Netlify
@@ -10,6 +12,7 @@ Website is deployed live on Netlify: https://astroauction.netlify.app/
 * SEO Meta tags
 <!-- * Functional Contact Form  -->
 * WebP image format
+* Backend (db/auth in progress)
 
 ## Optimizations
 * Backend + Database
@@ -23,8 +26,27 @@ Website is deployed live on Netlify: https://astroauction.netlify.app/
 
 ## Version History
 ---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.4 — Full stack web app
+📅 **Release Date:** August 7th, 2025
+
+---
+
+## 📢 Developer's Notes - **Install dependencies, Wire up backend, Render Views, Deploy to Railway **
+
+- Heard ChatGPT-5 was FREE for a week
+  - "DO YOU HAVE ANY IDEA HOW MUCH THIS IS WORTH"
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.3 — Brain storming
+📅 **Release Date:** August 6th, 2025
+
+---
+
+## 📢 Developer's Notes - **Styling changes & Meta tag updates**
+
+- Added some padding changes and update to our meta tags
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.2 — Hero section
-📅 **Release Date:** August 4th 
+📅 **Release Date:** August 4th, 2025
 
 ---
 
