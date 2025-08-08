@@ -1,0 +1,9 @@
+node_modules
+coverage
+dist
+build
+public/js/vendor
+*.min.js
+public/**/*.min.js
+.husky
+
