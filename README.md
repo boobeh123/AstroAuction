@@ -1,7 +1,7 @@
 ## Description
 Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount. 
 
-Phase 2~3 of the Web application is deployed live on Railway and is under development: https://astroauction-production.up.railway.app/
+Phase 2~3 of the Web application is deployed live on Railway and is under development: https://astroauction.up.railway.app/
 
 Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify.app/ (use Railway, this link was deployed for a static/landing page)
 
