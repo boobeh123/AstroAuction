@@ -1,2 +1,6 @@
 .env
 node_modules
+coverage
+dist
+uploads
+plan.md
