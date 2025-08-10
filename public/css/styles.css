@@ -278,6 +278,119 @@ p {
 .hero-image:hover img {
   transform: scale(1.02);
 }
+
+/**************************************************************
+* Login/Signup
+***************************************************************/
+
+.page-header {
+  background: linear-gradient(135deg, #1A1B3A 0%, #2D1B69 50%, #A855F7 100%);
+  color: #E8E9F3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem 1rem 1rem;
+  position: relative;
+  overflow: hidden;
+  /* border: 2px solid green; */
+  height: 100vh;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="%23A855F7" opacity="0.3"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/></circle><circle cx="80" cy="40" r="0.5" fill="%2300D9FF" opacity="0.4"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/></circle><circle cx="30" cy="70" r="0.8" fill="%23E879F9" opacity="0.3"><animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.5s" repeatCount="indefinite"/></circle></svg>');
+  /* background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,45 52,50 58,50 53,53 55,58 50,55 45,58 47,53 42,50 48,50" fill="%23A855F7" opacity="0.3"><animate attributeName="opacity" values="0.2;0.3;0.2" dur="2.5s" repeatCount="indefinite"/></polygon><polygon points="20,15 21,18 24,18 22,20 23,23 20,21 17,23 18,20 16,18 19,18" fill="%2300D9FF" opacity="0.5"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/></polygon><polygon points="80,35 81,38 84,38 82,40 83,43 80,41 77,43 78,40 76,38 79,38" fill="%23E879F9" opacity="0.4"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite"/></polygon></svg>'); */
+  background: url('/images/login2.svg');
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(168, 85, 247, 0.2);
+  backdrop-filter: blur(8px);
+  /* border: 2px solid red; */
+}
+
+.auth-card__title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  /* border: 2px solid red; */
+}
+
+.auth-card__subtitle {
+  margin: 0 0 1.25rem 0;
+  color: #B8C5D6;
+  font-size: 0.95rem;
+  /* border: 2px solid red; */
+
+}
+
+.auth-form .form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+  /* border: 2px solid red; */
+
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+  color: #D7DBE7;
+  /* border: 2px solid red; */
+
+}
+
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(184, 197, 214, 0.25);
+  background: rgba(12, 12, 28, 0.6);
+  color: #E8E9F3;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* border: 2px solid red !important; */
+}
+
+.auth-form input::placeholder {
+  color: #9AA8BA;
+
+}
+
+.auth-form input:focus {
+  border-color: #A855F7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.auth-form .form-actions {
+  margin-top: 1rem;
+  /* border: 2px solid red; */
+
+}
+
+.auth-form .helper-text {
+  margin-top: 0.75rem;
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  /* border: 2px solid red; */
+
+}
+.auth-form .helper-text a:hover {
+  /* border: 2px solid red; */
+  color: #0284C7;
+}
 /**************************************************************
 * Media queries
 ***************************************************************/
