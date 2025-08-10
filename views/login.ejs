@@ -1,2 +1,23 @@
-<h1>Log in to your account</h1>
-<a href="/" class="btn btn-secondary" aria-label="Go back">Go back</a>
+<%- include('./partials/header.ejs') %>
+<main id="main-content" role="main" aria-label="Main content">
+  <section class="page-header" role="region" aria-labelledby="login-title">
+    <div class="auth-card" role="form" aria-labelledby="login-title" aria-describedby="login-help">
+      <h1 id="login-title" class="auth-card__title">Welcome</h1>
+      <p class="auth-card__subtitle">Log in to continue</p>
+      <form class="auth-form" action="/login" method="POST" aria-describedby="login-help">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" style="width:100%">Log in</button>
+        </div>
+        <p id="login-help" class="helper-text">Need an account? <a href='/signup' aria-label="Go to signup page">Create account</a></p>
+      </form>
+    </div>
+  </section>
+</main>
