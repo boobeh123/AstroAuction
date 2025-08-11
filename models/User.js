@@ -11,8 +11,12 @@ const UserSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        unique: true,
         required: true
+    },
+    agreeToTerms: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 },
     { timestamps: true }
