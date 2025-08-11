@@ -13,7 +13,7 @@ const mainRoutes = require('./routes/main');
 require('dotenv').config({path: './config/.env'})
 
 // Passport config
-// require('./config/passport')(passport);
+require('./config/passport')(passport);
 
 connectDB();
 app.set('view engine', 'ejs');
@@ -35,8 +35,8 @@ app.use(
     })
   )
 // Passport middleware
-// app.use(passport.initialize())
-// app.use(passport.session())
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', mainRoutes);
 
