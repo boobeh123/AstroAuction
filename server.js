@@ -9,6 +9,7 @@ const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const mainRoutes = require('./routes/main');
+const flash = require('connect-flash');
 
 require('dotenv').config({path: './config/.env'})
 
@@ -34,6 +35,17 @@ app.use(
         })
     })
   )
+
+app.use(flash());
+
+// Flash available to all Views
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.errors = req.flash('errors');
+    res.locals.error = req.flash('error');
+    next();
+});
+
 // Passport middleware
 app.use(passport.initialize())
 app.use(passport.session())
