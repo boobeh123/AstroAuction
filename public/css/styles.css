@@ -395,6 +395,17 @@ p {
 .auth-form .form-actions .btn {
   width: 100%;
 }
+
+.checkbox {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.checkbox label {
+  gap: 0.25rem;
+  margin: 0;
+  cursor: pointer;
+}
 /**************************************************************
 * Media queries
 ***************************************************************/
