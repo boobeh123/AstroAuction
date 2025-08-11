@@ -21,11 +21,12 @@ module.exports = {
             const existingUser = await User.findOne({ email: email }).lean();
 
             if (!errors.isEmpty()) {
+                req.flash('errors', errors.array().map(e => e.msg));
                 return res.status(400).redirect('/signup');
             }
             
             if (existingUser) {
-                // req.flash('errors', { msg: 'Account with that email address or username already exists.' });
+                req.flash('errors', 'Account with that email already exists.');
                 return res.status(400).redirect('/signup');
             }
 
@@ -34,12 +35,13 @@ module.exports = {
                 password,
                 agreeToTerms,
               })
-
+              req.flash('success', 'Account created. Please log in.');
               await user.save();
               return res.redirect('/login');
 
         } catch (err) {
-            return next(err);
+            req.flash('errors', 'Unexpected error. Please try again.');
+            return res.status(500).redirect('/signup');
         }
     }
 }
