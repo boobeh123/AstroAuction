@@ -1,0 +1,20 @@
+  <div class="flash-stack" role="status" aria-live="polite">
+    <% if (success && success.length) { %>
+      <div class="flash flash--success">
+        <% success.forEach(m => { %>
+            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
+            <p><%= m %></p><% }) %></div>
+    <% } %>
+    <% if (error && error.length) { %>
+      <div class="flash flash--error">
+        <% error.forEach(m => { %>
+            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
+            <p><%= m %></p><% }) %></div>
+    <% } %>
+    <% if (errors && errors.length) { %>
+      <div class="flash flash--error">
+        <% errors.forEach(e => { %>
+            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
+            <p><%= typeof e === 'string' ? e : e.msg %></p><% }) %></div>
+    <% } %>
+  </div>
