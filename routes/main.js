@@ -14,7 +14,7 @@ const ensureAccountValidation = [
     .isEmail().withMessage('Please enter a valid email address.')
     .normalizeEmail({ gmail_remove_dots: false }),
     body('password')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+    .isLength({ min: 3 }).withMessage('Password must be at least 3 characters long'),
     body('confirmPassword')
     .custom((value, { req }) => {
         if (value !== req.body.password) throw new Error('Passwords do not match');
