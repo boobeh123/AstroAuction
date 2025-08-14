@@ -3,6 +3,8 @@ const router = express.Router();
 const homeController = require('../controllers/home');
 const authController = require('../controllers/auth');
 const { body } = require('express-validator');
+const passport = require('passport')
+
 
 router.get('/', homeController.getIndex);
 
@@ -24,5 +26,11 @@ const ensureAccountValidation = [
     .equals('yes').withMessage('You must agree to the Terms of Use')
 ];
 router.post('/signup', ensureAccountValidation, authController.postSignup);
+
+const ensureLoginValidation = [
+    body('email').isEmail().withMessage('Enter a valid email').normalizeEmail({ gmail_remove_dots: false }),
+    body('password').notEmpty().withMessage('Password cannot be blank')
+];
+router.post('/login', ensureLoginValidation, authController.postLogin);
 
 module.exports = router;
