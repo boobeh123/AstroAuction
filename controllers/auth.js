@@ -43,5 +43,22 @@ module.exports = {
             req.flash('errors', 'Unexpected error. Please try again.');
             return res.status(500).redirect('/signup');
         }
+    },
+
+    postLogin: async (req, res, next) => {
+
+        passport.authenticate('local', (err, user, info) => {
+            if (err) { return next(err) }
+            if (!user) {
+              req.flash('errors', info.message)
+              return res.redirect('/login')
+            }
+            req.logIn(user, (err) => {
+              if (err) { return next(err) }
+              req.flash('success', 'Success! You are logged in.')
+              res.redirect(req.session.returnTo || '/')
+            })
+          })(req, res, next)
+        }
+        
     }
-}
