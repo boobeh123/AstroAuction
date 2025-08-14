@@ -3,22 +3,23 @@ const mongoose = require('mongoose')
 const User = require('../models/User')
 
 module.exports = function (passport) {
-  passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-    User.findOne({ email: email.toLowerCase() })
-      .select('+password')
-      .exec((err, user) => {
-        if (err) { return done(err) }
-        if (!user) {
-          return done(null, false, { msg: `Email ${email} not found.` })
-        }
-        user.comparePassword(password, (err, isMatch) => {
-          if (err) { return done(err) }
-          if (isMatch) {
-            return done(null, user)
-          }
-          return done(null, false, { msg: 'Invalid email or password.' })
+  passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+    try {
+      const user = await User.findOne({ email: email.toLowerCase() })
+      if (!user) return done(null, false, { message: 'Invalid email or password.' })
+
+      const isMatch = await new Promise((resolve, reject) => {
+        user.comparePassword(password, (err, ok) => {
+          if (err) return reject(err)
+          return resolve(ok)
         })
       })
+
+      if (!isMatch) return done(null, false, { message: 'Invalid email or password.' })
+      return done(null, user)
+    } catch (error) {
+      return done(error)
+    }
   }))
   
 
@@ -26,7 +27,12 @@ module.exports = function (passport) {
     done(null, user.id)
   })
 
-  passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => done(err, user))
-  })
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id)
+      done(null, user)
+    } catch (err) {
+      done(err)
+    }
+})
 }
