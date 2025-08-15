@@ -206,6 +206,15 @@ p {
   /* border: 2px solid red; */
 }
 
+.user-email {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(168, 85, 247, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
 /**************************************************************
 * Hero
 ***************************************************************/
