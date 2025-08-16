@@ -5,12 +5,21 @@ const User = require('../models/User')
 module.exports = {
 
     getLogin: (req, res) => {
-        // if Authenticated, redirect - ToDO
+
+      if (req.user) {
+        return res.redirect('/auction')
+      } else {
         res.render('login.ejs');
+      }
     },
 
     getSignup: (req, res) => {
-        res.render('signup.ejs');
+
+        if (req.user) {
+          return res.redirect('/auction')
+        } else {
+          res.render('signup.ejs');
+        }
     },
 
     postSignup: async (req, res, next) => {
@@ -59,6 +68,20 @@ module.exports = {
               res.redirect(req.session.returnTo || '/')
             })
           })(req, res, next)
-        }
-        
-    }
+        },
+
+        getLogout: (req, res) => {
+          req.logout((err) => {
+              if (err) {
+                  console.error('Logout error:', err);
+                  return res.redirect('/');
+              }
+
+              // ToDo : destroy session to prevent hijack
+              
+              req.flash('success', 'You have been logged out');
+              res.redirect('/');
+          });
+      }
+
+}
