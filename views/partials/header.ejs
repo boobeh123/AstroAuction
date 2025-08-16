@@ -69,7 +69,7 @@
                   </a>
               </div>
               <div class="nav-actions" aria-label="Account">
-                <% if (user) { %>
+                <% if (typeof user !== 'undefined' && user) { %>
                     <span class="user-email" aria-label="Logged in as"><%= user.email %></span>
                     <a href="/logout" class="btn btn-secondary" aria-label="Log out">Log out</a>
                 <% } else { %>
