@@ -33,4 +33,6 @@ const ensureLoginValidation = [
 ];
 router.post('/login', ensureLoginValidation, authController.postLogin);
 
+router.get('/logout', authController.getLogout);
+
 module.exports = router;
