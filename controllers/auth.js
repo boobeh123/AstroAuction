@@ -70,18 +70,25 @@ module.exports = {
           })(req, res, next)
         },
 
-        getLogout: (req, res) => {
-          req.logout((err) => {
-              if (err) {
-                  console.error('Logout error:', err);
-                  return res.redirect('/');
-              }
+      getLogout: (req, res) => {
+        req.logout((err) => {
+            if (err) {
+                console.error('Logout error:', err);
+                req.flash('errors', 'Error during logout');
+                return res.redirect('/');
+            }
+            
+            req.session.destroy((err) => {
+                if (err) {
+                    console.error('Session destruction error:', err);
+                    return res.redirect('/');
+                }
 
-              // ToDo : destroy session to prevent hijack
-              
-              req.flash('success', 'You have been logged out');
-              res.redirect('/');
-          });
-      }
+                req.user = null;
+                res.clearCookie('connect.sid');
+                res.redirect('/');
+            });
+        });
+    }
 
 }
