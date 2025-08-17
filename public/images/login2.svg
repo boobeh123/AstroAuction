@@ -13,42 +13,42 @@
 <!-- Low # = left/Up / High # = Right/Down -->
   <g opacity="0.4" transform="translate(300, 400) scale(0.2) rotate(180)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.15;0.7;0.15" dur="2.8s" repeatCount="indefinite" begin="0s" />
+    <animate attributeName="opacity" values="0.15;0.7;0.15" dur="2.8s" repeatCount="1" begin="0s" />
   </g>
   <g opacity="0.5" transform="translate(1250, -400) scale(0.85) rotate(20)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.2;0.85;0.2" dur="3.2s" repeatCount="indefinite" begin="0.4s" />
+    <animate attributeName="opacity" values="0.2;0.85;0.2" dur="3.2s" repeatCount="1" begin="0.4s" />
   </g>
   <g opacity="0.45" transform="translate(1250, 150) scale(0.15) rotate(42)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.1;0.8;0.1" dur="2.6s" repeatCount="indefinite" begin="0.8s" />
+    <animate attributeName="opacity" values="0.1;0.8;0.1" dur="2.6s" repeatCount="1" begin="0.8s" />
   </g>
   <g opacity="0.5" transform="translate(800, -100) scale(0.55) rotate(65)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.2;0.9;0.2" dur="3.6s" repeatCount="indefinite" begin="1.2s" />
+    <animate attributeName="opacity" values="0.2;0.9;0.2" dur="3.6s" repeatCount="1" begin="1.2s" />
   </g>
   <g opacity="0.4" transform="translate(350, -250) scale(0.99) rotate(28)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.15;0.75;0.15" dur="3.1s" repeatCount="indefinite" begin="0.6s" />
+    <animate attributeName="opacity" values="0.15;0.75;0.15" dur="3.1s" repeatCount="1" begin="0.6s" />
   </g>
   <g opacity="0.6" transform="translate(1500, 900) scale(0.05) rotate(40)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.2;1;0.2" dur="3.8s" repeatCount="indefinite" begin="0.2s" />
+    <animate attributeName="opacity" values="0.2;1;0.2" dur="3.8s" repeatCount="1" begin="0.2s" />
   </g>
   <g opacity="0.45" transform="translate(150, 1250) scale(0.07) rotate(10)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.1;0.7;0.1" dur="2.9s" repeatCount="indefinite" begin="1.0s" />
+    <animate attributeName="opacity" values="0.1;0.7;0.1" dur="2.9s" repeatCount="1" begin="1.0s" />
   </g>
   <g opacity="0.5" transform="translate(1550, 1550) scale(0.14) rotate(69)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.2;0.85;0.2" dur="3.4s" repeatCount="indefinite" begin="0.9s" />
+    <animate attributeName="opacity" values="0.2;0.85;0.2" dur="3.4s" repeatCount="1" begin="0.9s" />
   </g>
   <g opacity="0.4" transform="translate(1000, 1550) scale(0.03) rotate(70)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.15;0.75;0.15" dur="2.7s" repeatCount="indefinite" begin="0.3s" />
+    <animate attributeName="opacity" values="0.15;0.75;0.15" dur="2.7s" repeatCount="1" begin="0.3s" />
   </g>
   <g opacity="0.55" transform="translate(150, 950) scale(0.76) rotate(40)">
     <use xlink:href="#star-shape" />
-    <animate attributeName="opacity" values="0.2;0.9;0.2" dur="3.3s" repeatCount="indefinite" begin="0.7s" />
+    <animate attributeName="opacity" values="0.2;0.9;0.2" dur="3.3s" repeatCount="1" begin="0.7s" />
   </g>
 </svg>
