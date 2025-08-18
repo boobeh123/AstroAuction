@@ -3,7 +3,7 @@
 ** @@                                                                           @@ */
 const { validationResult } = require('express-validator');
 // const { ensureLoginValidation } = require('../routes/main');
-const { ensureLoginValidation } = require('../../routes/main');
+const { ensureLoginValidation } = require('../../middleware/auth');
 
 // helper to run validators on fake input <- from chatgpt
 // We have runValidation(), an async function with two paramters: rules and data
@@ -35,7 +35,7 @@ test('fails when email is blank', async () => {
     const result = await runValidation(ensureLoginValidation, { email: '', password: 'secret' });
     // A test method which compares the result to the test result. If the result is empty, the test should evaluate as false? Not sure I understand. May need to see console logs
     expect(result.isEmpty()).toBe(false);
-    // A test method which checks the first index on an array. The element could be a string. The result compares the result string to the test string. If the input is blank, the first error message should be "__ is required"
+    // A test method which checks the first index on an array. The element could be a string. The result compares the result string to the test string. If the input is blank, the first error message should be "Enter a valid email" -- the previous test tested for username and I edited the test to test for emails. String was updated but not this comment
     expect(result.array()[0].msg).toBe('Enter a valid email');
 });
 
@@ -62,19 +62,80 @@ test('fails when password is blank', async () => {
     expect(result.array()[0].msg).toBe('Enter a valid email');
   });
 
-// TODO: Email edge cases, password edge cases, script injection/check sanitization 
-
   /* 
+Think of isEmpty() as "are there any validation errors?" rather than "is the input empty?"
+isEmpty() does NOT check if the input is blank. Instead, it checks if the validation result contains any errors. 
 
-  const runValidation = async (rules, data) => {
-  const req = { body: data };   // fake Express request object
-  for (let rule of rules) {
-    await rule.run(req);        // express-validator rule attaches errors to req
-  }
-  return validationResult(req); // gathers all validation results into one object
-};
+// When validation passes (no errors):
+const result = await runValidation(rules, validData);
+result.isEmpty() // Output -> true (no validation errors)
 
-Because we use mock data, we do not need to spin up the full Express server or Passport. We mock the req.body enough for unit testing validation
+// When validation fails (has errors):
+const result = await runValidation(rules, invalidData);
+result.isEmpty() // Output -> false (has validation errors) 
+
+.trim() → remove leading/trailing whitespace (no accidental " bob@example.com ").
+.escape() → ensures special characters (like < >) are HTML-escaped. Stops <script> injection into error messages.
+
+Validation answers:
+“Is this data allowed?”
+Validation = does it meet rules? (correct email, password length)
+
+Sanitization answers:
+“If it is allowed, do we need to clean it up before storing or using it?”
+Sanitization = even if valid, do we clean the data before saving or rendering?
+
+When a failed test suite appears:
+Do we change the code (the validator) or the test (the expected behavior)?
+
+The procedure is:
+Decide on intended behavior (business rule).
+Make sure code + tests agree on that behavior.
+
+Right now:
+Code (ensureLoginValidation) → uses normalizeEmail() only → "BOB@example.com".
+Test → expects everything lowercased → "bob@example.com".
+That’s the mismatch.
+
+If your app should treat all emails case-insensitively (which is 99% of login systems), then the test is correct. 
+You should update ensureLoginValidation to return a lowercase string.
+ */
+
+test('trims whitespace from email', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: '   bob@example.com   ', password: 'password123' });
+  expect(result.isEmpty()).toBe(true);
+});
+
+test('normalizes email to lowercase', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'BOB@EXAMPLE.COM', password: 'password123' });
+  expect(result.isEmpty()).toBe(true);
+});
+
+test('rejects short password', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'bob@example.com', password: '1' });
+  expect(result.isEmpty()).toBe(false);
+  expect(result.array()[0].msg).toBe('Password must be at least 3 characters');
+});
+
+test('rejects overly long password', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'bob@example.com', password: 'a'.repeat(200) });
+  expect(result.isEmpty()).toBe(false);
+  expect(result.array()[0].msg).toBe('Password cannot be longer than 128 characters');
+});
+
+test('escapes potential XSS in password', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'bob@example.com', password: '<script>alert(1)</script>' });
+  expect(result.isEmpty()).toBe(true);
+});
 
 
-*/
+// Tests I should be able to write from scratch
+test('normalizes email by lowercasing entire address', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'BOB@EXAMPLE.COM', password: 'helloworld' });
+  expect(result.isEmpty()).toBe(true)
+
+})
+test('normalizes email by lowercasing only domain', async () => {
+  const result = await runValidation(ensureLoginValidation, { email: 'bob@EXAMPLE.COM', password: 'helloworld' });
+  expect(result.isEmpty()).toBe(true);
+})
