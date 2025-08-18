@@ -16,8 +16,8 @@ const ensureAccountValidation = [
 ];
 
 const ensureLoginValidation = [
-    body('email').isEmail().withMessage('Enter a valid email').normalizeEmail({ gmail_remove_dots: false }),
-    body('password').notEmpty().withMessage('Password cannot be blank')
+    body('email').toLowerCase().trim().isEmail().withMessage('Enter a valid email').normalizeEmail({ gmail_remove_dots: false }),
+    body('password').trim().notEmpty().withMessage('Password cannot be blank').isLength({ min: 3 }).withMessage('Password must be at least 3 characters').isLength({ max: 128 }).withMessage('Password cannot be longer than 128 characters').escape()
 ];
 
 module.exports = { ensureLoginValidation, ensureAccountValidation };
