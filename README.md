@@ -10,21 +10,81 @@ Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify
 * Responsive to mobile viewports
 * Accessible to screen readers / Semantic HTML & ARIA
 * SEO Meta tags
-<!-- * Functional Contact Form  -->
 * WebP image format
-* Backend (db/auth in progress)
+* Server with database and authentication
 
 ## Optimizations
-* Backend + Database
-* Several schemas
-* Authentication
-* Nodemailer
+* Design/develop landing on '/auction' route
+* CRUD operations (post auctions/listings)
+* Auction schema
+* Nodemailer for contact form
 * Multer/cloudinary
+* Unit tests
+* Integration tests
+* E2E tests
 
 ## Technologies
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9a — Not quite a MVP yet - Plans for '/auction' page
+📅 **Release Date:** August 16th, 2025
+
+## 📢 Developer's Notes - **Destroy sessions, Optimize SVG, Unit tests, Plans for '/auction' route**
+
+- The core logout functionality worked, but did not destroy the session
+  - Ideally you want to destroy the session to optimize for security
+    - We optimized
+- The SVGs used on our login and signup animated indefinitely and uses your CPU to render
+  - I updated the animation to occur 1 time and stop
+    - I considered using webGL for animations/backgrounds since it uses the GPU to render
+      - Advised this is like using a rocket to fly to the grocery store
+      - I still would like to try webGL to render a background someday
+- I want to approach this project differently
+  - I'll dive deep vs wide on how the web application functions
+    - Since this project is intended to be used in a business, I must have my ducks in a row
+  - I am conducting experimentation on my functionalities 
+    - Unit testing our authentication to ensure no sneaky weird business can slip through
+      - Validating and sanitizing every input & especially inputs that gets stored in our database
+  - Still need to test the '/signup' route (& the several endpoints that the '/auction' route will have. rip future me)
+- If you're reading this, you have uncovered the scrolls from which it is written
+  - The auction page will have a "staging" area
+    - This area will contain a livestream from the business owner
+      - The business owner has hinted it could be Facebook live, or instagram, or tiktok?
+    - The business owner hinted to look toward eBay Live
+  - The auction page will have dynamic posts
+    - These posts can be created from registered users & is not hard-coded in HTML
+  - The auction page will have a profile area
+    - Will also serve as an admin control panel but dynamically rendered? 
+      - May need to lookup best practices & why/whynot it should be on a separate protected route or if dynamically rendered is fine?
+
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.9 — Users can logout
+📅 **Release Date:** August 15th, 2025
+
+## 📢 Developer's Notes - **Rendering dynamic data, Logout functionality, Redirecting protected routes**
+
+- I forgot how to render data from the database onto a web page
+  - The moment I saw the code to do it, I remembered how to do it
+    - Understanding > Memorization
+- The login/signup buttons are now dynamically rendered
+  - The website can determine whether you are a guest or a registered user and displays content accordingly
+    - If you are a registered user, you will see a different button
+- If you try to access the '/login' or '/signup' routes as registered user, you will be redirected
+  - You could always log out and create a new account, but the point is to protect the routes through redirection
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.8 — Users can login
+📅 **Release Date:** August 14th, 2025
+
+## 📢 Developer's Notes - **Login page enabled, Validate login credentials, Render auction page**
+
+- I used Passport.js and localStrategy for authentication. I thought I could use the code from a previous project. Nope
+  - Mongoose no longer accepts callbacks
+    - Code must use async/await 
+- The landing page on the '/auction' route now renders to both guest & authenticated users
+  - Interacting may require authentication, but looking should work for both
+    - Nothing to interact with atm, only text on a page
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.7 — Validation & Flash
 📅 **Release Date:** August 11th, 2025
 
