@@ -27,6 +27,16 @@ Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9b — I'm Back from the mist
+📅 **Release Date:** December 18th, 2025
+
+## 📢 Developer's Notes - **Frontend changes to static landing page**
+
+- I needed a break and this is fun again
+  - The real fun will be reading my code from half a year ago
+    - Muscle memory is very real & I'll be ok
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9a — Not quite a MVP yet - Plans for '/auction' page
 📅 **Release Date:** August 16th, 2025
 
