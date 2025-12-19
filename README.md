@@ -34,6 +34,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.014
+📅 **Release Date:** January 18th, 2026
+
+## 📢 Developer's Notes 
+
+- A favicon now renders on browser tabs
+- Refactored accessibility on the frontend 
+- Flash messages has icons & an animation
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.013
 📅 **Release Date:** January 17th, 2026
 
@@ -41,7 +51,19 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 - The landing page to update user personal information has been styled 
 - Our header partial now can determine which page a user is on and render buttons dynamically.
-  - "State" from React is kind of clicking, but I would need to take another peek at the docs
+  - Our header partial has been deleted & split into 3 different partials
+    - head, nav, footer
+- A favicon now renders on browser tabs
+- A lot of refactoring frontend 
+  - Semantic HTML already provides the meaning
+  - Visible text already describes the element
+- DO Use ARIA When:
+  - You need to label elements that don't have visible text (icon buttons)
+  - You need to provide additional context not visible to sighted users
+  - You're creating custom widgets (accordions, tabs, modals)
+  - You need to announce dynamic content changes (aria-live)
+  - Multiple landmarks of the same type need distinction
+-"No ARIA is better than bad ARIA" - First rule of ARIA
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.012
