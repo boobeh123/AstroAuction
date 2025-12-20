@@ -16,16 +16,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## Optimizations
 * Design/develop landing on `/auction` route
-  * Attach a user to listings
+  * ~~Attach a user to listings~~
   * Detailed listing page
-* Design/develop landing & functionality on `/profile` route
+* ~~Design/develop landing & functionality on `/profile` route~~
   * Administrator control panel
-  * Profile picture uploads
-* Add forms after `/signup` redirection
-* CRUD operations (post auctions/listings)
+  * ~~Profile picture uploads~~
+* ~~Add forms after `/signup` redirection~~
+* CRUD operations (~~post auctions/listings~~delete auctions)~~
 * ~~Auction schema~~
 * Nodemailer for contact form
-* Multer/cloudinary
+* ~~Multer/cloudinary~~
 * Unit tests
 * Integration tests
 * E2E tests
