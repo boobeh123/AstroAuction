@@ -53,17 +53,6 @@ AstroAuction web app - https://astroauction.up.railway.app/
 - Our header partial now can determine which page a user is on and render buttons dynamically.
   - Our header partial has been deleted & split into 3 different partials
     - head, nav, footer
-- A favicon now renders on browser tabs
-- A lot of refactoring frontend 
-  - Semantic HTML already provides the meaning
-  - Visible text already describes the element
-- DO Use ARIA When:
-  - You need to label elements that don't have visible text (icon buttons)
-  - You need to provide additional context not visible to sighted users
-  - You're creating custom widgets (accordions, tabs, modals)
-  - You need to announce dynamic content changes (aria-live)
-  - Multiple landmarks of the same type need distinction
--"No ARIA is better than bad ARIA" - First rule of ARIA
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.012
