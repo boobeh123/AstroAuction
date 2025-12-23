@@ -9,4 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (close) close.addEventListener('click', remove);
   });
+
+  const createListingBtn = document.querySelector('.rest').addEventListener('click', createListing);
+  
+  function createListing() {
+    console.log('hello world');
+    alert('hello world');
+  }    
+
 });
