@@ -1,9 +1,9 @@
 ## Description
-Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount. 
+A web page for Lost And Found & the companies web application, AstroAuction-- an in house community marketplace 
 
-Phase 2~3 of the Web application is deployed live on Railway and is under development: https://astroauction.up.railway.app/
+Lost And Found webpage - https://astroauction.netlify.app/
+AstroAuction web app - https://astroauction.up.railway.app/
 
-Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify.app/ (use Railway, this link was deployed for a static/landing page)
 
 ## Features
 * Static webpage deployed with Netlify
@@ -26,6 +26,22 @@ Phase 1 of the Website is deployed live on Netlify: https://astroauction.netlify
 ## Technologies
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
+## Version History
+# 🛠️ AstroAuction Patch 0.9c — C.R.-no .U.D yet
+📅 **Release Date:** December 22nd, 2025
+
+## 📢 Developer's Notes - **Backend functionality testing**
+
+- Registered users (& temporarily all users ) can create listings
+  - Defined the Auction Schema
+  - Added a form
+  - Add a POST request to the `/auction` route
+  - Add `postAuction` method
+- Data can now be displayed dynamically - listings created from registered users are visible to all users
+  - Update `getAuction` method to dynamically render data from the database
+  - Use EJS templating to iterate through the data
+
+---------------------------------------------------------------------------------------------------------------------------
 ## Version History
 # 🛠️ AstroAuction Patch 0.9b — I'm Back from the mist
 📅 **Release Date:** December 18th, 2025
