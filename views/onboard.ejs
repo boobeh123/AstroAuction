@@ -1,21 +1,31 @@
 <%- include('./partials/head.ejs') %>
-<%- include('./partials/navigation.ejs') %>
-<%- include('./partials/flash.ejs') %>
-<body id="temp">
-    <div id="onboarding-container">
-        <div id="onboarding-header">
-            <h1>Welcome!</h1>
-            <p>Let's set up your profile to get started</p>
-        </div>       
-        <form action="/onboard" method="POST">
-            <div id="form-group">
-                <label for="displayName">Display Name *</label>
-                <input type="text" id="displayName" name="displayName" placeholder="Enter your display name" required minlength="2" maxlength="25">
-                <div id="form-hint">This is how others will see you (2-25 characters)</div>
-            </div>
-            
-            <button type="submit" id="btn-submit">Complete Setup</button>
-        </form>
+<header class="header header-minimal">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <a href="/" aria-label="Astro Auction Home">
+                <i class="fas fa-gavel" aria-hidden="true"></i> 
+                <span>Astro Auction</span>
+            </a>
+        </div>
     </div>
-</body>
+</header>
+<%- include('./partials/flash.ejs') %>
+<main id="main-content" class="onboarding-page">
+    <div class="container">
+        <article class="onboarding-card">
+            <header class="onboarding-header">
+                <h1>Welcome to Astro Auction!</h1>
+                <p>Let's set up your profile to get started</p>
+            </header>            
+            <form action="/onboard" method="POST" class="onboarding-form">
+                <div class="form-group">
+                    <label for="displayName">Display Name <span class="required">*</span></label>
+                    <input type="text" id="displayName" name="displayName" placeholder="Enter your display name" aria-describedby="displayName-hint" required minlength="2" maxlength="25" autocomplete="username">
+                    <small id="displayName-hint" class="form-hint">This is how others will see you (2-25 characters)</small>
+                </div>                
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-check" aria-hidden="true"></i> Complete Setup</button>
+            </form>
+        </article>
+    </div>
+</main>
 <%- include('./partials/footer.ejs') %>
