@@ -1,4 +1,27 @@
 <h1>hello world</h1>
 <a href="/" aria-label="Go back">Go back</a>
-<button id="test" class="rest">Create</button>
+<button id="test" class="rest">test</button>
+
+<form action="/auction" method="POST">
+    <div>
+      <label for="title">Title</label>
+      <input id="title" type="text" name="title" placeholder="Enter item title" required>
+    </div>
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" placeholder="Enter item description" rows="4" required></textarea>
+    </div>
+    <div>
+      <label for="image">Image URL</label>
+      <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg">
+    </div>
+    <div>
+      <label for="video">Video URL</label>
+      <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4">
+    </div>
+    <div>
+      <button type="submit">Create Listing</button>
+    </div>
+  </form>
+
 <script src="/js/main.js"></script>
