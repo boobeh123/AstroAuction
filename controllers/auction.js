@@ -4,7 +4,10 @@ module.exports = {
 
     getAuction: async (req, res) => {
         try {
-            res.render('auction.ejs');
+            const listings = await Auction.find({}).sort({ createdAt: -1 }).lean();
+            res.render('auction.ejs', {
+                listings: listings
+            });
         } catch(err) {
             console.error(err)
             // redirect 404 todo
@@ -18,7 +21,7 @@ module.exports = {
                     title: req.body.title,
                     description: req.body.description,
                     image: req.body.image,
-                    video: req.body.video,
+                    video: req.body.video
                 })
                 console.log('Listing has been added!')
                 res.redirect('/auction')
