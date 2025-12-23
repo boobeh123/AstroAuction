@@ -16,3 +16,5 @@ const AuctionSchema = new mongoose.Schema({
 },
     { timestamps: true }
 )
+
+module.exports = mongoose.model('Auction', AuctionSchema)
