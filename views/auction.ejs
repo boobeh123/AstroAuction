@@ -2,7 +2,7 @@
 <a href="/" aria-label="Go back">Go back</a>
 <button id="test" class="rest">test</button>
 
-<form action="/auction" method="POST">
+<form action="/auction" method="POST" style="border: 1px solid gold">
     <div>
       <label for="title">Title</label>
       <input id="title" type="text" name="title" placeholder="Enter item title" required>
@@ -23,5 +23,28 @@
       <button type="submit">Create Listing</button>
     </div>
   </form>
+
+  <% if (listings && listings.length > 0) { %>
+    <div>
+      <h2>All Listings</h2>
+      <% listings.forEach(listing => { %>
+        <div style="border: 1px solid red; padding: 15px; margin: 10px 0;">
+          <h3><%= listing.title %></h3>
+          <p><%= listing.description %></p>
+          <% if (listing.image) { %>
+            <img src="<%= listing.image %>" alt="<%= listing.title %>" style="max-width: 300px;">
+          <% } %>
+          <% if (listing.video) { %>
+            <video controls style="max-width: 300px;">
+              <source src="<%= listing.video %>" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <p>No listings yet. Create your first listing below!</p>
+  <% } %>
 
 <script src="/js/main.js"></script>
