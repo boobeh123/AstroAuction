@@ -17,6 +17,12 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    image: { 
+      type: String
+    },
+    cloudinaryId: { 
+      type: String
     }
 },
     { timestamps: true }
