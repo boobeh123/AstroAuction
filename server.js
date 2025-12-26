@@ -11,6 +11,7 @@ const passport = require('passport');
 const mainRoutes = require('./routes/main');
 const flash = require('connect-flash');
 const auctionRoutes = require('./routes/auction');
+const profileRoutes = require('./routes/profile');
 
 require('dotenv').config({path: './config/.env'})
 
@@ -53,6 +54,7 @@ app.use(passport.session())
 
 app.use('/', mainRoutes);
 app.use('/auction', auctionRoutes);
+app.use('/profile', profileRoutes);
 
 app.listen(process.env.PORT, ()=>{
     console.log('Server is running, you better catch it!')
