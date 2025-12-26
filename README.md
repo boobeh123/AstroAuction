@@ -14,9 +14,12 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * Server with database and authentication
 
 ## Optimizations
-* Design/develop landing on '/auction' route
+* Design/develop landing on `/auction` route
+* Design/develop landing & functionality on `/profile` route
+  * Administrator control panel
+* Add forms after `/signup` redirection
 * CRUD operations (post auctions/listings)
-* Auction schema
+* ~~Auction schema~~
 * Nodemailer for contact form
 * Multer/cloudinary
 * Unit tests
@@ -27,6 +30,15 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9d — Backend until we're done
+📅 **Release Date:** December 26th, 2025
+
+## 📢 Developer's Notes - **User profiles**
+
+- [wya](watdoing.gif)
+- Render landing page for user profiles & everything behind it
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9c — C.R.-no .U.D yet
 📅 **Release Date:** December 22nd, 2025
 
@@ -42,7 +54,6 @@ AstroAuction web app - https://astroauction.up.railway.app/
   - Use EJS templating to iterate through the data
 
 ---------------------------------------------------------------------------------------------------------------------------
-## Version History
 # 🛠️ AstroAuction Patch 0.9b — I'm Back from the mist
 📅 **Release Date:** December 18th, 2025
 
