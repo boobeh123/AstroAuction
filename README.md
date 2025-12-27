@@ -34,9 +34,10 @@ AstroAuction web app - https://astroauction.up.railway.app/
 # 🛠️ AstroAuction Patch 0.9d — Backend until we're done
 📅 **Release Date:** December 26th, 2025
 
-## 📢 Developer's Notes - **User profiles**
+## 📢 Developer's Notes - **Personal update, User profiles, styling `/auction` route**
 ![wya](watdoing.gif)
 - Render landing page for user profiles & everything behind it
+- Style landing page on `/auction`
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9c — C.R.-no .U.D yet
