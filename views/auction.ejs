@@ -1,51 +1,95 @@
-<a href="/profile" class="btn btn-secondary" aria-label="Edit Profile">Edit Profile</a>
-
-<h1>hello world</h1>
-<a href="/" aria-label="Go back">Go back</a>
-
-<form action="/auction" method="POST" style="border: 1px solid gold">
-    <div>
-      <label for="title">Title</label>
-      <input id="title" type="text" name="title" placeholder="Enter item title" required>
-    </div>
-    <div>
-      <label for="description">Description</label>
-      <textarea id="description" name="description" placeholder="Enter item description" rows="4" required></textarea>
-    </div>
-    <div>
-      <label for="image">Image URL</label>
-      <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg">
-    </div>
-    <div>
-      <label for="video">Video URL</label>
-      <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4">
-    </div>
-    <div>
-      <button type="submit">Create Listing</button>
-    </div>
-  </form>
-
-  <% if (listings && listings.length > 0) { %>
-    <div>
-      <h2>All Listings</h2>
-      <% listings.forEach(listing => { %>
-        <div style="border: 1px solid red; padding: 15px; margin: 10px 0;">
-          <h3><%= listing.title %></h3>
-          <p><%= listing.description %></p>
-          <% if (listing.image) { %>
-            <img src="<%= listing.image %>" alt="<%= listing.title %>" style="max-width: 300px;">
-          <% } %>
-          <% if (listing.video) { %>
-            <video controls style="max-width: 300px;">
-              <source src="<%= listing.video %>" type="video/mp4">
-              Your browser does not support the video tag.
-            </video>
-          <% } %>
+<%- include('./partials/header.ejs') %>
+<%- include('./partials/flash.ejs') %>
+<main class="auction-page">
+    <div class="container">
+    <section class="auction-shell" aria-label="Auction listings">
+      <div class="auction-topbar">
+        <div class="auction-topbar__left">
+          <a href="/" class="btn btn-secondary" aria-label="Go back">Back</a>
         </div>
-      <% }) %>
-    </div>
-  <% } else { %>
-    <p>No listings yet. Create your first listing below!</p>
-  <% } %>
+        <div class="auction-topbar__right">
+          <a href="/profile" class="btn btn-primary" aria-label="Edit Profile">Profile</a>
+        </div>
+      </div>
 
+      <header class="auction-hero">
+        <h1 class="auction-title">Auction Listings</h1>
+        <p class="auction-subtitle">Create a listing and browse the latest items.</p>
+      </header>
+
+      <div class="auction-grid">
+        <section class="auction-card auction-card--form" aria-label="Create listing">
+          <h2 class="auction-card__title">Create Listing</h2>
+          <form action="/auction" method="POST" class="auction-form">
+            <div class="auction-form__group">
+              <label for="title">Title</label>
+              <input id="title" type="text" name="title" placeholder="Enter item title" required>
+            </div>
+
+            <div class="auction-form__group">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" placeholder="Enter item description" rows="4" required></textarea>
+            </div>
+
+            <div class="auction-form__group">
+              <label for="image">Image URL (optional)</label>
+              <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg" inputmode="url">
+            </div>
+
+            <div class="auction-form__group">
+              <label for="video">Video URL (optional)</label>
+              <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4" inputmode="url">
+            </div>
+
+            <div class="auction-form__actions">
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="auction-card auction-card--list" aria-label="All listings">
+          <div class="auction-list__header">
+            <h2 class="auction-card__title">Latest Listings</h2>
+            <p class="auction-list__meta"><%= (listings && listings.length) ? listings.length : 0 %> total</p>
+          </div>
+
+          <% if (listings && listings.length > 0) { %>
+            <div class="auction-listings">
+              <% listings.forEach(listing => { %>
+                <article class="listing-card" aria-label="Listing">
+                  <div class="listing-card__media">
+                    <% if (listing.image) { %>
+                      <img class="listing-card__image" src="<%= listing.image %>" alt="<%= listing.title %>">
+                    <% } else { %>
+                      <div class="listing-card__placeholder" aria-hidden="true"></div>
+                    <% } %>
+                  </div>
+
+                  <div class="listing-card__body">
+                    <h3 class="listing-card__title"><%= listing.title %></h3>
+                    <p class="listing-card__description"><%= listing.description %></p>
+
+                    <% if (listing.video) { %>
+                      <div class="listing-card__video">
+                        <video controls preload="metadata">
+                          <source src="<%= listing.video %>" type="video/mp4">
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    <% } %>
+                  </div>
+                </article>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <div class="auction-empty">
+              <h3 class="auction-empty__title">No listings yet</h3>
+              <p class="auction-empty__text">Create your first listing using the form.</p>
+            </div>
+          <% } %>
+        </section>
+      </div>
+    </section>
+  </div>
+</main>
 <script src="/js/main.js"></script>
