@@ -2,6 +2,7 @@
 A web page for Lost And Found & the companies web application, AstroAuction-- an in house community marketplace 
 
 Lost And Found webpage - https://astroauction.netlify.app/
+
 AstroAuction web app - https://astroauction.up.railway.app/
 
 
@@ -34,8 +35,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 📅 **Release Date:** December 26th, 2025
 
 ## 📢 Developer's Notes - **User profiles**
-
-- [wya](watdoing.gif)
+![wya](watdoing.gif)
 - Render landing page for user profiles & everything behind it
 
 ---------------------------------------------------------------------------------------------------------------------------
