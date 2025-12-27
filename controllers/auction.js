@@ -1,4 +1,5 @@
 const Auction = require('../models/Auction')
+const User = require('../models/User')
 
 module.exports = {
 
@@ -6,7 +7,8 @@ module.exports = {
         try {
             const listings = await Auction.find({}).sort({ createdAt: -1 }).lean();
             res.render('auction.ejs', {
-                listings: listings
+                listings: listings,
+                user: req.user
             });
         } catch(err) {
             console.error(err)
