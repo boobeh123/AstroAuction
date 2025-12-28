@@ -71,6 +71,7 @@
               <div class="nav-actions" aria-label="Account">
                 <% if (typeof user !== 'undefined' && user) { %>
                     <span class="user-email" aria-label="Logged in as"><%= user.email %></span>
+                    <a href="/profile" class="btn btn-primary">Edit profile</a>
                     <a href="/logout" class="btn btn-secondary" aria-label="Log out">Log out</a>
                 <% } else { %>
                   <a href="/login" class="btn btn-secondary" aria-label="Log in">Log in</a>
