@@ -529,6 +529,10 @@ p {
   /* border: 2px solid red; */
 }
 
+.auction-form-group small {
+  color: #999;
+}
+
 .auction-form label {
   display: block;
   margin-bottom: 0.35rem;
