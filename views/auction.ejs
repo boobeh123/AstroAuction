@@ -6,38 +6,35 @@
         <h1 class="auction-title">Auction Listings</h1>
         <p class="auction-subtitle">Create a listing and browse the latest items.</p>
       </header>
-
-      <!-- <div class="auction-grid">
-        <section class="auction-card" aria-labelledby="Create listing">
+      <div class="auction-grid">
+        <section class="auction-card">
           <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-          <form action="/auction" method="POST" class="auction-form">
+          <form action="/auction" method="POST" class="auction-form" aria-labelledby="Create listing title">
             <div class="auction-form-group">
               <label for="title">Title</label>
-              <input id="title" type="text" name="title" placeholder="Enter item title" required>
+              <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" aria-invalid="false" autocomplete="off">
             </div>
-
             <div class="auction-form-group">
               <label for="description">Description</label>
               <textarea id="description" name="description" placeholder="Enter item description" rows="4" required></textarea>
             </div>
-
             <div class="auction-form-group">
-              <label for="image">Image URL (optional)</label>
-              <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg" inputmode="url">
+              <label for="image">Image URL</label>
+              <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg" aria-describedby="imageHelp">
+              <small id="imageHelp">Optional - Add a URL to an image of your sale</small>
             </div>
-
             <div class="auction-form-group">
-              <label for="video">Video URL (optional)</label>
-              <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4" inputmode="url">
+              <label for="video">Video URL</label>
+              <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4" aria-describedby="videoHelp">
+              <small id="videoHelp">Optional - Add a URL to a video of your sale</small>
             </div>
-
             <div class="auction-form-actions">
               <button type="submit" class="btn btn-primary">Create</button>
             </div>
           </form>
         </section>
 
-        <section class="auction-card auction-card--list" aria-labelledby="All listings">
+        <!-- <section class="auction-card auction-card--list" aria-labelledby="All listings">
           <div class="auction-list-header">
             <h2 class="auction-card-title">Latest Listings</h2>
             <p class="auction-list-meta"><%= (listings && listings.length) ? listings.length : 0 %> total</p>
@@ -78,8 +75,8 @@
               <p class="auction-empty-text">Create your first listing using the form.</p>
             </div>
           <% } %>
-        </section>
-      </div> -->
+        </section> -->
+      </div>
   </div>
 </main>
 <script src="/js/main.js"></script>
