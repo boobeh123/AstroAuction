@@ -31,13 +31,37 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.005 — Dissect Da Slop++
+📅 **Release Date:** December 27th, 2025
+
+## 📢 Developer's Notes - **Optimize `/auction` page, versioning numbers**
+
+- Move `Profile` button into the header partial
+  - Visible to logged in users
+- Cleanup HTML within `auction.ejs`
+  - All of it was slop
+    - Should be slightly more digestable now
+- Rename several rules to use kebab case
+- Instead of `0.9d` I will use `0.9.005` and yes I scrolled all the way down to determine which patch/update contained a change worth a version number
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9d — Backend until we're done
 📅 **Release Date:** December 26th, 2025
 
 ## 📢 Developer's Notes - **Personal update, User profiles, styling `/auction` route**
+
 ![wya](watdoing.gif)
 - Render landing page for user profiles & everything behind it
+  - Add `/profile` route 
+  - Add `profileController` methods 
+    - Add GET Request 
+  - Add two properties to `User` schema
+    - This will be used to store user avatars/profile pictures
+  - Render landing page on `/profile`
+- Render dynamic data on `/auction` route
+  - Logged in users will see their email displayed within the header as the default
+    - This can be changed to render name or username instead of email
 - Style landing page on `/auction`
+  - Add header partial to landing page on `/auction`
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9c — C.R.-no .U.D yet
