@@ -1,22 +1,23 @@
 <%- include('./partials/header.ejs') %>
 <%- include('./partials/flash.ejs') %>
 <main class="auction-page">
+  <a href="#latestListingsTitle" class="skip-link">Skip to listings</a>
     <div class="container auction-page auction-container">
       <header class="auction-hero"> 
         <h1 class="auction-title">Auction Listings</h1>
         <p class="auction-subtitle">Create a listing and browse the latest items.</p>
       </header>
       <div class="auction-grid">
-        <section class="auction-card">
+        <section class="auction-card" aria-labelledby="createListingTitle">
           <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-          <form action="/auction" method="POST" class="auction-form" aria-labelledby="Create listing title">
+          <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle">
             <div class="auction-form-group">
               <label for="title">Title</label>
               <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" aria-invalid="false" autocomplete="off">
             </div>
             <div class="auction-form-group">
               <label for="description">Description</label>
-              <textarea id="description" name="description" placeholder="Enter item description" rows="4" required></textarea>
+              <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true" aria-invalid="false"></textarea>
             </div>
             <div class="auction-form-group">
               <label for="image">Image URL</label>
@@ -33,34 +34,34 @@
             </div>
           </form>
         </section>
-
-        <!-- <section class="auction-card auction-card--list" aria-labelledby="All listings">
+        <section class="auction-card auction-card--list" aria-labelledby="latestListingsTitle">
           <div class="auction-list-header">
-            <h2 class="auction-card-title">Latest Listings</h2>
-            <p class="auction-list-meta"><%= (listings && listings.length) ? listings.length : 0 %> total</p>
+            <h2 class="auction-card-title" id="latestListingsTitle">Latest Listings</h2>
+            <p class="auction-list-meta">
+              <span aria-live="polite" aria-atomic="true">
+                <%= (listings && listings.length) ? listings.length : 0 %> total
+              </span>
+            </p>
           </div>
-
           <% if (listings && listings.length > 0) { %>
             <ul class="auction-listings">
               <% listings.forEach(listing => { %>
-                <li class="listing-card">
-                  <h3 aria-labelledby="Listing Title"><%= listing.title %></h3>
+                <li class="listing-card" id="listing-<%= listing.id %>">
                   <div class="listing-card-media">
                     <% if (listing.image) { %>
-                      <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>">
+                      <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy">
                     <% } else { %>
-                      <div class="listing-card-placeholder" aria-hidden="true"></div>
+                      <div class="listing-card-placeholder" aria-hidden="true" role="presentation"></div>
                     <% } %>
                   </div>
-
                   <div class="listing-card-body">
                     <h3 class="listing-card-title"><%= listing.title %></h3>
                     <p class="listing-card-description"><%= listing.description %></p>
-
                     <% if (listing.video) { %>
                       <div class="listing-card-video">
-                        <video controls preload="metadata">
+                        <video controls preload="metadata" aria-label="Video for <%= listing.title %>">
                           <source src="<%= listing.video %>" type="video/mp4">
+                          <track kind="captions" src="path-to-captions.vtt" srclang="en" label="English">
                           Your browser does not support the video tag.
                         </video>
                       </div>
@@ -68,14 +69,14 @@
                   </div>
                 </li>
               <% }) %>
-              </ul>
+            </ul>
           <% } else { %>
-            <div class="auction-empty">
+            <div class="auction-empty" role="status" aria-live="polite">
               <h3 class="auction-empty-title">No listings yet</h3>
               <p class="auction-empty-text">Create your first listing using the form.</p>
             </div>
           <% } %>
-        </section> -->
+        </section>
       </div>
   </div>
 </main>
