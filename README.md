@@ -13,16 +13,23 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * SEO Meta tags
 * WebP image format
 * Server with database and authentication
+* CRUD opeartions
+* User profiles & profile pictures
 
 ## Optimizations
 * Design/develop landing on `/auction` route
   * ~~Attach a user to listings~~
   * Detailed listing page
+  * A scrolling red banner which is displayed to all users
+    * May need to research how
+  * Embed a video player which represents a livestream or an anchor href to the livestream?
+    * May need to research if allowed/TOS
 * ~~Design/develop landing & functionality on `/profile` route~~
   * Administrator control panel
+    * To moderate the listings/images from users
   * ~~Profile picture uploads~~
 * ~~Add forms after `/signup` redirection~~
-* CRUD operations (~~post auctions/listings~~delete auctions)~~
+* ~~CRUD operations (post auctions/listings/delete auctions)~~
 * ~~Auction schema~~
 * Nodemailer for contact form
 * ~~Multer/cloudinary~~
