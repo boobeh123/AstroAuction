@@ -41,6 +41,17 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.018
+📅 **Release Date:** January 28th, 2026
+
+## 📢 Developer's Notes 
+
+- Updated the static web page for The Lost And Found LLC (company web page. Astro Auction is the web app for L&F LLC. The web page & web app are for the same business owner)
+  - Optimized/updated several tags in the `<head>` & `<body>`
+  - Converted jpg/pngs to webp (from 202 KB to 47.2 KB, wow fast load times)
+  - Navigational menu now functional & displays on mobile viewports
+
+  ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.017
 📅 **Release Date:** January 27th, 2026
 
