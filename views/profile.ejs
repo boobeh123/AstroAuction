@@ -1,2 +1,67 @@
+    <main class="profile-main" aria-labelledby="profile-heading">
+        <div class="container">
+            <div class="card-panel z-depth-2">
+                <h1 class="center-align flow-text" id="profile-heading">
+                    <a href="/todos" aria-label="Back to dashboard"><i class="fas fa-chevron-left"></i></a>
+                    Profile Information
+                </h1>
+                <div class="divider"></div>
+                <div class="center-align margin">
+                    <form id="profile-pic-form" class="margin" action="/profile" method="POST" enctype="multipart/form-data">
+                        <div class="file-field input-field">
+                            <div class="btn blue-grey waves-effect waves-light hoverable">
+                                <span><i class="material-icons left">cloud_upload</i>Browse</span>
+                                <input id="profile-file" type="file" name="file" required>
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload a new profile picture">
+                            </div>
+                        </div>
+                        <button id="upload-btn" type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Update Picture">
+                            <span id="upload-btn-text">Submit</span>
+                            <!-- <div id="upload-preloader" class="preloader-wrapper small active">
+                                <div class="spinner-layer spinner-blue-only">
+                                    <div class="circle-clipper left"><div class="circle"></div></div>
+                                    <div class="gap-patch"><div class="circle"></div></div>
+                                    <div class="circle-clipper right"><div class="circle"></div></div>
+                                </div>
+                            </div> -->
+                        </button>
+                    </form>
+                </div>
+                <section class="profile-info-section center-align margin" aria-labelledby="profile-info-heading">
+                    <h2 id="profile-info-heading" class="sr-only">Profile Details</h2>
+                    <div class="profile-info-card" role="region" aria-labelledby="profile-name-label">
+                        <dl>
+                            <dt id="profile-name-label" class="bold">Name:</dt>
+                            
+                        </dl>
+                    </div>
+                    <div class="profile-info-card" role="region" aria-labelledby="profile-email-label">
+                        <dl>
+                            <dt id="profile-email-label" class="bold">Email:</dt>
+
+                        </dl>
+                    </div>
+                    <div class="profile-info-card" role="region" aria-labelledby="profile-role-label">
+                        <dl>
+                            <dt id="profile-role-label" class="bold">Account Type:</dt>
+                        </dl>
+                    </div>
+                    <form action="#" method="GET">
+                        <button type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Edit Profile">
+                            <i class="fas fa-edit left"></i> Edit Profile
+                        </button>
+                    </form>
+                    <form action="#" method="POST">
+                        <button type="submit" class="btn red waves-effect waves-light hoverable" aria-label="Delete Profile">
+                            <i class="fas fa-trash left"></i> Delete Profile
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
 <h1>Hello world</h1>
-<a href="/" aria-label="Go back">Go back</a>
+<a href="/" aria-label="Go back">Go back</a>'
