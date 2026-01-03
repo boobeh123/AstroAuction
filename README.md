@@ -16,8 +16,11 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## Optimizations
 * Design/develop landing on `/auction` route
+  * Attach a user to listings
+  * Detailed listing page
 * Design/develop landing & functionality on `/profile` route
   * Administrator control panel
+  * Profile picture uploads
 * Add forms after `/signup` redirection
 * CRUD operations (post auctions/listings)
 * ~~Auction schema~~
@@ -31,6 +34,18 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.006 — PFP
+📅 **Release Date:** January 2nd, 2026
+
+## 📢 Developer's Notes - **Backend functionality on `/profile`**
+
+- File uploads (image only) are now supported
+  - Uploading an image will be stored into cloudinary
+    - This applies to both your profile picture and images from your listings/auction/items
+  - Currently images are uploaded, but not rendered on the (View) profile page
+    - Will be added
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.005 — Dissect Da Slop++
 📅 **Release Date:** December 27th, 2025
 
@@ -43,6 +58,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
     - Should be slightly more digestable now
 - Rename several rules to use kebab case
 - Instead of `0.9d` I will use `0.9.005` and yes I scrolled all the way down to determine which patch/update contained a change worth a version number
+
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9d — Backend until we're done
 📅 **Release Date:** December 26th, 2025
