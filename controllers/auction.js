@@ -12,7 +12,8 @@ module.exports = {
             });
         } catch(err) {
             console.error(err)
-            // redirect 404 todo
+            // redirect 404 todo or could be status 500?
+            res.render('404.ejs');
         }
     },
 
@@ -29,7 +30,8 @@ module.exports = {
                 res.redirect('/auction')
             } catch(err) {
                 console.log(err)
-                // redirect 404 todo
+                // redirect 404 todo or could be status 500?
+                res.render('404.ejs');
             }
         },
     
