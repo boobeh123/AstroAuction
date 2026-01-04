@@ -1,5 +1,5 @@
 const passport = require('passport')
-const { validationResult } = require('express-validator');
+const validator = require('validator')
 const User = require('../models/User')
 
 module.exports = {
@@ -24,51 +24,69 @@ module.exports = {
 
     postSignup: async (req, res, next) => {
 
-        try {
-            const errors = validationResult(req);
-            const { email, password, confirmPassword, agreeToTerms } = req.body;
-            const existingUser = await User.findOne({ email: email }).lean();
+      const validationErrors = []
+      if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
+      if (!validator.isLength(req.body.password, { min: 3 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
+      if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' })
+    
+      if (validationErrors.length) {
+        req.flash('errors', validationErrors)
+        return res.redirect('../signup')
+      }
+      req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
 
-            if (!errors.isEmpty()) {
-                req.flash('errors', errors.array().map(e => e.msg));
-                return res.status(400).redirect('/signup');
-            }
-            
-            if (existingUser) {
-                req.flash('errors', 'Account with that email already exists.');
-                return res.status(400).redirect('/signup');
-            }
-
-              const user = new User({
-                email,
-                password,
-                agreeToTerms,
-              })
-              req.flash('success', 'Account created. Please log in.');
-              await user.save();
-              return res.redirect('/login');
-
-        } catch (err) {
-            req.flash('errors', 'Unexpected error. Please try again.');
-            return res.status(500).redirect('/signup');
+      try {
+        const existingUser = await User.findOne({ email: req.body.email })
+        if (existingUser) {
+          req.flash('errors', {msg: "Account with that email address or username already exists."})
+          return res.redirect('/signup')
         }
+
+        const user = new User({
+          role: 'User',
+          email: req.body.email,
+          password: req.body.password,
+          agreeToTerms: req.body.agreeToTerms,
+          firstName: '',
+          lastName: '',
+          image: '',
+          cloudinaryId: '',
+        })
+        await user.save()
+        req.login(user, function(err) {
+          if (err) { return next(err); }
+          res.redirect('/');
+        });
+      } catch(err) {
+        return next(err)
+      }
     },
 
     postLogin: async (req, res, next) => {
-
-        passport.authenticate('local', (err, user, info) => {
-            if (err) { return next(err) }
-            if (!user) {
-              req.flash('errors', info.message)
-              return res.redirect('/login')
-            }
-            req.logIn(user, (err) => {
-              if (err) { return next(err) }
-              req.flash('success', 'Success! You are logged in.')
-              res.redirect(req.session.returnTo || '/')
-            })
-          })(req, res, next)
-        },
+      const validationErrors = []
+      if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
+      if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' })
+  
+      if (validationErrors.length) {
+        req.flash('errors', info.message)
+        return res.redirect('/login')
+      }
+      
+      req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
+  
+      passport.authenticate('local', (err, user, info) => {
+        if (err) { return next(err) }
+        if (!user) {
+          req.flash('errors', info.message)
+          return res.redirect('/login')
+        }
+        req.logIn(user, (err) => {
+          if (err) { return next(err) }
+          req.flash('success', 'Success! You are logged in.')
+          res.redirect(req.session.returnTo || '/auction')
+      })
+    })(req, res, next)
+  },
 
       getLogout: (req, res) => {
         req.logout((err) => {
