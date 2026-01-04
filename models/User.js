@@ -23,6 +23,16 @@ const UserSchema = new mongoose.Schema({
     },
     cloudinaryId: { 
       type: String
+    },
+    firstName: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    lastName: {
+      type: String,
+      required: false,
+      default: ''
     }
 },
     { timestamps: true }
