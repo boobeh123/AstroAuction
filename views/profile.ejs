@@ -4,7 +4,9 @@
                 <h1 class="center-align flow-text" id="profile-heading">
                     <a href="/todos" aria-label="Back to dashboard"><i class="fas fa-chevron-left"></i></a>
                     Profile Information
+
                 </h1>
+                <img src="<%= user.image === '' ? 'https://placeholder.pics/svg/100x100' : user.image %>" class="responsive-img circle z-depth-1" alt="User profile image" style="width: 120px; height: 120px;">
                 <div class="divider"></div>
                 <div class="center-align margin">
                     <form id="profile-pic-form" class="margin" action="/profile" method="POST" enctype="multipart/form-data">
@@ -34,21 +36,16 @@
                     <div class="profile-info-card" role="region" aria-labelledby="profile-name-label">
                         <dl>
                             <dt id="profile-name-label" class="bold">Name:</dt>
-                            
+                            <dd><%= user.firstName %></dd>
                         </dl>
                     </div>
                     <div class="profile-info-card" role="region" aria-labelledby="profile-email-label">
                         <dl>
                             <dt id="profile-email-label" class="bold">Email:</dt>
-
+                            <dd><%= user.email || '' %></dd>
                         </dl>
                     </div>
-                    <div class="profile-info-card" role="region" aria-labelledby="profile-role-label">
-                        <dl>
-                            <dt id="profile-role-label" class="bold">Account Type:</dt>
-                        </dl>
-                    </div>
-                    <form action="#" method="GET">
+                    <form action="/profile/edit" method="GET">
                         <button type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Edit Profile">
                             <i class="fas fa-edit left"></i> Edit Profile
                         </button>
