@@ -1,0 +1,33 @@
+<main aria-labelledby="edit-profile-heading">
+        <div>
+            <section aria-labelledby="edit-profile-heading">
+                <h1 id="edit-profile-heading"><a href="/profile" aria-label="Back to profile"><i class="fas fa-chevron-left"></i></a>Edit your profile</h1>
+                <div>
+                    <% if (user.name === '') { %>
+                    <form action="/profile/edit/<%=user._id%>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading">
+                        <label for="editprofile-name">Name</label>
+                        <input id="editprofile-name" type="text" placeholder="Name" name="userName">
+                        <label for="editprofile-email">Email</label>
+                        <input id="editprofile-email" type="text" placeholder="Email" name="userEmail" value="<%=user.email%>">
+                        <button type="submit" title="Update Profile">Submit</button>
+                    </form>
+                    <% } else { %>
+                    <form action="/profile/edit/<%=user._id%>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading">
+                        <label for="editprofile-name">Name</label>
+                        <input id="editprofile-name" type="text" placeholder="Name" name="userName" value="<%=user.name%>">
+                        <label for="editprofile-email">Email</label>
+                        <input id="editprofile-email" type="text" placeholder="Email" name="userEmail" value="<%=user.email%>">
+                        <button type="submit" title="Update Profile">Submit</button>
+                    </form>
+                    <% } %>
+                </div>
+                <div>
+                    <% if (user.image === '') { %>
+                    <img src="https://placeholder.pics/svg/100x100" alt="Profile placeholder image" />
+                    <% } else { %>
+                    <img src="<%=user.image%>" alt="User profile image" />
+                    <% } %>
+                </div>
+            </section>
+        </div>
+    </main>
