@@ -34,6 +34,21 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.007
+📅 **Release Date:** January 2nd, 2026
+
+## 📢 Developer's Notes - **Render images dynamically, Updating personal info, Bug fix with signup/auth**
+
+- AstroAuction Authentication now uses `Passport.js` Local strategy to sign up and log in.
+  - Previous auth was generated slop. I'm sorry for being so lazy.
+    - I referenced `Passport.js` documentation to implement authentication properly with this update.
+  - `Passport.js ensureAuth` is being used to protect routes. 
+- The `/profile` route now displays your profile picture if one is uploaded, otherwise a placeholder image is shown
+  - Data is rendered if you update your information
+- The `/profile/edit` route now allows you to update your personal information
+  - This personal information will be displayed on listing cards within the `/auction` route
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.006 — PFP
 📅 **Release Date:** January 2nd, 2026
 
@@ -41,7 +56,8 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 - File uploads (image only) are now supported
   - Uploading an image will be stored into cloudinary
-    - This applies to both your profile picture and images from your listings/auction/items
+    - This applies to your profile picture 
+    - This is also how images from your listings/auction/items will be stored
   - Currently images are uploaded, but not rendered on the (View) profile page
     - Will be added
 
