@@ -34,6 +34,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.015
+📅 **Release Date:** January 19th, 2026
+
+## 📢 Developer's Notes - Delete profile
+
+- Registered users can now delete their profile
+  - The listings the user posts do not delete when the profile is deleted
+    - You will have to delete your listings then your profile if you want to ensure data is lost
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.014
 📅 **Release Date:** January 18th, 2026
 
