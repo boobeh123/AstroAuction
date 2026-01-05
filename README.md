@@ -34,6 +34,20 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.017
+📅 **Release Date:** January 27th, 2026
+
+## 📢 Developer's Notes 
+
+- Bug: Guest-users who attempted to create a listing received error 500
+  - Fix: Dynamically render two forms, which determines if you are a guest or user
+- Removed a few font awesome icons from buttons
+- Add terms of use text content
+- Styling to mobile/tablet viewports
+- I used the `:has()` CSS pseudo-class to conditionally style elements. I can apply styles to an element based on whether it contains a specific child element. For example:
+  - `body:has(.auction-page)` means to 'apply styles to the `<body>` tag only when it contains an element with the class of `auction-page`.'
+
+  ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.016
 📅 **Release Date:** January 26th, 2026
 
