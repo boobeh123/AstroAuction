@@ -19,15 +19,38 @@ module.exports = {
     uploadProfilePicture: async (req, res) => {
 
         try {
+            const currentUser = await User.findById(req.user.id).lean()
+            if (currentUser.image === '') {
                 const result = await cloudinary.uploader.upload(req.file.path, {
                     use_filename: true,
                     unique_filename: false,
                     overwrite: true,
+                    width: 100, 
+                    height: 100, 
+                    gravity: "faces", 
+                    crop: "thumb"
                 });
                 await User.findByIdAndUpdate(req.user.id, {
                     image: result.secure_url,
                     cloudinaryId: result.public_id
                 })
+            }
+             else {
+                await cloudinary.uploader.destroy(req.user.cloudinaryId)
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    use_filename: true,
+                    unique_filename: false,
+                    overwrite: true,
+                    width: 100, 
+                    height: 100, 
+                    gravity: "faces", 
+                    crop: "thumb"
+                });
+                await User.findByIdAndUpdate(req.user.id, {
+                    image: result.secure_url,
+                    cloudinaryId: result.public_id
+            })
+        }
             console.log('Profile picture added')
             res.redirect('/profile')
         } catch(err) {
