@@ -34,10 +34,10 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
-# 🛠️ AstroAuction Patch 0.9.007
+# 🛠️ AstroAuction Patch 0.9.008
 📅 **Release Date:** January 6th, 2026
 
-## 📢 Developer's Notes - ****
+## 📢 Developer's Notes
 
 - Update `getAuction` & `postAuction` methods
   - Our header partial now displays logged in users on `/auction` route
