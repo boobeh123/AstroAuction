@@ -5,10 +5,11 @@ module.exports = {
 
     getAuction: async (req, res) => {
         try {
-            const listings = await Auction.find({}).sort({ createdAt: -1 }).lean();
+            const listings = await Auction.find({}).sort({ createdAt: -1 }).populate('user', 'image firstName').lean();
             res.render('auction.ejs', {
                 listings: listings,
-                user: req.user
+                user: req.user,
+
             });
         } catch(err) {
             console.error(err)
@@ -24,7 +25,8 @@ module.exports = {
                     title: req.body.title,
                     description: req.body.description,
                     image: req.body.image,
-                    video: req.body.video
+                    video: req.body.video,
+                    user: req.user.id
                 })
                 console.log('Listing has been added!')
                 res.redirect('/auction')
