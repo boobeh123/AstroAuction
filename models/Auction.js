@@ -12,6 +12,11 @@ const AuctionSchema = new mongoose.Schema({
     },
     video: {
         type: String,
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     }
 },
     { timestamps: true }
