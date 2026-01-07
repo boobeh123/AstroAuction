@@ -35,6 +35,29 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## Version History
 # 🛠️ AstroAuction Patch 0.9.007
+📅 **Release Date:** January 6th, 2026
+
+## 📢 Developer's Notes - ****
+
+- Update `getAuction` & `postAuction` methods
+  - Our header partial now displays logged in users on `/auction` route
+  - User profile pictures and first name now displays on `/auction` route
+  - Creating a listing now stores user id into the database
+- Update `uploadProfilePicture` method
+  - If the user already has a picture uploaded, 
+    - The previous picture is deleted & the new picture is stored and displayed
+    - I do not want to keep your data and the code reflects this
+- Update to our Auction Schema
+  - My first time structuring relational data with MongoDB
+    - The `populate()` method used in our `postAuction` method explicitly passes in user images & first name
+      - Sensitive fields like email, password, etc. are not included and the code reflects this
+- Render referenced data & remove video player from `/auction` route
+  - User profile picture & first name now show on listing
+  - Video player will return along with detailed listing info
+    - A modal or new route could be used here
+
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.9.007
 📅 **Release Date:** January 2nd, 2026
 
 ## 📢 Developer's Notes - **Render images dynamically, Updating personal info, Bug fix with signup/auth**
