@@ -34,6 +34,15 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.009
+📅 **Release Date:** January 7th, 2026
+
+## 📢 Developer's Notes
+
+- Users who create listings can delete their own listing
+- Unregistered users are now defined as `null` vs `undefined`
+  - Explicitly passing this value allows EJS templating & conditionals to have less errors with rendering
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.008
 📅 **Release Date:** January 6th, 2026
 
