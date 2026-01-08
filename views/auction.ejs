@@ -61,6 +61,11 @@
                       <img src="<%= listing.user.image %>" alt="<%= listing.user.firstName %>'s profile photo" loading="lazy">
                       <p>Posted by: <%= listing.user.firstName %></p>
                   <% } %>
+                  <% if (user && listing.user && listing.user._id.toString() === user.id) { %>
+                    <form action="/auction/deleteListing/<%= listing._id %>?_method=DELETE" method="POST"> 
+                        <button type="submit">Delete</button>
+                    </form>
+                <% } %>
                   </div>
                 </li>
               <% }) %>
