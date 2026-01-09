@@ -13,8 +13,7 @@ module.exports = {
             });
         } catch(err) {
             console.error(err)
-            // redirect 404 todo or could be status 500?
-            res.render('404.ejs');
+            res.status(500).render('500.ejs');
         }
     },
 
