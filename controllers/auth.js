@@ -4,22 +4,33 @@ const User = require('../models/User')
 
 module.exports = {
 
-    getLogin: (req, res) => {
+    getLogin: async (req, res) => {
 
-      if (req.user) {
-        return res.redirect('/auction')
-      } else {
-        res.render('login.ejs');
+      try {
+        if (req.user) {
+          return res.redirect('/auction')
+        } else {
+          res.render('login.ejs');
+        }
+    } catch(err) {
+        console.error(err)
+        res.status(500).render('500.ejs');
       }
     },
 
-    getSignup: (req, res) => {
+    getSignup: async (req, res) => {
 
+      try {
         if (req.user) {
           return res.redirect('/auction')
         } else {
           res.render('signup.ejs');
         }
+    } catch(err) {
+        console.error(err)
+        res.status(500).render('500.ejs');
+      }
+
     },
 
     postSignup: async (req, res, next) => {
@@ -88,25 +99,33 @@ module.exports = {
     })(req, res, next)
   },
 
-      getLogout: (req, res) => {
-        req.logout((err) => {
-            if (err) {
-                console.error('Logout error:', err);
-                req.flash('errors', 'Error during logout');
-                return res.redirect('/');
-            }
-            
-            req.session.destroy((err) => {
-                if (err) {
-                    console.error('Session destruction error:', err);
-                    return res.redirect('/');
-                }
+      getLogout: async (req, res) => {
 
-                req.user = null;
-                res.clearCookie('connect.sid');
-                res.redirect('/');
-            });
-        });
+        try {
+          req.logout((err) => {
+              if (err) {
+                  console.error('Logout error:', err);
+                  req.flash('errors', 'Error during logout');
+                  return res.redirect('/');
+              }
+              
+              req.session.destroy((err) => {
+                  if (err) {
+                      console.error('Session destruction error:', err);
+                      return res.redirect('/');
+                  }
+  
+                  req.user = null;
+                  res.clearCookie('connect.sid');
+                  res.redirect('/');
+              });
+          });
+
+        } catch(err) {
+            console.error(err)
+            res.status(500).render('500.ejs');
+          }
+        
     }
 
 }
