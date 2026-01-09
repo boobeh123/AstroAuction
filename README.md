@@ -35,6 +35,13 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 ## Version History
 # 🛠️ AstroAuction Patch 0.9.009
+📅 **Release Date:** January 8th, 2026
+
+## 📢 Developer's Notes
+
+- Auction listings now show the image you upload
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 0.9.009
 📅 **Release Date:** January 7th, 2026
 
 ## 📢 Developer's Notes
