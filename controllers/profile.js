@@ -10,8 +10,7 @@ module.exports = {
             });
         } catch(err) {
             console.error(err)
-            // redirect 404 todo
-            res.render('404.ejs');
+            res.status(500).render('500.ejs');
         }
 
     },
@@ -55,6 +54,7 @@ module.exports = {
             res.redirect('/profile')
         } catch(err) {
             console.error(err);
+            res.status(500).render('500.ejs');
         }
     },
 
@@ -66,8 +66,7 @@ module.exports = {
             console.log(req.user);
         } catch(err) {
             console.error(err)
-            // redirect 404 todo
-            res.render('404.ejs');
+            res.status(500).render('500.ejs');
         }
         
     },
@@ -92,8 +91,7 @@ module.exports = {
             }
         } catch(err) {
             console.error(err)
-            // redirect 404 todo
-            res.render('404.ejs');
+            res.status(500).render('500.ejs');
         }
         
     },
