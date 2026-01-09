@@ -10,7 +10,7 @@
       <div class="auction-grid">
         <section class="auction-card" aria-labelledby="createListingTitle">
           <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-          <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle">
+          <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
             <div class="auction-form-group">
               <label for="title">Title</label>
               <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" aria-invalid="false" autocomplete="off">
@@ -20,8 +20,8 @@
               <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true" aria-invalid="false"></textarea>
             </div>
             <div class="auction-form-group">
-              <label for="image">Image URL</label>
-              <input id="image" type="url" name="image" placeholder="https://example.com/image.jpg" aria-describedby="imageHelp">
+              <label for="file">Image URL</label>
+              <input id="file" type="file" name="file" aria-describedby="imageHelp">
               <small id="imageHelp">Optional - Add a URL to an image of your sale</small>
             </div>
             <div class="auction-form-group">
@@ -50,8 +50,6 @@
                   <div class="listing-card-media">
                     <% if (listing.image) { %>
                       <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy">
-                    <% } else { %>
-                      <div class="listing-card-placeholder" aria-hidden="true" role="presentation"></div>
                     <% } %>
                   </div>
                   <div class="listing-card-body">
