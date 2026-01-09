@@ -1,4 +1,5 @@
 const Auction = require('../models/Auction')
+const cloudinary = require("../middleware/cloudinary");
 
 module.exports = {
 
@@ -20,13 +21,22 @@ module.exports = {
     postAuction: async (req, res) => {
 
         try {
+
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                use_filename: true,
+                unique_filename: false,
+                overwrite: true
+            });
+
             await Auction.create({
                     title: req.body.title,
                     description: req.body.description,
-                    image: req.body.image,
+                    image: result.secure_url,
                     video: req.body.video,
-                    user: req.user.id
+                    user: req.user.id,
+                    cloudinaryId: result.public_id
                 })
+                console.log(req.file)
                 console.log('Listing has been added!')
                 res.redirect('/auction')
             } catch(err) {
