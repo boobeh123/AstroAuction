@@ -40,8 +40,9 @@ AstroAuction web app - https://astroauction.up.railway.app/
 ## 📢 Developer's Notes - Delete profile
 
 - Registered users can now delete their profile
-  - The listings the user posts do not delete when the profile is deleted
-    - You will have to delete your listings then your profile if you want to ensure data is lost
+  - ~~The listings the user posts do not delete when the profile is deleted~~
+    - ~~You must delete your listings then your profile if you want to ensure data is lost~~
+  - All data (listings & profile pic) IS deleted when deleting a profile
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.014
