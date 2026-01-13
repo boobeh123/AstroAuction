@@ -1,0 +1,20 @@
+
+<%- include('./partials/header.ejs') %>
+<%- include('./partials/flash.ejs') %>
+<body id="temp">
+    <div id="onboarding-container">
+        <div id="onboarding-header">
+            <h1>Welcome!</h1>
+            <p>Let's set up your profile to get started</p>
+        </div>       
+        <form action="/onboard" method="POST">
+            <div id="form-group">
+                <label for="displayName">Display Name *</label>
+                <input type="text" id="displayName" name="displayName" placeholder="Enter your display name" required minlength="2" maxlength="25">
+                <div id="form-hint">This is how others will see you (2-25 characters)</div>
+            </div>
+            
+            <button type="submit" id="btn-submit">Complete Setup</button>
+        </form>
+    </div>
+</body>
