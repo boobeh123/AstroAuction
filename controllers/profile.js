@@ -83,7 +83,7 @@ module.exports = {
                 res.redirect('/')
             } else { 
                 await User.findByIdAndUpdate(req.user._id, {
-                    firstName: req.body.userName,
+                    displayName: req.body.userName,
                     email: req.body.userEmail,
             })  
            console.log('Edited Profile Information')
