@@ -58,15 +58,18 @@ module.exports = {
           email: req.body.email,
           password: req.body.password,
           agreeToTerms: req.body.agreeToTerms,
-          firstName: '',
-          lastName: '',
+          displayName: '',
           image: '',
           cloudinaryId: '',
+          onboardingComplete: false,
+          emailVerified: false,
         })
+
         await user.save()
         req.login(user, function(err) {
           if (err) { return next(err); }
-          res.redirect('/');
+          res.redirect('/onboard');
+
         });
       } catch(err) {
         return next(err)
