@@ -5,7 +5,7 @@ module.exports = {
 
     getAuction: async (req, res) => {
         try {
-            const listings = await Auction.find({}).sort({ createdAt: -1 }).populate('user', 'image firstName').lean();
+            const listings = await Auction.find({}).sort({ createdAt: -1 }).populate('user', 'image displayName').lean();
             res.render('auction.ejs', {
                 listings: listings,
                 user: req.user || null,
