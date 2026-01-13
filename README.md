@@ -34,13 +34,22 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.011
+📅 **Release Date:** January 12th, 2026
+
+## 📢 Developer's Notes - Onboarding Flow
+
+- New accounts are now given some direction after registration
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.010
 📅 **Release Date:** January 8th, 2026
 
 ## 📢 Developer's Notes
 
 - Auction listings now show the image you upload
-9th:
+
+Jan 9th:
 - Added status codes to `try/catch` blocks and render `500.ejs` instead of `404.ejs`
 - Created landing pages for status code responses
 ---------------------------------------------------------------------------------------------------------------------------
