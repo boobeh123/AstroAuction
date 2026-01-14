@@ -41,6 +41,15 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.020
+📅 **Release Date:** January 30th, 2026
+
+## 📢 Developer's Notes - Automatic emails w/ verification
+
+- Creating an account will send YOU an email. 
+  - You may use real, registered emails and get verified
+
+  ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.019
 📅 **Release Date:** January 29th, 2026
 
