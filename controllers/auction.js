@@ -40,12 +40,11 @@ module.exports = {
                 res.redirect('/auction')
             } catch(err) {
                 console.log(err)
-                // redirect 404 todo or could be status 500?
-                res.render('404.ejs');
+                res.status(500).render('500.ejs');
             }
         },
 
-        deleteListing: async (req, res) => {
+        deleteAuction: async (req, res) => {
 
             try {
                 const listing = await Auction.findById(req.params.id);
@@ -64,9 +63,19 @@ module.exports = {
                 
             } catch(err) {
                 console.log(err)
-                res.render('404.ejs');
+                res.status(500).render('500.ejs');
             }
 
+        },
+
+        getDetailedAuction: async (req, res) => {
+            try {
+                
+                res.render('detailedAuction.ejs');
+            } catch(err) {
+                console.error(err)
+                res.status(500).render('500.ejs');
+            }
         },
     
 }
