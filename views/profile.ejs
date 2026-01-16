@@ -1,4 +1,5 @@
     <main class="profile-main" aria-labelledby="profile-heading">
+        <a href="/auction">Go back</a>
         <div class="container">
             <div class="card-panel z-depth-2">
                 <h1 class="center-align flow-text" id="profile-heading">
@@ -12,12 +13,11 @@
                     <form id="profile-pic-form" class="margin" action="/profile" method="POST" enctype="multipart/form-data">
                         <div class="file-field input-field">
                             <div class="btn blue-grey waves-effect waves-light hoverable">
-                                <span><i class="material-icons left">cloud_upload</i>Browse</span>
                                 <input id="profile-file" type="file" name="file" required>
                             </div>
-                            <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text" placeholder="Upload a new profile picture">
-                            </div>
+                            <!-- <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Upload a new profile picture" disabled>
+                            </div> -->
                         </div>
                         <button id="upload-btn" type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Update Picture">
                             <span id="upload-btn-text">Submit</span>
@@ -60,5 +60,4 @@
         </div>
     </main>
 
-<h1>Hello world</h1>
-<a href="/" aria-label="Go back">Go back</a>'
+<p>to do: styling, semantics, aria</p>
