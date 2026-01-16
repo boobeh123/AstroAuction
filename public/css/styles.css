@@ -145,6 +145,50 @@ p {
   .is-hidden {
     display: none !important;
   }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  
+  }
+
+/**************************************************************
+* Utility
+***************************************************************/
+.center-align {
+  text-align: center;
+}
+
+.margin {
+  margin: 1rem 0;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.z-depth-1 {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+
+.z-depth-2 {
+  box-shadow: 0 8px 17px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+}
+
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+}
+
+.circle {
+  border-radius: 50%;
+}
 /**************************************************************
 * Header
 ***************************************************************/
@@ -786,7 +830,161 @@ p {
 .onboard-text {
   color: #fff;
 }
+/**************************************************************
+* Profile Page
+***************************************************************/
+.profile-main {
+  padding-top: calc(var(--header-h) + 24px);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+  /* border: 2px solid red !important; */
+}
 
+.profile-main .container {
+  max-width: 640px;
+  /* border: 2px solid red; */
+}
+
+.card-panel {
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(168, 85, 247, 0.12);
+  backdrop-filter: blur(8px);
+  /* border: 2px solid red; */
+}
+
+.card-panel header h1 {
+  color: #E8E9F3;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  /* border: 2px solid red; */
+
+}
+
+.profile-avatar {
+  margin: 0 0 1.5rem 0;
+  /* border: 2px solid red; */
+
+}
+
+.profile-avatar img {
+  display: inline-block;
+  border: 3px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  /* border: 2px solid red; */
+
+}
+
+.file-field {
+  margin-bottom: 1rem;
+}
+
+.file-field label {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  /* border: 2px solid red; */
+}
+
+.file-field input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0.1px;
+  height: 0.1px;
+  /* border: 2px solid red !important; */
+  /* opacity: 1; */
+}
+
+.profile-info-section {
+  margin-top: 2rem;
+  /* border: 2px solid red; */
+}
+
+.profile-info-card {
+  background: rgba(12, 12, 28, 0.4);
+  border: 1px solid rgba(184, 197, 214, 0.15);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+  /* border: 2px solid red; */
+}
+
+.profile-info-item {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  /* border: 2px solid red; */
+}
+
+.profile-info-item:last-child {
+  margin-bottom: 0;
+  /* border: 2px solid red; */
+}
+
+.profile-info-card dt {
+  color: #B8C5D6;
+  font-weight: 500;
+  /* border: 2px solid red; */
+}
+
+.profile-info-card dd {
+  color: #E8E9F3;
+  margin: 0;
+  /* border: 2px solid red; */
+}
+
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  /* border: 2px solid red; */
+}
+
+.profile-actions .btn {
+  min-width: 140px;
+  color: black;
+  /* border: 2px solid red; */
+}
+
+.blue-grey {
+  background: linear-gradient(135deg, #546E7A 0%, #455A64 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  /* border: 2px solid red; */
+}
+
+.blue-grey:hover {
+  background: linear-gradient(135deg, #607D8B 0%, #546E7A 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
+  /* border: 2px solid red; */
+}
+
+.btn.red {
+  background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+  border: 1px solid rgba(229, 57, 53, 0.3);
+  border: 2px solid red;
+}
+
+.btn.red:hover {
+  background: linear-gradient(135deg, #EF5350 0%, #E53935 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+}
+
+#deleteLater {
+  display: block;
+  color: #fff;
+  font-size: xx-small;
+}
 /**************************************************************
 * Media queries
 ***************************************************************/
