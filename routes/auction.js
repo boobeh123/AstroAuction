@@ -5,6 +5,8 @@ const upload = require("../middleware/multer");
 
 router.get('/', auctionController.getAuction);
 router.post('/', upload.single('file'), auctionController.postAuction);
-router.delete('/deleteListing/:id', auctionController.deleteListing)
+router.delete('/deleteAuction/:id', auctionController.deleteAuction);
+
+router.get('/viewAuction/:id', auctionController.getDetailedAuction)
 
 module.exports = router;
