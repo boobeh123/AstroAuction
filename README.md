@@ -34,6 +34,15 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.012
+📅 **Release Date:** January 15th, 2026
+
+## 📢 Developer's Notes 
+
+- A button has been added to every listing, which I intend to render the seller's profile, more details to the listing, and a comment section
+  - I haven't built a comment section before, but I wondered if I could build my own "social media" network/website. Perfect time to learn
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.011
 📅 **Release Date:** January 12th, 2026
 
