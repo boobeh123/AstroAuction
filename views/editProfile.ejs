@@ -7,7 +7,7 @@
                     <% if (user.name === '') { %>
                     <form action="/profile/edit/<%=user._id%>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading">
                         <label for="editprofile-name">Name</label>
-                        <input id="editprofile-name" type="text" placeholder="Name" name="userName">
+                        <input id="editprofile-name" type="text" placeholder="<Name>" name="userName">
                         <button type="submit" title="Update Profile">Submit</button>
                     </form>
                     <% } else { %>
