@@ -59,8 +59,9 @@
                       <img src="<%= listing.user.image %>" alt="<%= listing.user.displayName %>'s profile photo" loading="lazy">
                       <p>Posted by: <%= listing.user.displayName %></p>
                   <% } %>
+                  <a href="/auction/viewAuction/<%= listing._id %>" class="btn btn-secondary" aria-label="View Auction">See More</a>
                   <% if (user && listing.user && listing.user._id.toString() === user.id) { %>
-                    <form action="/auction/deleteListing/<%= listing._id %>?_method=DELETE" method="POST"> 
+                    <form action="/auction/deleteAuction/<%= listing._id %>?_method=DELETE" method="POST"> 
                         <button type="submit">Delete</button>
                     </form>
                 <% } %>
