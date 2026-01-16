@@ -41,6 +41,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 
 - A button has been added to every listing, which I intend to render the seller's profile, more details to the listing, and a comment section
   - I haven't built a comment section before, but I wondered if I could build my own "social media" network/website. Perfect time to learn
+- The edit profile page has been styled
 
 ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.011
