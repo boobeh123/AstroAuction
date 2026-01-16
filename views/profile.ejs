@@ -1,63 +1,55 @@
-    <main class="profile-main" aria-labelledby="profile-heading">
-        <a href="/auction">Go back</a>
-        <div class="container">
-            <div class="card-panel z-depth-2">
-                <h1 class="center-align flow-text" id="profile-heading">
-                    <a href="/todos" aria-label="Back to dashboard"><i class="fas fa-chevron-left"></i></a>
-                    Profile Information
-
-                </h1>
-                <img src="<%= user.image === '' ? 'https://placeholder.pics/svg/100x100' : user.image %>" class="responsive-img circle z-depth-1" alt="User profile image" style="width: 120px; height: 120px;">
-                <div class="divider"></div>
-                <div class="center-align margin">
-                    <form id="profile-pic-form" class="margin" action="/profile" method="POST" enctype="multipart/form-data">
-                        <div class="file-field input-field">
-                            <div class="btn blue-grey waves-effect waves-light hoverable">
-                                <input id="profile-file" type="file" name="file" required>
-                            </div>
-                            <!-- <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text" placeholder="Upload a new profile picture" disabled>
-                            </div> -->
-                        </div>
-                        <button id="upload-btn" type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Update Picture">
-                            <span id="upload-btn-text">Submit</span>
-                            <!-- <div id="upload-preloader" class="preloader-wrapper small active">
-                                <div class="spinner-layer spinner-blue-only">
-                                    <div class="circle-clipper left"><div class="circle"></div></div>
-                                    <div class="gap-patch"><div class="circle"></div></div>
-                                    <div class="circle-clipper right"><div class="circle"></div></div>
-                                </div>
-                            </div> -->
+<%- include('./partials/header.ejs') %>
+<%- include('./partials/flash.ejs') %>
+<main id="main-content" class="profile-main">
+    <div class="container">
+        <article class="card-panel z-depth-2">
+            <header>
+                <h1 class="center-align flow-text">Profile Information</h1>
+            </header>
+            <figure class="profile-avatar center-align">
+                <img id="profile-picture" src="<%= user.image || 'https://placeholder.pics/svg/100x100' %>" class="responsive-img circle z-depth-1" alt="Profile picture of <%= user.displayName %>">
+            </figure>         
+            <section class="center-align margin" aria-labelledby="upload-heading">
+                <h2 id="upload-heading" class="sr-only">Update Profile Picture</h2>
+                <form id="profile-pic-form" action="/profile" method="POST" enctype="multipart/form-data">
+                    <div class="file-field input-field">
+                        <label for="profile-file" class="btn blue-grey waves-effect waves-light hoverable">
+                            <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+                            <span>Choose profile picture</span>
+                        </label>
+                            <input id="profile-file" type="file" name="file" accept="image/*" aria-describedby="file-help" required>
+                            <span id="file-help" class="sr-only">Upload a profile picture (JPG or PNG)</span>
+                    </div>
+                    <button type="submit" class="btn blue-grey waves-effect waves-light hoverable">
+                        <span id="upload-btn-text">Upload Picture</span>
+                    </button>
+                </form>
+            </section>
+            <section class="profile-info-section center-align margin" aria-labelledby="profile-details-heading">
+                <h2 id="profile-details-heading" class="sr-only">Profile Details</h2>
+                <dl class="profile-info-card">
+                    <div class="profile-info-item">
+                        <dt class="bold">Name:</dt>
+                        <dd><%= user.displayName %></dd>
+                    </div>
+                    <div class="profile-info-item">
+                        <dt class="bold">Email:</dt>
+                        <dd><%= user.email || 'No email provided' %></dd>
+                    </div>
+                </dl>
+                
+                <div class="profile-actions" role="group" aria-label="Profile actions">
+                    <a href="/profile/edit" class="btn blue-grey waves-effect waves-light hoverable">
+                        <i class="fas fa-edit left" aria-hidden="true"></i> Edit Profile
+                    </a>
+                    <!-- <form action="/profile/delete" method="POST">
+                        <button type="submit" class="btn red waves-effect waves-light hoverable">
+                            <i class="fas fa-trash left" aria-hidden="true"></i> Delete Profile
                         </button>
-                    </form>
+                    </form> -->
                 </div>
-                <section class="profile-info-section center-align margin" aria-labelledby="profile-info-heading">
-                    <h2 id="profile-info-heading" class="sr-only">Profile Details</h2>
-                    <div class="profile-info-card" role="region" aria-labelledby="profile-name-label">
-                        <dl>
-                            <dt id="profile-name-label" class="bold">Name:</dt>
-                            <dd><%= user.displayName %></dd>
-                        </dl>
-                    </div>
-                    <div class="profile-info-card" role="region" aria-labelledby="profile-email-label">
-                        <dl>
-                            <dt id="profile-email-label" class="bold">Email:</dt>
-                            <dd><%= user.email || '' %></dd>
-                        </dl>
-                    </div>
-                    <form action="/profile/edit" method="GET">
-                        <button type="submit" class="btn blue-grey waves-effect waves-light hoverable" aria-label="Edit Profile">
-                            <i class="fas fa-edit left"></i> Edit Profile
-                        </button>
-                    </form>
-                    <form action="#" method="POST">
-                        <button type="submit" class="btn red waves-effect waves-light hoverable" aria-label="Delete Profile">
-                            <i class="fas fa-trash left"></i> Delete Profile
-                        </button>
-                    </form>
-                </section>
-            </div>
-        </div>
-    </main>
-
-<p>to do: styling, semantics, aria</p>
+            </section>
+        </article>
+        <p id="deleteLater">to do: delete profile backend</p>
+    </div>
+</main>
