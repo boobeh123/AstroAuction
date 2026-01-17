@@ -31,7 +31,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * ~~Add forms after `/signup` redirection~~
 * ~~CRUD operations (post auctions/listings/delete auctions)~~
 * ~~Auction schema~~
-* Nodemailer for contact form
+* ~~Nodemailer for contact form~~
 * ~~Multer/cloudinary~~
 * Unit tests
 * Integration tests
@@ -41,6 +41,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.019
+📅 **Release Date:** January 29th, 2026
+
+## 📢 Developer's Notes - Automatic emails
+
+- Creating an account automatically sends an email with nodemailer
+  - Making an account will NOT send you an email (yet)
+    - To do: Email verification being emailed to you with account verification code
+
+  ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.018
 📅 **Release Date:** January 28th, 2026
 
