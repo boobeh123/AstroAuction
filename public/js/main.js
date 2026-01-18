@@ -1,13 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.flash').forEach((element, index) => {
-        const close = element.querySelector('.flash__close');
-        const remove = () => element.remove();
-        let time = setTimeout(remove, 5000 + index * 500);
 
-        ['mouseenter','focusin'].forEach(event => element.addEventListener(event, () => clearTimeout(time)));
-        ['mouseleave','focusout'].forEach(event => element.addEventListener(event, () => time = setTimeout(remove, 3000)));
-        
-        if (close) close.addEventListener('click', remove);
+  // Auto-dismiss flash
+  const flashes = document.querySelectorAll('.flash');  
+  flashes.forEach(flash => {
+      const isError = flash.classList.contains('flash-error');
+      const timeout = isError ? 7000 : 5000;
+      const dismissTimer = setTimeout(() => {
+        dismissFlash(flash);
+      }, timeout);
+      
+      // Manual dismiss flash
+      const closeBtn = flash.querySelector('.flash-close');
+      if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+              clearTimeout(dismissTimer);
+              dismissFlash(flash);
+          });
+      }
   });
-
 });
+
+function dismissFlash(flash) {
+  setTimeout(() => {
+      flash.remove();
+  }, 300);
+}
