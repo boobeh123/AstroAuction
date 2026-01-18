@@ -15,6 +15,7 @@ module.exports = {
 
             res.render('onboard.ejs', {
                 user: req.user,
+                currentPath: req.originalUrl
             });
         } catch(err) {
             console.error(err)
