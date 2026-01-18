@@ -12,7 +12,7 @@
                 <% } else if (typeof user !== 'undefined' && user) { %>
                     <span class="user-email"><span class="sr-only">Logged in as</span><%= user.displayName %></span>
                     <% if (currentPath === '/profile' || currentPath === '/profile/edit') { %>
-                        <a href="/auction" class="btn btn-primary"><i class="fas fa-gavel" aria-hidden="true"></i> Auctions</a>\
+                        <a href="/auction" class="btn btn-primary"><i class="fas fa-gavel" aria-hidden="true"></i> Auctions</a>
                         <% } else if (currentPath === '/auction' || currentPath === '/') { %>
                             <a href="/profile" class="btn btn-primary"><i class="fas fa-user" aria-hidden="true"></i> Profile</a>
                             <% } else { %>
