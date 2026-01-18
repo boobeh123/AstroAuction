@@ -12,7 +12,7 @@
         <form action="/profile/edit/<%=user._id %>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading" class="edit-profile-form">
         <div class="form-group">
             <label for="edit-profile-name">Display name</label>
-            <input id="edit-profile-name" type="text" placeholder="<%= user.name || 'Enter your name' %>" name="userName" value="<%= user.name %>" aria-describedby="name-help" required>
+            <input id="edit-profile-name" type="text" placeholder="<%= user.name || 'Enter your name' %>" name="userName" aria-describedby="name-help" required>
             <small id="name-help" class="form-help">This is how your name will appear to other users</small>
         </div>
         <div class="form-actions">
