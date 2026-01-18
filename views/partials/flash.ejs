@@ -1,20 +1,31 @@
-  <div class="flash-stack" role="status" aria-live="polite">
-    <% if (success && success.length) { %>
-      <div class="flash flash--success">
-        <% success.forEach(m => { %>
-            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
-            <p><%= m %></p><% }) %></div>
-    <% } %>
-    <% if (error && error.length) { %>
-      <div class="flash flash--error">
-        <% error.forEach(m => { %>
-            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
-            <p><%= m %></p><% }) %></div>
-    <% } %>
-    <% if (errors && errors.length) { %>
-      <div class="flash flash--error">
-        <% errors.forEach(e => { %>
-            <button type="button" class="flash__close" aria-label="Dismiss notification">×</button>
-            <p><%= typeof e === 'string' ? e : e.msg %></p><% }) %></div>
-    <% } %>
-  </div>
+<div class="flash-stack" aria-live="polite">
+  <% if (success && success.length) { %>
+      <% success.forEach((msg) => { %>
+          <aside class="flash flash-success" role="status">
+              <div class="flash-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></div>
+              <p class="flash-message"><%= msg %></p>
+              <button type="button" class="flash-close" aria-label="Dismiss success message"><i class="fas fa-times" aria-hidden="true"></i></button>
+          </aside>
+      <% }) %>
+  <% } %>
+  
+  <% if (error && error.length) { %>
+      <% error.forEach((msg) => { %>
+          <aside class="flash flash-error" role="alert">
+              <div class="flash-icon" aria-hidden="true"><i class="fas fa-exclamation-circle"></i></div>
+              <p class="flash-message"><%= msg %></p>
+              <button type="button" class="flash-close" aria-label="Dismiss error message"><i class="fas fa-times" aria-hidden="true"></i></button>
+          </aside>
+      <% }) %>
+  <% } %>
+  
+  <% if (errors && errors.length) { %>
+      <% errors.forEach((e) => { %>
+          <aside class="flash flash-error" role="alert">
+              <div class="flash-icon" aria-hidden="true"><i class="fas fa-exclamation-circle"></i></div>
+              <p class="flash-message"><%= typeof e === 'string' ? e : e.msg %></p>
+              <button type="button" class="flash-close" aria-label="Dismiss error message"><i class="fas fa-times" aria-hidden="true"></i></button>
+          </aside>
+      <% }) %>
+  <% } %>
+</div>
