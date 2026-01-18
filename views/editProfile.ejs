@@ -1,30 +1,24 @@
-<main aria-labelledby="edit-profile-heading">
-        <div>
-            <section aria-labelledby="edit-profile-heading">
-                <h1 id="edit-profile-heading"><a href="/profile" aria-label="Back to profile"><i class="fas fa-chevron-left"></i></a>Edit your profile</h1>
-                <p>to do: edit/update profile pic, styling, semantics, aria</p>
-                <div>
-                    <% if (user.name === '') { %>
-                    <form action="/profile/edit/<%=user._id%>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading">
-                        <label for="editprofile-name">Name</label>
-                        <input id="editprofile-name" type="text" placeholder="<Name>" name="userName">
-                        <button type="submit" title="Update Profile">Submit</button>
-                    </form>
-                    <% } else { %>
-                    <form action="/profile/edit/<%=user._id%>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading">
-                        <label for="editprofile-name">Name</label>
-                        <input id="editprofile-name" type="text" placeholder="Name" name="userName" value="<%=user.name%>">
-                        <button type="submit" title="Update Profile">Submit</button>
-                    </form>
-                    <% } %>
-                </div>
-                <div>
-                    <% if (user.image === '') { %>
-                    <img src="https://placeholder.pics/svg/100x100" alt="Profile placeholder image" />
-                    <% } else { %>
-                    <img src="<%=user.image%>" alt="User profile image" />
-                    <% } %>
-                </div>
-            </section>
+<%- include('./partials/header.ejs') %>
+<%- include('./partials/flash.ejs') %>
+<main id="main-content" class="profile-main">
+    <div class="container">
+        <article class="card-panel z-depth-2">
+            <header>
+                <h1 id="edit-profile-heading">Edit your profile</h1>
+                <p class="section-description">Update your personal information</p>
+            </header>
+
+        <form action="/profile/edit/<%=user._id %>?_method=PUT" data-id="<%=user._id%>" method="POST" aria-labelledby="edit-profile-heading" class="edit-profile-form">
+        <div class="form-group">
+            <label for="edit-profile-name">Display name</label>
+            <input id="edit-profile-name" type="text" placeholder="<%= user.name || 'Enter your name' %>" name="userName" value="<%= user.name %>" aria-describedby="name-help" required>
+            <small id="name-help" class="form-help">This is how your name will appear to other users</small>
         </div>
-    </main>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save changes</button>
+            <a href="/profile" class="btn btn-secondary">Cancel</a>
+        </div>
+            </form>
+        </article>
+    </div>
+</main>
