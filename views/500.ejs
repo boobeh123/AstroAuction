@@ -1,2 +1,18 @@
-<h1>Internal Server Error</h1>
-<a href="/" aria-label="Go back">Go back</a>
+<%- include('./partials/head.ejs') %>
+<%- include('./partials/navigation.ejs') %>
+<main id="main-content" class="error-page">
+    <div class="container">
+        <div class="error-content">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            </div>
+            <h1 class="error-title">500 - Server Error</h1>
+            <p class="error-message">Oops! Something went wrong on our end. We're working to fix it.</p>
+            <p class="error-submessage">Please try again in a few moments. If the problem persists, contact support.</p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary"><i class="fas fa-home" aria-hidden="true"></i> Go Home</a>
+            </div>
+        </div>
+    </div>
+</main>
+<%- include('./partials/footer.ejs') %>
