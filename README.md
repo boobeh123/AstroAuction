@@ -34,6 +34,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.013
+📅 **Release Date:** January 17th, 2026
+
+## 📢 Developer's Notes 
+
+- The landing page to update user personal information has been styled 
+- Our header partial now can determine which page a user is on and render buttons dynamically.
+  - "State" from React is kind of clicking, but I would need to take another peek at the docs
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.012
 📅 **Release Date:** January 15th, 2026
 
