@@ -1,0 +1,30 @@
+<header class="header">
+    <nav class="navbar" aria-label="Main Navigation">
+      <div class="nav-container">
+        <div class="nav-brand">
+            <a id="logo-anchor" href="/" aria-label="Astro Auction Home"><i class="fas fa-gavel" aria-hidden="true"></i><span>Astro Auction</span></a>
+        </div>
+        <div class="nav-actions">
+            <% if (typeof user !== 'undefined' && user && !user.onboardingComplete) { %>
+                <span class="onboard-text">Setting up your account</span>
+                <a href="/onboard" class="btn btn-primary">Setup</a>
+                <a href="/logout" class="btn btn-secondary" aria-label="Log out">Log out</a>
+                <% } else if (typeof user !== 'undefined' && user) { %>
+                    <span class="user-email"><span class="sr-only">Logged in as</span><%= user.displayName %></span>
+                    <% if (currentPath === '/profile' || currentPath === '/profile/edit') { %>
+                        <a href="/auction" class="btn btn-primary"><i class="fas fa-gavel" aria-hidden="true"></i> Auctions</a>\
+                        <% } else if (currentPath === '/auction' || currentPath === '/') { %>
+                            <a href="/profile" class="btn btn-primary"><i class="fas fa-user" aria-hidden="true"></i> Profile</a>
+                            <% } else { %>
+                                <a href="/auction" class="btn btn-primary"><i class="fas fa-gavel" aria-hidden="true"></i> Auctions</a>
+                                <a href="/profile" class="btn btn-primary"><i class="fas fa-user" aria-hidden="true"></i> Profile</a>
+                                <% } %>
+                                <a href="/logout" class="btn btn-secondary">Log out</a>
+                                <% } else { %>
+                                    <a href="/login" class="btn btn-secondary">Log in</a>
+                                    <a href="/signup" class="btn btn-primary">Create account</a>
+                                    <% } %>
+        </div>
+      </div>
+    </nav>
+  </header>
