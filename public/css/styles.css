@@ -986,6 +986,81 @@ p {
   font-size: xx-small;
 }
 /**************************************************************
+* Edit Profile 
+***************************************************************/
+.card-panel header {
+  margin-bottom: 2rem;
+  /* border: 2px solid red; */
+}
+
+.section-description {
+  color: #B8C5D6;
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  /* border: 2px solid red; */
+}
+
+.edit-profile-form .form-group {
+  margin-bottom: 1.5rem;
+  /* border: 2px solid red; */
+
+}
+
+.edit-profile-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #D7DBE7;
+  font-weight: 500;
+  /* border: 2px solid red; */
+}
+
+.edit-profile-form input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(184, 197, 214, 0.25);
+  background: rgba(12, 12, 28, 0.6);
+  color: #E8E9F3;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1rem;
+  /* border: 2px solid red; */
+
+}
+
+.edit-profile-form input::placeholder {
+  color: #9AA8BA;
+}
+
+.edit-profile-form input:focus {
+  border-color: #A855F7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.5rem;
+  color: #9AA8BA;
+  font-size: 0.875rem;
+  /* border: 2px solid red; */
+
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  /* border: 2px solid red; */
+}
+
+.form-actions .btn {
+  min-width: 120px;
+  /* border: 2px solid red; */
+}
+
+/**************************************************************
 * Media queries
 ***************************************************************/
 @media (max-width: 1024px) {
@@ -1058,6 +1133,16 @@ p {
 
   .hero-buttons {
       justify-content: center;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  /* border: 2px solid red; */
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  /* border: 2px solid red; */
   }
 
 }
