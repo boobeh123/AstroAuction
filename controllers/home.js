@@ -5,7 +5,8 @@ module.exports = {
     getIndex: async (req, res) => {
         try {
             res.render('index.ejs', {
-                user: req.user
+                user: req.user,
+                currentPath: req.originalUrl
             });
         } catch(err) {
             console.error(err)
