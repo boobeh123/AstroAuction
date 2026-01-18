@@ -7,6 +7,7 @@ module.exports = {
         try {
             res.render('profile.ejs', {
                 user: req.user,
+                currentPath: req.originalUrl
             });
         } catch(err) {
             console.error(err)
@@ -62,8 +63,9 @@ module.exports = {
         try {
             res.render('editProfile.ejs', {
                 user: req.user,
+                currentPath: req.originalUrl
+
             });
-            console.log(req.user);
         } catch(err) {
             console.error(err)
             res.status(500).render('500.ejs');
@@ -84,9 +86,8 @@ module.exports = {
             } else { 
                 await User.findByIdAndUpdate(req.user._id, {
                     displayName: req.body.userName,
-                    email: req.body.userEmail,
             })  
-           console.log('Edited Profile Information')
+           console.log('Profile updated')
            res.redirect('/profile')
             }
         } catch(err) {
