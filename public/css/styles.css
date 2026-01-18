@@ -1059,6 +1059,66 @@ p {
   min-width: 120px;
   /* border: 2px solid red; */
 }
+/**************************************************************
+* Error Pages (404, 403, 500)
+***************************************************************/
+.error-page {
+  padding-top: calc(var(--header-h) + 40px);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 600px;
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 14px;
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(168, 85, 247, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.error-icon {
+  font-size: 4rem;
+  color: #A855F7;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
+}
+
+.error-title {
+  color: #E8E9F3;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+}
+
+.error-message {
+  color: #B8C5D6;
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-submessage {
+  color: #9AA8BA;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-actions .btn {
+  min-width: 140px;
+}
 
 /**************************************************************
 * Media queries
@@ -1143,6 +1203,26 @@ p {
   .form-actions .btn {
     width: 100%;
   /* border: 2px solid red; */
+  }
+
+  .error-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+  }
+  
+  .error-title {
+    font-size: 1.5rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+  }
+  
+  .error-actions .btn {
+    width: 100%;
   }
 
 }
