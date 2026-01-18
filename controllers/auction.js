@@ -9,7 +9,7 @@ module.exports = {
             res.render('auction.ejs', {
                 listings: listings,
                 user: req.user || null,
-
+                currentPath: req.originalUrl
             });
         } catch(err) {
             console.error(err)
@@ -70,7 +70,6 @@ module.exports = {
 
         getDetailedAuction: async (req, res) => {
             try {
-                
                 res.render('detailedAuction.ejs');
             } catch(err) {
                 console.error(err)
