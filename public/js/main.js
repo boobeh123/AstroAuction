@@ -18,10 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
           });
       }
   });
+
+  // Confirmation to delete - profileController.deleteProfile
+  const deleteForm = document.querySelector('#deleteForm');
+  if (deleteForm) {
+      deleteForm.addEventListener('submit', (event) => {
+          const confirmed = confirm('Are you sure you want to permanently DELETE your account?\n' + 'This action cannot be UNDONE.');
+
+          if (!confirmed) {
+              event.preventDefault();
+          }
+
+      });
+  }
+
 });
 
 function dismissFlash(flash) {
   setTimeout(() => {
-      flash.remove();
+    flash.remove();
   }, 300);
 }
