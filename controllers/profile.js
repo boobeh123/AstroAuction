@@ -96,4 +96,35 @@ module.exports = {
         }
         
     },
+    deleteProfile: async (req, res) => {
+        try {
+
+            if (req.params.id !== req.user._id.toString()) {
+                req.flash('error', 'You can only delete your own account');
+                return res.status(403).render('403.ejs');
+            }
+
+            const currentUser = await User.findById(req.user._id).lean();
+            
+            if (!currentUser) {
+                req.flash('error', 'User not found');
+                return res.redirect('/');
+            }
+
+            await User.deleteOne({_id: req.user._id});
+            req.logout((err) => {
+                if (err) {
+                    console.error('Logout error:', err);
+                    return res.redirect('/');
+                }
+            });
+            
+            console.log('Profile deleted')
+            res.redirect('/');
+        } catch (err) {
+            console.log(err);
+            req.flash('error', 'Failed to delete profile. Please try again.');
+            res.status(500).render('500.ejs');
+        }
+    },
 }
