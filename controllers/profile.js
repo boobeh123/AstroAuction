@@ -110,7 +110,7 @@ module.exports = {
                 req.flash('error', 'User not found');
                 return res.redirect('/');
             }
-
+            await cloudinary.uploader.destroy(req.user.cloudinaryId)
             await User.deleteOne({_id: req.user._id});
             req.logout((err) => {
                 if (err) {
