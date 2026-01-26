@@ -1,36 +1,40 @@
 <%- include('./partials/head.ejs') %>
 <%- include('./partials/navigation.ejs') %>
 <%- include('./partials/flash.ejs') %>
-<main id="main-content" aria-label="Main content">
-  <section class="page-header" aria-labelledby="signup-title">
-    <div class="auth-card">
-      <h1 id="signup-title" class="auth-card__title">Welcome</h1>
-      <p class="auth-card__subtitle">Create your account</p>
-      <form class="auth-form" action="/signup" method="POST" aria-describedby="signup-help">
+<main id="main-content">
+  <section class="page-header">
+    <article class="auth-card">
+      <header>
+        <h1 class="auth-card-title">Welcome</h1>
+        <p class="auth-card-subtitle">Create your account</p>
+      </header>
+      <form class="auth-form" action="/signup" method="POST">
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="new-password" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm password</label>
-          <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required>
+          <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required aria-required="true">
         </div>
         <div class="form-group">
           <div class="checkbox">
-            <input id="agree" type="checkbox" name="agreeToTerms" value="yes" required>
-            <label for="agree">I agree to the <a href="#">Terms of Use</a></label>
+            <input id="agree" type="checkbox" name="agreeToTerms" value="yes" required aria-required="true">
+            <label for="agree">I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a></label>
           </div>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-secondary">Register</button>
         </div>
-        <p id="signup-help" class="helper-text">Already created an account? <a href='/login'>Log in</a></p>
       </form>
-    </div>
+      <footer>
+        <p class="helper-text">Already created an account? <a href='/login'>Log in</a></p>
+      </footer>
+    </article>
   </section>
 </main>
 <%- include('./partials/footer.ejs') %>

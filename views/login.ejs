@@ -1,26 +1,31 @@
 <%- include('./partials/head.ejs') %>
 <%- include('./partials/navigation.ejs') %>
 <%- include('./partials/flash.ejs') %>
-<main id="main-content" aria-label="Main content">
-  <section class="page-header" aria-labelledby="login-title">
-    <div class="auth-card" aria-labelledby="login-title" aria-describedby="login-help">
-      <h1 id="login-title" class="auth-card__title">Welcome</h1>
-      <p class="auth-card__subtitle">Log in to continue</p>
-      <form class="auth-form" action="/login" method="POST" aria-describedby="login-help">
+<!-- to do: semantic/aria -->
+<main id="main-content">
+  <section class="page-header">
+    <article class="auth-card">
+      <header>
+        <h1 id="login-title" class="auth-card-title">Welcome</h1>
+        <p class="auth-card-subtitle">Log in to continue</p>
+      </header>
+      <form class="auth-form" action="/login" method="POST">
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-required="true">
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="current-password" required aria-required="true">
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Log in</button>
         </div>
-        <p id="login-help" class="helper-text">Need an account? <a href='/signup'>Create account</a></p>
       </form>
-    </div>
+      <footer>
+        <p class="helper-text">Need an account? <a href='/signup'>Create account</a></p>
+      </footer>
+    </article>
   </section>
 </main>
 <%- include('./partials/footer.ejs') %>
