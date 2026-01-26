@@ -3,6 +3,7 @@ const router = express.Router();
 const homeController = require('../controllers/home');
 const authController = require('../controllers/auth');
 const onboardController = require('../controllers/onboard');
+const termController = require('../controllers/term');
 
 router.get('/', homeController.getIndex);
 
@@ -14,5 +15,7 @@ router.get('/logout', authController.getLogout);
 
 router.get('/onboard', onboardController.getOnboard);
 router.post('/onboard', onboardController.postOnboard);
+
+router.get('/terms', termController.getTerms);
 
 module.exports = router;
