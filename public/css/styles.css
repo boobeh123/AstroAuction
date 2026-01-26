@@ -476,13 +476,13 @@ p {
   /* border: 2px solid red; */
 }
 
-.auth-card__title {
+.auth-card-title {
   margin: 0 0 0.25rem 0;
   font-size: 1.5rem;
   /* border: 2px solid red; */
 }
 
-.auth-card__subtitle {
+.auth-card-subtitle {
   margin: 0 0 1.25rem 0;
   color: #B8C5D6;
   font-size: 0.95rem;
@@ -536,7 +536,7 @@ p {
 
 }
 
-.auth-form .helper-text {
+.helper-text {
   margin-top: 0.75rem;
   color: #B8C5D6;
   font-size: 0.9rem;
