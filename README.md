@@ -34,6 +34,18 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://profilinator.rishav.dev/skills-assets/html5-original-wordmark.svg" alt="HTML5" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/css3-original-wordmark.svg" alt="CSS3" height="50" /><img src="https://profilinator.rishav.dev/skills-assets/javascript-original.svg" alt="JavaScript" height="40" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.016
+📅 **Release Date:** January 26th, 2026
+
+## 📢 Developer's Notes - Timeline can restore
+
+- Added a landing page for `/terms` and will use Termly for this
+- Optimized middleware for DRY code
+- Styled the navigation partial & `/auction` route
+- I accidentally deleted all my local changes with `git restore .` 
+  - Right-clicking a file, then opening a timeline saved my day
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.015
 📅 **Release Date:** January 19th, 2026
 
