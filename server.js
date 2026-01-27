@@ -38,19 +38,21 @@ app.use(
     })
   )
 
+// Passport middleware
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash());
 
-// Flash available to all Views
+// Aavailable to all Views
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
     res.locals.errors = req.flash('errors');
     res.locals.error = req.flash('error');
+    res.locals.currentPath = req.originalUrl;
+    res.locals.user = req.user || null
     next();
 });
-
-// Passport middleware
-app.use(passport.initialize())
-app.use(passport.session())
 
 app.use('/', mainRoutes);
 app.use('/auction', auctionRoutes);
