@@ -7,9 +7,7 @@ module.exports = {
         try {
             const listings = await Auction.find({}).sort({ createdAt: -1 }).populate('user', 'image displayName').lean();
             res.render('auction.ejs', {
-                listings: listings,
-                user: req.user || null,
-                currentPath: req.originalUrl
+                listings: listings
             });
         } catch(err) {
             console.error(err)
