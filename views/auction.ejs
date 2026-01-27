@@ -9,6 +9,7 @@
       <div class="auction-layout">
         <aside class="auction-sidebar">
           <section class="auction-card" aria-labelledby="createListingTitle">
+            <% if (typeof user !== 'undefined' && user) { %>
             <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
             <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
               <div class="auction-form-group">
@@ -28,6 +29,27 @@
                 <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
               </div>
             </form>
+            <% } else { %>
+              <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
+              <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
+                <div class="auction-form-group">
+                  <label for="title">Title <span class="required">*</span></label>
+                  <input id="title" type="text" name="title" placeholder="Create an account to post" required aria-required="true" autocomplete="off" disabled>
+                </div>
+                <div class="auction-form-group">
+                  <label for="description">Description <span class="required">*</span></label>
+                  <textarea id="description" name="description" placeholder="Guests may browse" rows="4" required aria-required="true" disabled></textarea>
+                </div>
+                <div class="auction-form-group">
+                  <label for="file">Image</label>
+                  <input id="file" type="file" name="file" accept="image/*" aria-describedby="imageHelp" disabled>
+                  <small id="imageHelp">Optional - Upload an image of your sale</small>
+                </div>
+                <div class="auction-form-actions">
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
+                </div>
+              </form>
+            <% } %>
           </section>
         </aside>
         <div class="auction-main">
