@@ -5,10 +5,7 @@ module.exports = {
 
     getProfile: async (req, res) => {
         try {
-            res.render('profile.ejs', {
-                user: req.user,
-                currentPath: req.originalUrl
-            });
+            res.render('profile.ejs');
         } catch(err) {
             console.error(err)
             res.status(500).render('500.ejs');
@@ -61,11 +58,7 @@ module.exports = {
 
     getEditProfile: async (req, res) => {
         try {
-            res.render('editProfile.ejs', {
-                user: req.user,
-                currentPath: req.originalUrl
-
-            });
+            res.render('editProfile.ejs');
         } catch(err) {
             console.error(err)
             res.status(500).render('500.ejs');
