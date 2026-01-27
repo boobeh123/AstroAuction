@@ -19,11 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // Confirmation to delete - profileController.deleteProfile
-  const deleteForm = document.querySelector('#deleteForm');
+  // Confirmation to delete - profileController.deleteProfile & auctionController.deleteAuction
+  const deleteForm = document.querySelector('.deleteForm');
+
   if (deleteForm) {
       deleteForm.addEventListener('submit', (event) => {
-          const confirmed = confirm('Are you sure you want to permanently DELETE your account?\n' + 'This action cannot be UNDONE.');
+          const confirmed = confirm('Are you sure you want to permanently DELETE this?\n' + 'This action cannot be UNDONE.');
 
           if (!confirmed) {
               event.preventDefault();
