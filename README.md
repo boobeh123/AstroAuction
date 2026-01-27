@@ -47,8 +47,8 @@ AstroAuction web app - https://astroauction.up.railway.app/
 ## 📢 Developer's Notes - Automatic emails
 
 - Creating an account automatically sends an email with nodemailer
-  - Making an account will NOT send you an email (yet)
-    - To do: Email verification being emailed to you with account verification code
+  - Making an account will ~~NOT~~ send you an email ~~(yet)~~
+    - To do: Email verification ~~being emailed to you~~ with account verification code/button?
 
   ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.018
