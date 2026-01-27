@@ -13,10 +13,7 @@ module.exports = {
                 return res.redirect('/auction');
             }
 
-            res.render('onboard.ejs', {
-                user: req.user,
-                currentPath: req.originalUrl
-            });
+            res.render('onboard.ejs');
         } catch(err) {
             console.error(err)
             res.status(500).render('500.ejs');
