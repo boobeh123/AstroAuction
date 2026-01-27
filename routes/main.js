@@ -17,5 +17,6 @@ router.get('/onboard', onboardController.getOnboard);
 router.post('/onboard', onboardController.postOnboard);
 
 router.get('/terms', termController.getTerms);
+router.get('/privacy', termController.getPrivacy);
 
 module.exports = router;
