@@ -1,77 +1,76 @@
 <%- include('./partials/head.ejs') %>
 <%- include('./partials/navigation.ejs') %>
 <%- include('./partials/flash.ejs') %>
-<main class="auction-page">
-  <a href="#latestListingsTitle" class="skip-link">Skip to listings</a>
-    <div class="container auction-page auction-container">
+<main id="main-content" class="auction-page">
       <header class="auction-hero"> 
         <h1 class="auction-title">Auction Listings</h1>
         <p class="auction-subtitle">Create a listing and browse the latest items.</p>
       </header>
-      <div class="auction-grid">
-        <section class="auction-card" aria-labelledby="createListingTitle">
-          <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-          <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
-            <div class="auction-form-group">
-              <label for="title">Title</label>
-              <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" aria-invalid="false" autocomplete="off">
-            </div>
-            <div class="auction-form-group">
-              <label for="description">Description</label>
-              <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true" aria-invalid="false"></textarea>
-            </div>
-            <div class="auction-form-group">
-              <label for="file">Image URL</label>
-              <input id="file" type="file" name="file" aria-describedby="imageHelp">
-              <small id="imageHelp">Optional - Add a URL to an image of your sale</small>
-            </div>
-            <div class="auction-form-group">
-              <label for="video">Video URL</label>
-              <input id="video" type="url" name="video" placeholder="https://example.com/video.mp4" aria-describedby="videoHelp">
-              <small id="videoHelp">Optional - Add a URL to a video of your sale</small>
-            </div>
-            <div class="auction-form-actions">
-              <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-          </form>
-        </section>
-        <section class="auction-card auction-card--list" aria-labelledby="latestListingsTitle">
-          <div class="auction-list-header">
-            <h2 class="auction-card-title" id="latestListingsTitle">Latest Listings</h2>
-            <p class="auction-list-meta">
-              <span aria-live="polite" aria-atomic="true">
+      <div class="auction-layout">
+        <aside class="auction-sidebar">
+          <section class="auction-card" aria-labelledby="createListingTitle">
+            <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
+            <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
+              <div class="auction-form-group">
+                <label for="title">Title <span class="required">*</span></label>
+                <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" autocomplete="off">
+              </div>
+              <div class="auction-form-group">
+                <label for="description">Description <span class="required">*</span></label>
+                <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true"></textarea>
+              </div>
+              <div class="auction-form-group">
+                <label for="file">Image</label>
+                <input id="file" type="file" name="file" accept="image/*" aria-describedby="imageHelp">
+                <small id="imageHelp">Optional - Upload an image of your sale</small>
+              </div>
+              <div class="auction-form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
+              </div>
+            </form>
+          </section>
+        </aside>
+        <div class="auction-main">
+          <section class="auction-card auction-card-list" aria-labelledby="latestListingsTitle">
+            <header class="auction-list-header">
+              <h2 class="auction-card-title" id="latestListingsTitle">Latest Listings</h2>
+              <p class="auction-list-meta" aria-live="polite" aria-atomic="true">
                 <%= (listings && listings.length) ? listings.length : 0 %> total
-              </span>
-            </p>
-          </div>
-          <% if (listings && listings.length > 0) { %>
-            <ul class="auction-listings">
-              <% listings.forEach(listing => { %>
-                <li class="listing-card" id="listing-<%= listing.id %>">
-                  <div class="listing-card-media">
+                <%= (listings && listings.length === 1) ? 'listing' : 'listings' %>
+              </p>
+            </header>
+
+            <% if (listings && listings.length > 0) { %>
+              <div class="auction-listings">
+                <% listings.forEach(listing => { %>
+                  <article class="listing-card" id="listing-<%= listing.id %>">
                     <% if (listing.image) { %>
-                      <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy">
-                    <% } %>
-                  </div>
-                  <div class="listing-card-body">
-                    <h3 class="listing-card-title"><%= listing.title %></h3>
-                    <p class="listing-card-description"><%= listing.description %></p>
-                    <% if (listing.user) { %>
-                      <img src="<%= listing.user.image %>" alt="<%= listing.user.displayName %>'s profile photo" loading="lazy">
-                      <p>Posted by: <%= listing.user.displayName %></p>
-                  <% } %>
-                  <a href="/auction/viewAuction/<%= listing._id %>" class="btn btn-secondary" aria-label="View Auction">See More</a>
-                  <% if (user && listing.user && listing.user._id.toString() === user.id) { %>
-                    <form action="/auction/deleteAuction/<%= listing._id %>?_method=DELETE" method="POST"> 
-                        <button type="submit">Delete</button>
-                    </form>
-                <% } %>
-                  </div>
-                </li>
+                      <div class="listing-card-media">
+                        <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
+                      </div>
+                      <% } %>
+                      <div class="listing-card-body">
+                        <h3 class="listing-card-title"><%= listing.title %></h3>
+                        <% if (listing.user) { %>
+                          <div class="listing-card-seller">
+                            <img src="<%= listing.user.image %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
+                            <span class="seller-name">Posted by: <%= listing.user.displayName %></span>
+                          </div>
+                          <% } %>
+                          <div class="listing-card-actions">
+                            <a href="/auction/viewAuction/<%= listing._id %>" class="btn btn-secondary">View Details</a>
+                            <% if (user && listing.user && listing.user._id.toString() === user.id) { %>
+                              <form action="/auction/deleteAuction/<%= listing._id %>?_method=DELETE" method="POST" class="deleteForm"> 
+                                <button type="submit" class="btn red waves-effect waves-light hoverable"><i class="fas fa-trash" aria-hidden="true"></i>Delete</button>
+                              </form>
+                              <% } %>
+                            </div>
+                          </div>
+                          </article>
               <% }) %>
-            </ul>
+              </div>
           <% } else { %>
-            <div class="auction-empty" role="status" aria-live="polite">
+            <div class="auction-empty">
               <h3 class="auction-empty-title">No listings yet</h3>
               <p class="auction-empty-text">Create your first listing using the form.</p>
             </div>
