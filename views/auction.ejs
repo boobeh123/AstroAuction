@@ -83,7 +83,7 @@
                             <a href="/auction/viewAuction/<%= listing._id %>" class="btn btn-secondary">View Details</a>
                             <% if (user && listing.user && listing.user._id.toString() === user.id) { %>
                               <form action="/auction/deleteAuction/<%= listing._id %>?_method=DELETE" method="POST" class="deleteForm"> 
-                                <button type="submit" class="btn red waves-effect waves-light hoverable"><i class="fas fa-trash" aria-hidden="true"></i>Delete</button>
+                                <button type="submit" class="btn red waves-effect waves-light hoverable">Delete</button>
                               </form>
                               <% } %>
                             </div>
