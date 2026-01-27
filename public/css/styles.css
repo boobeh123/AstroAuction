@@ -1426,6 +1426,7 @@ color: #A855F7;
 
 .legal-document strong {
   color: #E8E9F3;
+}
 /**************************************************************
 * Footer todo
 ***************************************************************/
@@ -1481,80 +1482,42 @@ color: #A855F7;
 
 @media (max-width: 768px) {
 
-  .nav-toggle {
-      display: flex;
-  }
-
-  .nav-menu {
-      position: fixed;
-      top: 51px;
-      left: -100%;
-      width: 100%;
-      background: linear-gradient(135deg, #1A1B3A 0%, #2D1B69 50%, #0F0F23 100%);
-      flex-direction: column;
-      transition: 0.3s;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-      padding: 2rem 0;
+  /* nav partial */
+    .nav-actions a {
       /* border: 2px solid red; */
-  }
-
-  .nav-menu.active {
-      left: 0;
-      /* border: 2px solid red; */
-  }
-
-  .nav-list {
-      flex-direction: column;
-      gap: 1.5rem;
-      /* border: 2px solid red; */
-
-  }
-
-  .nav-toggle.active .bar:nth-child(2) {
-      opacity: 0;
-      border: 2px solid #A855F7;
-
-  }
-
-  .nav-toggle.active .bar:nth-child(1) {
-      transform: translateY(7px) rotate(45deg);
-      border: 2px solid #A855F7;
-  }
-
-  .nav-toggle.active .bar:nth-child(3) {
-      transform: translateY(-7px) rotate(-45deg);
-      border: 2px solid #A855F7;
+      font-size: .75rem;
+      padding: 7.5px 12px !important;
     }
 
+    .nav-brand i, .nav-brand span{
+      /* border: 2px solid red; */
+      font-size: 1.5rem;
+    }
+
+    /* home */
     .hero {
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       text-align: center;
-      padding-top: 1.5rem;
       /* border: 2px solid red; */
   }
 
   .hero-title {
       font-size: 2rem;
+      /* border: 2px solid red; */
   }
 
-  .hero-buttons {
-      justify-content: center;
+  .hero-image {
+    display: none;
   }
 
-  .form-actions {
-    flex-direction: column;
-  /* border: 2px solid red; */
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-  /* border: 2px solid red; */
-  }
-
+    /* Flash */
   .error-content {
     padding: 2rem 1.5rem;
+    border: 2px solid red;
+
   }
-  
   .error-icon {
     font-size: 3rem;
   }
@@ -1582,6 +1545,28 @@ color: #A855F7;
     padding: 12px 16px;
   }
 
+  /* signup/login */
+  .checkbox label {
+    font-size: .75rem;
+  }
+
+  /* profile */
+  .profile-main .card-panel {
+    padding: 1rem;
+    /* border: 2px solid red; */
+  }
+  
+  .profile-main .container .card-panel header h1 {
+    /* border: 2px solid red; */
+    margin: 0;
+    font-size: 1.75rem;
+  }
+
+  .profile-main .container .card-panel figure {
+    margin: 0;
+  }
+
+  /* onboard */
   .onboarding-card {
     padding: 2rem 1.5rem;
   }
@@ -1594,6 +1579,7 @@ color: #A855F7;
     display: none;
   }
 
+  /* header partial on /auction route */
   .header-overlay {
     min-height: 0px !important;
     background: none;
