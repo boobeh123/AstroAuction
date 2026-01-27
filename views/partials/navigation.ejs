@@ -1,4 +1,12 @@
-<header class="header">
+<header class="header <%= currentPath === '/auction' ? 'header-auction' : '' %>">
+  <div class="header-overlay">
+    <div class="header-overlay-text">
+    <% if (currentPath === '/auction') { %>
+      <div><i class="fas fa-store"></i><span> Setup your sale</span></div>
+      <div><i class="fas fa-bolt"></i><span> Instantly contact users</span></div>
+      <div><i class="fas fa-users"></i><span> Local economy</span></div>
+    <% } %>
+    </div>
     <nav class="navbar" aria-label="Main Navigation">
       <div class="nav-container">
         <div class="nav-brand">
@@ -27,4 +35,5 @@
         </div>
       </div>
     </nav>
-  </header>
+  </div>
+</header>
