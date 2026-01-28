@@ -1491,7 +1491,7 @@ color: #A855F7;
 
     .nav-brand i, .nav-brand span{
       /* border: 2px solid red; */
-      font-size: 1.5rem;
+      font-size: 1.25rem;
     }
 
     /* home */
@@ -1554,6 +1554,10 @@ color: #A855F7;
     padding: 5rem 1rem .5rem 1rem;
   }
 
+  .signup-page .page-header .auth-card {
+    padding: 1rem;
+  }
+
   .signup-page .page-header .auth-card-subtitle {
     margin-bottom: .5rem;
   }
@@ -1562,18 +1566,35 @@ color: #A855F7;
     margin-bottom: .5rem;
   }
 
-
   .signup-page .page-header .helper-text {
-    margin-bottom: .5rem;
+    margin: .5rem 0;
+    /* border: 2px solid red; */
   }
 
 
   /* profile */
+  .profile-main {
+    padding-bottom: 0.5rem;
+  }
   .profile-main .card-panel {
     padding: 1rem;
     /* border: 2px solid red; */
   }
+
+  .profile-main .card-panel #upload-btn-text {
+    color: black;
+    /* border: 2px solid red; */
+  }
+
+  .profile-main .file-field {
+    margin-bottom: .5rem;
+  }
   
+  .profile-main .container .card-panel section {
+    /* border: 2px solid red; */
+    margin: .5rem 0;
+  }
+
   .profile-main .container .card-panel header h1 {
     /* border: 2px solid red; */
     margin: 0;
