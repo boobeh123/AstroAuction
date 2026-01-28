@@ -1550,6 +1550,24 @@ color: #A855F7;
     font-size: .75rem;
   }
 
+  .signup-page .page-header {
+    padding: 5rem 1rem .5rem 1rem;
+  }
+
+  .signup-page .page-header .auth-card-subtitle {
+    margin-bottom: .5rem;
+  }
+
+  .signup-page .page-header .form-group {
+    margin-bottom: .5rem;
+  }
+
+
+  .signup-page .page-header .helper-text {
+    margin-bottom: .5rem;
+  }
+
+
   /* profile */
   .profile-main .card-panel {
     padding: 1rem;
