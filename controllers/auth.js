@@ -68,7 +68,7 @@ module.exports = {
         })
 
         await user.save()
-        req.login(user, function(err) {
+        req.login(user, async function(err) {
           if (err) { return next(err); }
           
 
@@ -174,7 +174,7 @@ module.exports = {
               `
             };
           
-            transporter.sendMail(mailOptions);
+            await transporter.sendMail(mailOptions);
             console.log('Welcome email sent to:', user.email);
           } catch (err) {
             console.error('Failed to send welcome email:', err.message);
