@@ -175,13 +175,13 @@ module.exports = {
               `
             };
           
-            transporter.sendMail(mailOptions);
-            res.redirect('/onboard');
-
+            await transporter.sendMail(mailOptions);
+            
           } catch (err) {
-
+            console.error('Failed to send welcome email:', err.message);
           }
 
+          res.redirect('/onboard');
         });
       } catch(err) {
         return next(err)
