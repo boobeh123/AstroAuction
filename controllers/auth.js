@@ -68,7 +68,7 @@ module.exports = {
         })
 
         await user.save()
-        req.login(user, async function(err) {
+        req.login(user, function(err) {
           if (err) { return next(err); }
           
 
