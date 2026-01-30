@@ -37,10 +37,6 @@ module.exports = {
     },
 
     postSignup: async (req, res, next) => {
-      console.log('Nodemailer config - debugging:', {
-        user: process.env.EMAIL_NAME,
-        hasPassword: !!process.env.EMAIL_PASSWORD
-      });
       const validationErrors = []
       if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
       if (!validator.isLength(req.body.password, { min: 3 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
