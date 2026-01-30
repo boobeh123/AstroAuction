@@ -3,7 +3,7 @@ const validator = require('validator')
 const User = require('../models/User')
 // const Contact = require('../models/Contact');
 const nodemailer = require('nodemailer');
-const { createTransporter } = require('../middleware/mailer');
+const { createTransporter } = require('../config/mailer');
 
 module.exports = {
 
@@ -69,86 +69,85 @@ module.exports = {
         })
 
         await user.save()
-        req.login(user, function(err) {
+        req.login(user, async function(err) {
           if (err) { return next(err); }
           
-          const transporter = createTransporter();
-  
-          const mailOptions = {
-            from: process.env.EMAIL_NAME,
-            to: 'bobasakawa@gmail.com',
-            subject: 'Welcome to Astro Auction, please verify your email',
-            html: `
-            <!DOCTYPE html>
-            <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Thank you for contacting pretriq</title>
-              <style>
-                body {
-                  background: #f5f7fa;
-                  margin: 0;
-                  padding: 0;
-                  font-family: 'Roboto', Arial, sans-serif;
-                }
-                .email-container {
-                  max-width: 480px;
-                  margin: 2rem auto;
-                  background: #fff;
-                  border-radius: 12px;
-                  box-shadow: 0 4px 24px rgba(102,126,234,0.10);
-                  padding: 2rem 1.5rem;
-                }
-                .header {
-                  color: #185a9d;
-                  font-size: 1.5rem;
-                  font-weight: 700;
-                  margin-bottom: 1rem;
-                  text-align: center;
-                }
-                .content {
-                  color: #333;
-                  font-size: 1.1rem;
-                  margin-bottom: 1.5rem;
-                }
-                .message {
-                  background: #f1f8e9;
-                  border-left: 4px solid #43cea2;
-                  padding: 1rem;
-                  margin: 1.5rem 0;
-                  font-style: italic;
-                  color: #2e7d32;
-                }
-                .footer {
-                  color: #888;
-                  font-size: 0.95rem;
-                  text-align: center;
-                  margin-top: 2rem;
-                }
-                @media only screen and (max-width: 600px) {
+
+          try {
+            const transporter = createTransporter();
+    
+            const mailOptions = {
+              from: `Astro Auction ${process.env.EMAIL_NAME}`,
+              to: user.email,
+              subject: 'Welcome to Astro Auction - Please verify your email',
+              html: `
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to Astro Auction</title>
+                <style>
+                  body {
+                    background: #f5f7fa;
+                    margin: 0;
+                    padding: 0;
+                    font-family: 'Roboto', Arial, sans-serif;
+                  }
                   .email-container {
-                    padding: 1rem 0.5rem;
+                    max-width: 480px;
+                    margin: 2rem auto;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+                    padding: 2rem 1.5rem;
                   }
                   .header {
-                    font-size: 1.2rem;
+                    color: #185a9d;
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    text-align: center;
                   }
                   .content {
-                    font-size: 1rem;
+                    color: #333;
+                    font-size: 1.1rem;
+                    margin-bottom: 1.5rem;
                   }
-                }
-              </style>
-            </head>
+                  .message {
+                    background: #f1f8e9;
+                    border-left: 4px solid #43cea2;
+                    padding: 1rem;
+                    margin: 1.5rem 0;
+                    font-style: italic;
+                    color: #2e7d32;
+                  }
+                  .footer {
+                    color: #888;
+                    font-size: 0.95rem;
+                    text-align: center;
+                    margin-top: 2rem;
+                  }
+                  @media only screen and (max-width: 600px) {
+                    .email-container {
+                      padding: 1rem 0.5rem;
+                    }
+                    .header {
+                      font-size: 1.2rem;
+                    }
+                    .content {
+                      font-size: 1rem;
+                    }
+                  }
+                </style>
+              </head>
             <body>
               <div class="email-container">
                 <div class="header">Thank you for joining Astro Auction!</div>
                 <div class="content">
-                  Hi <b>user</b>,<br>
-                  <p>We've received your message and will get back to you at our earliest convenience.</p>
-                  <div class="message">
-                    <b>Your message:</b><br>
-                    <em>hello world - to do: email verification, node mailer works tho</em>
-                  </div>
+                <p>Hello</p>
+                <p>We're excited to have you join our local marketplace community!</p>
+                <p>If you have any questions, feel free to reach out to us.</p>
                 </div>
               <div class="footer">
                 Best regards,<br>
@@ -172,12 +171,16 @@ module.exports = {
               </div>
               </div>
             </body>
-            </html>
-            `
-          };
-        
-          transporter.sendMail(mailOptions);
-          res.redirect('/onboard');
+              </html>
+              `
+            };
+          
+            transporter.sendMail(mailOptions);
+            res.redirect('/onboard');
+
+          } catch (err) {
+
+          }
 
         });
       } catch(err) {
