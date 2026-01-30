@@ -178,7 +178,7 @@ module.exports = {
               `
             };
           
-            await transporter.sendMail(mailOptions);
+            transporter.sendMail(mailOptions);
             console.log('Welcome email sent to:', user.email);
           } catch (err) {
             console.error('Failed to send welcome email:', err.message);
