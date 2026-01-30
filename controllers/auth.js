@@ -75,7 +75,7 @@ module.exports = {
           const transporter = createTransporter();
   
           const mailOptions = {
-            from: process.env.EMAILNAME,
+            from: process.env.EMAIL_NAME,
             to: 'bobasakawa@gmail.com',
             subject: 'Welcome to Astro Auction, please verify your email',
             html: `
