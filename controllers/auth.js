@@ -4,6 +4,7 @@ const User = require('../models/User')
 // const Contact = require('../models/Contact');
 const nodemailer = require('nodemailer');
 const { createTransporter } = require('../config/mailer');
+const crypto = require('crypto');
 
 module.exports = {
 
@@ -55,6 +56,8 @@ module.exports = {
           return res.redirect('/signup')
         }
 
+        const token = crypto.randomBytes(20).toString('hex');
+
         const user = new User({
           role: 'User',
           email: req.body.email,
@@ -65,9 +68,14 @@ module.exports = {
           cloudinaryId: '',
           onboardingComplete: false,
           emailVerified: false,
+          verificationToken: token,
+          verificationTokenExpires: Date.now() + 3600000,
         })
 
         await user.save()
+
+        const verificationUrl = `${req.protocol}://${req.get('host')}/verify/${token}`
+
         req.login(user, async function(err) {
           if (err) { return next(err); }
           
@@ -146,7 +154,9 @@ module.exports = {
                 <div class="content">
                 <p>Hello</p>
                 <p>We're excited to have you join our local marketplace community!</p>
-                <p>If you have any questions, feel free to reach out to us.</p>
+                <p>Please verify your email by clicking the button below:</p>
+                <a href="${verificationUrl}" style="background-color: #185a9d; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify my email</a>
+                <p>This link will expire in 1 hour.</p>
                 </div>
               <div class="footer">
                 Best regards,<br>
@@ -240,6 +250,35 @@ module.exports = {
             res.status(500).render('500.ejs');
           }
         
-    }
+    },
+
+    getVerified: async (req, res) => {
+
+      try {
+
+        const user = await User.findOne({
+          verificationToken: req.params.token,
+          verificationTokenExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+          req.flash('errors', { msg: 'Verification link is invalid or has expired.' });
+          return res.redirect('/signup');
+        }
+
+        user.emailVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpires = undefined;
+
+        await user.save();
+
+        req.flash('success', 'Your email has been verified! You may now create listings.')
+        res.redirect('/auction');
+
+    } catch(err) {
+        console.error(err)
+        res.status(500).render('500.ejs');
+      }
+    },
 
 }
