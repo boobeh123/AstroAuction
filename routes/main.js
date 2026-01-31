@@ -12,6 +12,7 @@ router.get('/signup', authController.getSignup);
 router.post('/signup', authController.postSignup);
 router.post('/login', authController.postLogin);
 router.get('/logout', authController.getLogout);
+router.get('/verify/:token', authController.getVerified);
 
 router.get('/onboard', onboardController.getOnboard);
 router.post('/onboard', onboardController.postOnboard);
