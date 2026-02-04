@@ -44,7 +44,7 @@ app.use(passport.session())
 
 app.use(flash());
 
-// Aavailable to all Views
+// Available to all Views
 app.use((req, res, next) => {
     res.locals.success = req.flash('success');
     res.locals.errors = req.flash('errors');
