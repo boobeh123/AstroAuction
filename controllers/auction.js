@@ -18,22 +18,30 @@ module.exports = {
     postAuction: async (req, res) => {
 
         try {
+            let imageUrl = null;
+            let cloudinaryId = null;
 
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                use_filename: true,
-                unique_filename: false,
-                overwrite: true
-            });
+            if (req.file) {
+                const result = await cloudinary.uploader.upload(req.file.path, {
+                    use_filename: true,
+                    unique_filename: false,
+                    overwrite: true
+                });
+                imageUrl = result.secure_url;
+                cloudinaryId = result.public_id
+
+            }
 
             await Auction.create({
                     title: req.body.title,
                     description: req.body.description,
-                    image: result.secure_url,
+                    image: imageUrl,
                     video: req.body.video,
                     user: req.user.id,
-                    cloudinaryId: result.public_id
+                    cloudinaryId: cloudinaryId,
+                    category: req.body.category
                 })
-                console.log(req.file)
+
                 console.log('Listing has been added!')
                 res.redirect('/auction')
             } catch(err) {
