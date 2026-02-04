@@ -21,6 +21,26 @@
                 <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true"></textarea>
               </div>
               <div class="auction-form-group">
+                <label for="category">Category <span class="required">*</span></label> 
+                <select id="category" name="category" required aria-required="true">
+                  <option value="" disabled selected>Select a category</option>
+                  <option value="Art">Art</option>
+                  <option value="Antiques">Antiques</option>
+                  <option value="Coins & Collectibles">Coins & Collectibles</option>
+                  <option value="Jewelry & Watches">Jewelry & Watches</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Home Decor & Goods">Home Decor & Goods</option>
+                  <option value="Lawn & Garden">Lawn & Garden</option>
+                  <option value="Furniture">Furniture</option>
+                  <option value="Sports Goods">Sports Goods</option>
+                  <option value="Toys">Toys</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Cars">Cars</option>
+                  <option value="Construction">Construction</option>
+                  <option value="Services">Services</option>
+                </select>
+              </div>
+              <div class="auction-form-group">
                 <label for="file">Image</label>
                 <input id="file" type="file" name="file" accept="image/*" aria-describedby="imageHelp">
                 <small id="imageHelp">Optional - Upload an image of your sale</small>
@@ -39,6 +59,26 @@
                 <div class="auction-form-group">
                   <label for="description">Description <span class="required">*</span></label>
                   <textarea id="description" name="description" placeholder="Guests may browse" rows="4" required aria-required="true" disabled></textarea>
+                </div>
+                <div class="auction-form-group">
+                  <label for="category-guest">Category <span class="required">*</span></label> 
+                  <select id="category-guest" name="category" required aria-required="true" disabled>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="Art">Art</option>
+                    <option value="Antiques">Antiques</option>
+                    <option value="Coins & Collectibles">Coins & Collectibles</option>
+                    <option value="Jewelry & Watches">Jewelry & Watches</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Home Decor & Goods">Home Decor & Goods</option>
+                    <option value="Lawn & Garden">Lawn & Garden</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Sports Goods">Sports Goods</option>
+                    <option value="Toys">Toys</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Cars">Cars</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Services">Services</option>
+                  </select>
                 </div>
                 <div class="auction-form-group">
                   <label for="file">Image</label>
