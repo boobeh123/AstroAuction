@@ -76,7 +76,16 @@ module.exports = {
 
         getDetailedAuction: async (req, res) => {
             try {
-                res.render('detailedAuction.ejs');
+                const listing = await Auction.findById(req.params.id).populate('user', 'image displayName createdAt').lean();
+
+                if (!listing) {
+                    return res.status(404).render('404.ejs');
+                }
+                
+                res.render('detailedAuction.ejs', {
+                    listing: listing
+                });
+
             } catch(err) {
                 console.error(err)
                 res.status(500).render('500.ejs');
