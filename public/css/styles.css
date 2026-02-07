@@ -1451,6 +1451,107 @@ color: #A855F7;
 .legal-document strong {
   color: #E8E9F3;
 }
+
+/**************************************************************
+* Detailed Auction Page
+***************************************************************/
+.detailed-auction-page {
+  padding-top: calc(var(--header-h) + 24px);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+  /* border: 2px solid red; */
+}
+
+.detailed-nav {
+  margin-bottom: 1.5rem;
+  /* border: 2px solid red; */
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 10px;
+  color: #E8E9F3;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btn-back:hover {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: #A855F7;
+  transform: translateX(-3px);
+}
+
+.btn-back i {
+  color: #A855F7;
+  transition: transform 0.2s ease;
+}
+
+.btn-back:hover i {
+  transform: translateX(-3px);
+}
+
+.detailed-auction-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start;
+  /* border: 2px solid red; */
+}
+
+.detailed-auction-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  /* border: 2px solid red; */
+}
+
+.detailed-image-container {
+  /* border: 2px solid red; */
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(168, 85, 247, 0.12);
+}
+
+.detailed-image {
+  /* border: 2px solid red; */
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  display: block;
+  background: rgba(12, 12, 28, 0.4);
+}
+
+.detailed-image-placeholder {
+  /* border: 2px solid red; */
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #B8C5D6;
+  gap: 1rem;
+}
+
+.detailed-image-placeholder i {
+  font-size: 4rem;
+  color: rgba(168, 85, 247, 0.3);
+}
+
+.detailed-image-placeholder p {
+  margin: 0;
+  font-size: 1.1rem;
+}
 /**************************************************************
 * Footer todo
 ***************************************************************/
