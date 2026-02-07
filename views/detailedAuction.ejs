@@ -1,3 +1,71 @@
-<h1>hello world</h1>
-<p>To do: Render profile, full-sized listing page, comment section with upvotes</p>
-<a href="/auction" aria-label="Go back">Go back</a>
+<%- include('./partials/head.ejs') %>
+<%- include('./partials/navigation.ejs') %>
+<%- include('./partials/flash.ejs') %>
+
+<main id="main-content" class="detailed-auction-page">
+    <div class="container">
+        <div class="detailed-nav">
+          <a href="/auction" class="btn-back" aria-label="Back to listings"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Listings</a>
+        </div>
+        <div class="detailed-auction-layout">
+          <div class="detailed-auction-main">
+            <% if (listing.image) { %>
+              <div class="detailed-image-container">
+                <img src="<%= listing.image %>" alt="<%= listing.title %>" class="detailed-image">
+              </div>
+            <% } else { %>
+              <div class="detailed-image-container detailed-image-placeholder">
+                <i class="fas fa-image" aria-hidden="true"></i>
+                <p>No image available</p>
+              </div>
+            <% } %>
+            <div class="detailed-card">
+              <div class="detailed-category-badge">
+                <i class="fas fa-tag" aria-hidden="true"></i>
+                <%= listing.category %>
+              </div>
+              <h1 class="detailed-title"><%= listing.title %></h1>    
+              <div class="detailed-description-section">
+                <h2 class="section-title">Description</h2>
+                <p class="detailed-description"><%= listing.description %></p>
+              </div>
+            </div>
+          </div>
+          <aside class="detailed-auction-sidebar">
+            <div class="detailed-card">
+              <h2 class="section-title">Listing Information</h2>
+              <div class="info-list">
+                <div class="info-item">
+                  <span class="info-label">Listing ID:</span>
+                  <span class="info-value"><%= listing._id.toString().slice(-8).toUpperCase() %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Category:</span>
+                  <span class="info-value"><%= listing.category %></span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Posted:</span>
+                  <span class="info-value"><%= new Date(listing.createdAt).toLocaleDateString() %></span>
+                </div>
+              </div>
+            </div>
+            <% if (listing.user) { %>
+              <div class="detailed-card seller-card">
+                <h2 class="section-title">Seller</h2>
+                <div class="seller-info">
+                  <img src="<%= listing.user.image %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
+                  <div class="seller-details">
+                    <h3 class="seller-name"><%= listing.user.displayName %></h3>
+                    <p class="seller-joined">Member since <%= new Date(listing.user.createdAt).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      year: 'numeric' 
+                    }) %></p>
+                  </div>
+                </div>
+              </div>
+            <% } %>
+          </aside>
+        </div>
+      </div>
+</main>
+<%- include('./partials/footer.ejs') %>
