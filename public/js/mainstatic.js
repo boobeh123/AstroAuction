@@ -45,9 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Image Comparison Slider
-    const slider = document.getElementById('imageComparisonSlider');
-    const overlay = document.getElementById('comparisonOverlay');
-    const handle = document.getElementById('sliderHandle');
+    const slider = document.querySelector('#imageComparisonSlider');
+    const overlay = document.querySelector('#comparisonOverlay');
+    const handle = document.querySelector('#sliderHandle');
 
     if (slider && overlay && handle) {
         let isSliding = false;
