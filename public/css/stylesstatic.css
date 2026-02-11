@@ -333,8 +333,8 @@ p {
 }
 .image-comparison-slider {
   /* border: 2px solid gold; */
-  width: 50%;
-  height: 50%;
+  width: 75%;
+  height: 75%;
   position: relative;
   user-select: none;
 }
@@ -802,12 +802,12 @@ address a:hover {
 
   .image-comparison-slider {
     display: block;
-    width: 90%;
-    height: 90%;
+    width: 80%;
+    height: 80%;
   }
 
   .image-comparison-slider-handle {
-
+    
     top: 5%;
   }
 
@@ -816,7 +816,7 @@ address a:hover {
   }
 
   .image-comparison-labels {
-    bottom: 10px;
+    bottom: -1.25rem;
     padding: 0 10px;
   }
 
@@ -827,8 +827,8 @@ address a:hover {
   }
 
   .slider-button {
-    width: 40px;
-    height: 40px;
+    width: 65px;
+    height: 65px;
   }
 
   .slider-button i {
