@@ -89,7 +89,25 @@
                 </div>
             </div>
             <div class="hero-image">
-                <img src="/public/images/lnf.webp" alt="Exterior view of Lost And Found antique store building in Wahiawa" loading="lazy">
+                <div class="image-comparison-slider" id="imageComparisonSlider">
+                    <div class="image-comparison-container">
+                        <img src="/public/images/lnf.webp" alt="Exterior view of Lost And Found antique store building in Wahiawa" class="image-comparison-before" loading="eager">
+                        <div class="image-comparison-overlay" id="comparisonOverlay">
+                            <img src="/public/images/LostAndFoundBuilding5.webp" alt="Interior window display featuring colorful origami cranes and collectibles" class="image-comparison-after" loading="eager">
+                        </div>
+                        <div class="image-comparison-slider-handle" id="sliderHandle">
+                            <div class="slider-line"></div>
+                            <div class="slider-button">
+                                <i class="fas fa-chevron-left"></i>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-comparison-labels">
+                        <span class="label-before">Exterior</span>
+                        <span class="label-after">Display</span>
+                    </div>
+                </div>
             </div>
         </section>
         <section class="why-choose-us" id="about" aria-labelledby="about-title">
@@ -146,7 +164,7 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="name">Name <span aria-label="required">*</span></label>
-                                    <input type="text" id="name" name="name" placeholder="Your name" requiredaria-required="true">
+                                    <input type="text" id="name" name="name" placeholder="Your name" required aria-required="true">
                                 </div>
                                 <div class="form-group">
                                     <label for="email">Email <span aria-label="required">*</span></label>
@@ -159,7 +177,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="message">Message <span aria-label="required">*</span></label>
-                                <textarea id="message" name="message" rows="4" placeholder="Tell us more..." requiredaria-required="true"></textarea>
+                                <textarea id="message" name="message" rows="4" placeholder="Tell us more..." required aria-required="true"></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">Send Message</button>
                         </form>
