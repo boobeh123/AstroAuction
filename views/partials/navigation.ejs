@@ -9,9 +9,6 @@
     </div>
     <nav class="navbar" aria-label="Main Navigation">
       <div class="nav-container">
-        <div class="nav-brand">
-            <a id="logo-anchor" href="/" aria-label="Astro Auction Home"><i class="fas fa-gavel" aria-hidden="true"></i><span>Astro Auction</span></a>
-        </div>
         <div class="nav-actions">
             <% if (typeof user !== 'undefined' && user && !user.onboardingComplete) { %>
                 <span class="onboard-text">Setting up your account</span>
@@ -33,6 +30,9 @@
                                     <a href="/signup" class="btn btn-primary">Create account</a>
                                     <% } %>
         </div>
+        <div class="nav-brand">
+          <a id="logo-anchor" href="/" aria-label="Astro Auction Home"><i class="fas" aria-hidden="true"></i><span>AstroAuction.com</span></a>
+      </div>
       </div>
     </nav>
   </div>
