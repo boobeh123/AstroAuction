@@ -45,6 +45,26 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.025
+📅 **Release Date:** March 24th, 2026
+
+## 📢 Developer's Notes
+
+- The business owner wanted to change a few things:
+  - Changes to AstroAuction Web Application (railway)
+    [ ] AstroAuction.com currently points to The Lost And Found webpage
+    [X] Change Astro Auction to AstroAuction.com
+    [X] Change hero text (streamline)
+    [X] Move login to left hand side
+    [X] Center the logo
+    [ ] Add password reset functionality
+  - The Lost And Found Web Page (netlify)
+    [X] Change The Lost And Found to AstroAuction
+    [X] Remove Boxes 2,3,4
+    [X] Add Instagram to the Lost And Found
+    [X] Instagram should be more visible
+
+  ---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.024
 📅 **Release Date:** February 23th, 2026
 
