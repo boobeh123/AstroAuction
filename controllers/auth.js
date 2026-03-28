@@ -281,4 +281,215 @@ module.exports = {
       }
     },
 
+    getForgetPassword: async (req, res) => {
+
+      try {
+        if (req.user) {
+          return res.redirect('/auction');
+        }
+        res.render('forgotPassword.ejs');
+      } catch (err) {
+        console.error(err);
+        res.status(500).render('500.ejs');
+      }
+    },
+
+    postForgetPassword: async (req, res) => {
+
+      try {
+        if (!validator.isEmail(req.body.email)) {
+          req.flash('errors', { msg: 'Please enter a valid email address.' });
+          return res.redirect('/recover');
+        }
+
+        const email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
+        const user  = await User.findOne({ email });
+
+        if (!user) {
+          req.flash('success', 'If an account with that email exists, a reset link has been sent.');
+          return res.redirect('/recover');
+        }
+
+        const token   = crypto.randomBytes(20).toString('hex');
+        const expires = Date.now() + 3600000;
+
+        user.passwordResetToken   = token;
+        user.passwordResetExpires = expires;
+        await user.save();
+
+        const resetUrl = `${req.protocol}://${req.get('host')}/recover/${token}`;
+
+        try {
+          const transporter = createTransporter();
+
+          const mailOptions = {
+            from: `Astro Auction ${process.env.EMAIL_NAME}`,
+            to: user.email,
+            subject: 'Astro Auction — Password Reset Request',
+            html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Password Reset</title>
+              <style>
+                body {
+                  background: #f5f7fa;
+                  margin: 0;
+                  padding: 0;
+                  font-family: 'Roboto', Arial, sans-serif;
+                }
+                .email-container {
+                  max-width: 480px;
+                  margin: 2rem auto;
+                  background: #fff;
+                  border-radius: 12px;
+                  box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+                  padding: 2rem 1.5rem;
+                }
+                .header {
+                  color: #185a9d;
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  margin-bottom: 1rem;
+                  text-align: center;
+                }
+                .content {
+                  color: #333;
+                  font-size: 1.1rem;
+                  margin-bottom: 1.5rem;
+                }
+                .footer {
+                  color: #888;
+                  font-size: 0.95rem;
+                  text-align: center;
+                  margin-top: 2rem;
+                }
+                @media only screen and (max-width: 600px) {
+                  .email-container { padding: 1rem 0.5rem; }
+                  .header { font-size: 1.2rem; }
+                  .content { font-size: 1rem; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="email-container">
+                <div class="header">Password Reset Request</div>
+                <div class="content">
+                  <p>Hello,</p>
+                  <p>We received a request to reset the password for your Astro Auction account.</p>
+                  <p>Click the button below to choose a new password. This link will expire in <strong>1 hour</strong>.</p>
+                  <p style="text-align:center;">
+                    <a href="${resetUrl}"
+                       style="background-color:#185a9d;color:#ffffff;padding:12px 24px;
+                              text-decoration:none;border-radius:5px;font-weight:bold;
+                              display:inline-block;">
+                      Reset my password
+                    </a>
+                  </p>
+                  <p>If you did not request a password reset, you can safely ignore this email — your password will not change.</p>
+                </div>
+                <div class="footer">
+                  Best regards,<br>
+                  The Astro Auction Team<br>
+                  <a href="https://astroauction.up.railway.app/" style="color:#185a9d;text-decoration:none;">Astroauction</a>
+                </div>
+                <div style="margin-top:2rem;text-align:center;">
+                  <a href="https://x.com/boobeh123" style="margin:0 8px;display:inline-block;" title="X" target="_blank">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" width="28" height="28" style="vertical-align:middle;border-radius:50%;">
+                  </a>
+                  <a href="https://github.com/boobeh123/" style="margin:0 8px;display:inline-block;" title="GitHub" target="_blank">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub" width="28" height="28" style="vertical-align:middle;border-radius:50%;">
+                  </a>
+                  <a href="https://bobby-asakawa.netlify.app/" style="margin:0 8px;display:inline-block;" title="Portfolio" target="_blank">
+                    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/internetarchive.svg" alt="Portfolio" width="28" height="28" style="vertical-align:middle;border-radius:50%;">
+                  </a>
+                </div>
+                <div style="color:#aaa;font-size:0.95rem;margin-top:1.5rem;text-align:center;">
+                  You are receiving this email because a password reset was requested for your account.<br>
+                  If you did not make this request, you can safely ignore this email.
+                </div>
+              </div>
+            </body>
+            </html>
+            `,
+          };
+
+          await transporter.sendMail(mailOptions);
+          console.log('Password reset email sent to:', user.email);
+        } catch (mailErr) {
+          console.error('Failed to send password reset email:', mailErr.message);
+        }
+
+        req.flash('success', 'If an account with that email exists, a reset link has been sent.');
+        res.redirect('/recover');
+      } catch (err) {
+        console.error(err);
+        res.status(500).render('500.ejs');
+      }
+    },
+
+    getResetPassword: async (req, res) => {
+
+      try {
+        const user = await User.findOne({
+          passwordResetToken:   req.params.token,
+          passwordResetExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+          req.flash('errors', { msg: 'Password reset link is invalid or has expired.' });
+          return res.redirect('/recover');
+        }
+
+        res.render('resetPassword.ejs', { token: req.params.token });
+      } catch (err) {
+        console.error(err);
+        res.status(500).render('500.ejs');
+      }
+    },
+
+    postResetPassword: async (req, res) => {
+
+      try {
+        const validationErrors = [];
+
+        if (!validator.isLength(req.body.password, { min: 3 })) {
+          validationErrors.push({ msg: 'Password must be at least 8 characters long.' });
+        }
+        if (req.body.password !== req.body.confirmPassword) {
+          validationErrors.push({ msg: 'Passwords do not match.' });
+        }
+
+        if (validationErrors.length) {
+          req.flash('errors', validationErrors);
+          return res.redirect(`/recover/${req.params.token}`);
+        }
+
+        const user = await User.findOne({
+          passwordResetToken:   req.params.token,
+          passwordResetExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+          req.flash('errors', { msg: 'Password reset link is invalid or has expired.' });
+          return res.redirect('/recover');
+        }
+
+        user.password             = req.body.password;
+        user.passwordResetToken   = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+
+        req.login(user, (err) => {
+          if (err) return next(err);
+          req.flash('success', 'Your password has been reset. Welcome back!');
+          res.redirect('/auction');
+        });
+      } catch (err) {
+        console.error(err);
+        res.status(500).render('500.ejs');
+      }
+    },
 }
