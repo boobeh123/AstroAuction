@@ -9,17 +9,17 @@ router.get('/', homeController.getIndex);
 
 router.get('/login', authController.getLogin);
 router.get('/signup', authController.getSignup);
-router.post('/signup', authController.postSignup);
-router.post('/login', authController.postLogin);
-router.get('/logout', authController.getLogout);
-router.get('/verify/:token', authController.getVerified);
+// router.post('/signup', authController.postSignup);
+// router.post('/login', authController.postLogin);
+// router.get('/logout', authController.getLogout);
+// router.get('/verify/:token', authController.getVerified);
 router.get('/recover', authController.getForgetPassword);
-router.post('/recover', authController.postForgetPassword);
-router.get('/recover/:token', authController.getResetPassword);
-router.post('/recover/:token', authController.postResetPassword);
+// router.post('/recover', authController.postForgetPassword);
+// router.get('/recover/:token', authController.getResetPassword);
+// router.post('/recover/:token', authController.postResetPassword);
 
-router.get('/onboard', onboardController.getOnboard);
-router.post('/onboard', onboardController.postOnboard);
+// router.get('/onboard', onboardController.getOnboard);
+// router.post('/onboard', onboardController.postOnboard);
 
 router.get('/terms', termController.getTerms);
 router.get('/privacy', termController.getPrivacy);
