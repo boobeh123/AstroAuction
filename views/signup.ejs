@@ -5,30 +5,32 @@
   <section class="page-header">
     <article class="auth-card">
       <header>
-        <h1 class="auth-card-title">Welcome</h1>
-        <p class="auth-card-subtitle">Create your account</p>
+        <!-- <h1 class="auth-card-title">Welcome</h1>
+        <p class="auth-card-subtitle">Create your account</p> -->
+        <h1 class="auth-card-title">Please come back later</h1>
+        <p class="auth-card-subtitle">Account creation is under maintenance</p>
       </header>
       <form class="auth-form" action="/signup" method="POST">
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-required="true">
+          <input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required aria-required="true" disabled>
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="new-password" required aria-required="true">
+          <input id="password" type="password" name="password" placeholder="Enter your password" autocomplete="new-password" required aria-required="true" disabled>
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm password</label>
-          <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required aria-required="true">
+          <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required aria-required="true" disabled>
         </div>
         <div class="form-group">
           <div class="checkbox">
-            <input id="agree" type="checkbox" name="agreeToTerms" value="yes" required aria-required="true">
+            <input id="agree" type="checkbox" name="agreeToTerms" value="yes" required aria-required="true" disabled>
             <label for="agree">I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a></label>
           </div>
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-secondary">Register</button>
+          <button type="submit" class="btn btn-secondary" disabled>Register</button>
         </div>
       </form>
       <footer>
