@@ -3,6 +3,7 @@
 <%- include('./partials/flash.ejs') %>
 <main id="main-content">
     <section class="hero">
+        <canvas id="hero-particles" class="hero-particles" aria-hidden="true"></canvas>
         <div class="hero-content">
             <div class="hero-text">
                 <!-- <h1 id="home-title" class="hero-title">View <strong>The Lost And Found's</strong> inventory online with AstroAuctions.com</h1> -->
@@ -14,7 +15,20 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="/images/astrologo.webp" alt="Astro Auction - Cosmic Auction House" width="600" height="600">
+            <div class="hero-image-frame">
+                <img src="/images/astrologo.webp" alt="Astro Auction - Cosmic Auction House" width="600" height="600">
+                <div class="hero-corner hero-corner--tl" aria-hidden="true"></div>
+                <div class="hero-corner hero-corner--tr" aria-hidden="true"></div>
+                <div class="hero-corner hero-corner--bl" aria-hidden="true"></div>
+                <div class="hero-corner hero-corner--br" aria-hidden="true"></div>
+                <div class="hero-scan" aria-hidden="true"></div>
+                <div class="orbit-ring" aria-hidden="true">
+                    <div class="orbit-particle">&#10022;</div>
+                    <div class="orbit-particle">&#10022;</div>
+                    <div class="orbit-particle">&#10022;</div>
+                    <div class="orbit-particle">&#10022;</div>
+                </div>
+            </div>
         </div>
     </section>
 </main>
