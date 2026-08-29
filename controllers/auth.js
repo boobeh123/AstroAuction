@@ -12,13 +12,13 @@ module.exports = {
 
       try {
         if (req.user) {
-          return res.redirect('/auction')
+          return res.redirect('/')
         } else {
           res.render('login.ejs');
         }
     } catch(err) {
         console.error(err)
-        res.status(500).render('500.ejs');
+        res.status(500).render('errors/500.ejs');
       }
     },
 
@@ -26,13 +26,13 @@ module.exports = {
 
       try {
         if (req.user) {
-          return res.redirect('/auction')
+          return res.redirect('/')
         } else {
           res.render('signup.ejs');
         }
     } catch(err) {
         console.error(err)
-        res.status(500).render('500.ejs');
+        res.status(500).render('errors/500.ejs');
       }
 
     },
@@ -197,60 +197,60 @@ module.exports = {
     //   }
     // },
 
-  //   postLogin: async (req, res, next) => {
-  //     const validationErrors = []
-  //     if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
-  //     if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' })
+    postLogin: async (req, res, next) => {
+      const validationErrors = []
+      if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
+      if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' })
   
-  //     if (validationErrors.length) {
-  //       req.flash('errors', info.message)
-  //       return res.redirect('/login')
-  //     }
+      if (validationErrors.length) {
+        req.flash('errors', validationErrors)
+        return res.redirect('/login')
+      }
       
-  //     req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
+      req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
   
-  //     passport.authenticate('local', (err, user, info) => {
-  //       if (err) { return next(err) }
-  //       if (!user) {
-  //         req.flash('errors', info.message)
-  //         return res.redirect('/login')
-  //       }
-  //       req.logIn(user, (err) => {
-  //         if (err) { return next(err) }
-  //         req.flash('success', 'Success! You are logged in.')
-  //         res.redirect(req.session.returnTo || '/auction')
-  //     })
-  //   })(req, res, next)
-  // },
+      passport.authenticate('local', (err, user, info) => {
+        if (err) { return next(err) }
+        if (!user) {
+          req.flash('errors', info.message)
+          return res.redirect('/login')
+        }
+        req.logIn(user, (err) => {
+          if (err) { return next(err) }
+          req.flash('success', 'Success! You are logged in.')
+          res.redirect(req.session.returnTo || '/')
+      })
+    })(req, res, next)
+  },
 
-    //   getLogout: async (req, res) => {
+      getLogout: async (req, res) => {
 
-    //     try {
-    //       req.logout((err) => {
-    //           if (err) {
-    //               console.error('Logout error:', err);
-    //               req.flash('errors', 'Error during logout');
-    //               return res.redirect('/');
-    //           }
+        try {
+          req.logout((err) => {
+              if (err) {
+                  console.error('Logout error:', err);
+                  req.flash('errors', 'Error during logout');
+                  return res.redirect('/');
+              }
               
-    //           req.session.destroy((err) => {
-    //               if (err) {
-    //                   console.error('Session destruction error:', err);
-    //                   return res.redirect('/');
-    //               }
+              req.session.destroy((err) => {
+                  if (err) {
+                      console.error('Session destruction error:', err);
+                      return res.redirect('/');
+                  }
   
-    //               req.user = null;
-    //               res.clearCookie('connect.sid');
-    //               res.redirect('/');
-    //           });
-    //       });
+                  req.user = null;
+                  res.clearCookie('connect.sid');
+                  res.redirect('/');
+              });
+          });
 
-    //     } catch(err) {
-    //         console.error(err)
-    //         res.status(500).render('500.ejs');
-    //       }
+        } catch(err) {
+            console.error(err)
+            res.status(500).render('errors/500.ejs');
+          }
         
-    // },
+    },
 
     // getVerified: async (req, res) => {
 
@@ -285,12 +285,12 @@ module.exports = {
 
       try {
         if (req.user) {
-          return res.redirect('/auction');
+          return res.redirect('/');
         }
         res.render('forgotPassword.ejs');
       } catch (err) {
         console.error(err);
-        res.status(500).render('500.ejs');
+        res.status(500).render('errors/500.ejs');
       }
     },
 
