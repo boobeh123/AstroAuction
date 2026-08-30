@@ -16,9 +16,9 @@ router.post('/login', authController.postLogin);
 router.get('/logout', authController.getLogout);
 // router.get('/verify/:token', authController.getVerified);
 router.get('/recover', authController.getForgetPassword);
-// router.post('/recover', authController.postForgetPassword);
-// router.get('/recover/:token', authController.getResetPassword);
-// router.post('/recover/:token', authController.postResetPassword);
+router.post('/recover', authController.postForgetPassword);
+router.get('/recover/:token', authController.getResetPassword);
+router.post('/recover/:token', authController.postResetPassword);
 
 router.get('/onboard', ensureAuth, onboardController.getOnboard);
 router.post('/onboard', ensureAuth, onboardController.postOnboard);
