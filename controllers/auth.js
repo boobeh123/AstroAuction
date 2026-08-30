@@ -68,7 +68,7 @@ module.exports = {
           cloudinaryId: '',
           onboardingComplete: false,
           emailVerified: false,
-          verificationToken: token,
+          verificationToken: hashToken(token),
           verificationTokenExpires: Date.now() + 3600000,
         })
 
@@ -252,34 +252,34 @@ module.exports = {
         
     },
 
-    // getVerified: async (req, res) => {
+    getVerified: async (req, res) => {
 
-    //   try {
+      try {
 
-    //     const user = await User.findOne({
-    //       verificationToken: req.params.token,
-    //       verificationTokenExpires: { $gt: Date.now() }
-    //     });
+        const user = await User.findOne({
+          verificationToken: hashToken(req.params.token),
+          verificationTokenExpires: { $gt: Date.now() }
+        });
 
-    //     if (!user) {
-    //       req.flash('errors', { msg: 'Verification link is invalid or has expired.' });
-    //       return res.redirect('/signup');
-    //     }
+        if (!user) {
+          req.flash('errors', { msg: 'Verification link is invalid or has expired.' });
+          return res.redirect('/signup');
+        }
 
-    //     user.emailVerified = true;
-    //     user.verificationToken = undefined;
-    //     user.verificationTokenExpires = undefined;
+        user.emailVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpires = undefined;
 
-    //     await user.save();
+        await user.save();
 
-    //     req.flash('success', 'Your email has been verified! You may now create listings.')
-    //     res.redirect('/auction');
+        req.flash('success', 'Your email has been verified! You may now create listings.')
+        res.redirect('/');
 
-    // } catch(err) {
-    //     console.error(err)
-    //     res.status(500).render('500.ejs');
-    //   }
-    // },
+    } catch(err) {
+        console.error(err)
+        res.status(500).render('errors/500.ejs');
+      }
+    },
 
     getForgetPassword: async (req, res) => {
 
