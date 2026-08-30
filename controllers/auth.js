@@ -281,6 +281,153 @@ module.exports = {
       }
     },
 
+    postResendVerification: async (req, res) => {
+
+      try {
+        if (req.user.emailVerified) {
+          req.flash('success', 'Your email is already verified.');
+          return res.redirect('/profile');
+        }
+
+        const COOLDOWN_MS = 2 * 60 * 1000;
+        const TOKEN_LIFETIME_MS = 60 * 60 * 1000;
+
+        if (req.user.verificationTokenExpires) {
+          const timeSinceIssued = TOKEN_LIFETIME_MS - (req.user.verificationTokenExpires - Date.now());
+          if (timeSinceIssued < COOLDOWN_MS) {
+            req.flash('errors', { msg: 'A verification email was already sent recently. Please wait a few minutes and try again.' });
+            return res.redirect('/profile');
+          }
+        }
+
+        const token = crypto.randomBytes(20).toString('hex');
+
+        await User.findByIdAndUpdate(req.user._id, {
+          verificationToken: hashToken(token),
+          verificationTokenExpires: Date.now() + TOKEN_LIFETIME_MS,
+        });
+
+        const verificationUrl = `${req.protocol}://${req.get('host')}/verify/${token}`;
+
+          try {
+            const transporter = createTransporter();
+    
+            const mailOptions = {
+              from: `Astro Auction ${process.env.EMAIL_NAME}`,
+              to: req.user.email,
+              subject: 'Welcome to Astro Auction - Please verify your email',
+              html: `
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to Astro Auction</title>
+                <style>
+                  body {
+                    background: #f5f7fa;
+                    margin: 0;
+                    padding: 0;
+                    font-family: 'Roboto', Arial, sans-serif;
+                  }
+                  .email-container {
+                    max-width: 480px;
+                    margin: 2rem auto;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 24px rgba(102,126,234,0.10);
+                    padding: 2rem 1.5rem;
+                  }
+                  .header {
+                    color: #185a9d;
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    text-align: center;
+                  }
+                  .content {
+                    color: #333;
+                    font-size: 1.1rem;
+                    margin-bottom: 1.5rem;
+                  }
+                  .message {
+                    background: #f1f8e9;
+                    border-left: 4px solid #43cea2;
+                    padding: 1rem;
+                    margin: 1.5rem 0;
+                    font-style: italic;
+                    color: #2e7d32;
+                  }
+                  .footer {
+                    color: #888;
+                    font-size: 0.95rem;
+                    text-align: center;
+                    margin-top: 2rem;
+                  }
+                  @media only screen and (max-width: 600px) {
+                    .email-container {
+                      padding: 1rem 0.5rem;
+                    }
+                    .header {
+                      font-size: 1.2rem;
+                    }
+                    .content {
+                      font-size: 1rem;
+                    }
+                  }
+                </style>
+              </head>
+            <body>
+              <div class="email-container">
+                <div class="header">Thank you for joining Astro Auction!</div>
+                <div class="content">
+                <p>Hello</p>
+                <p>We're excited to have you join our local marketplace community!</p>
+                <p>Please verify your email by clicking the button below:</p>
+                <a href="${verificationUrl}" style="background-color: #185a9d; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Verify my email</a>
+                <p>This link will expire in 1 hour.</p>
+                </div>
+              <div class="footer">
+                Best regards,<br>
+                The Astro Auction Team<br>
+                <a href="https://astroauction.up.railway.app/" style="color:#185a9d;text-decoration:none;">Astroauction</a>
+              </div>
+              <div style="margin-top:2rem; text-align:center;">
+                <a href="https://x.com/boobeh123" style="margin:0 8px; display:inline-block;" title="X" target="_blank">
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X" width="28" height="28" style="vertical-align:middle; border-radius:50%;">
+                </a>
+                <a href="https://github.com/boobeh123/" style="margin:0 8px; display:inline-block;" title="GitHub" target="_blank">
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/github.svg" alt="GitHub" width="28" height="28" style="vertical-align:middle; border-radius:50%;">
+                </a>
+                <a href="https://bobby-asakawa.netlify.app/" style="margin:0 8px; display:inline-block;" title="Portfolio" target="_blank">
+                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/internetarchive.svg" alt="Portfolio" width="28" height="28" style="vertical-align:middle; border-radius:50%;">
+                </a>
+              </div>
+              <div style="color:#aaa; font-size:0.95rem; margin-top:1.5rem; text-align:center;">
+                You are receiving this email because you contacted Astro Auction via our website.<br>
+                If you did not make this request, you can safely ignore this email.
+              </div>
+              </div>
+            </body>
+              </html>
+              `
+            };
+          
+            await transporter.sendMail(mailOptions);
+            console.log('Welcome email sent to:', req.user.email);
+          } catch (err) {
+            console.error('Failed to send welcome email:', err.message);
+          }
+
+        req.flash('success', 'Verification email sent! Please check your inbox.');
+        res.redirect('/profile');
+
+    } catch(err) {
+        console.error(err)
+        res.status(500).render('errors/500.ejs');
+      }
+    },
+
     getForgetPassword: async (req, res) => {
 
       try {
