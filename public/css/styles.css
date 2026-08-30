@@ -1029,7 +1029,6 @@ color: #A855F7;
 
 }
 .deleteForm .btn {
-  width: 100%;
   color: #E8E9F3;
 }
 
@@ -1236,6 +1235,8 @@ color: #A855F7;
 
 .file-field {
   margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .file-field label {
@@ -1308,6 +1309,40 @@ color: #A855F7;
   /* border: 2px solid red; */
 }
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge--verified {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22C55E;
+}
+
+.status-badge--unverified {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #FBBF24;
+}
+
+.resend-verification-form {
+  margin-top: 0.6rem;
+}
+
+.file-name {
+  display: block;
+  margin-left: 0.75rem;
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
 .blue-grey {
   background: linear-gradient(135deg, #546E7A 0%, #455A64 100%);
   border: 1px solid rgba(168, 85, 247, 0.2);
@@ -1346,6 +1381,10 @@ color: #A855F7;
   margin: 0.5rem 0 0 0;
   font-size: 0.95rem;
   /* border: 2px solid red; */
+}
+
+.profile-file-label {
+  margin: 0 auto;
 }
 
 .edit-profile-form .form-group {
