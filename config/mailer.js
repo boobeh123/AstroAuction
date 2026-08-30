@@ -8,8 +8,7 @@ const createTransporter = () => {
     auth: {
       user: process.env.EMAIL_NAME,
       pass: process.env.EMAIL_PASSWORD
-    },
-    tls: { rejectUnauthorized: false }
+    }
   });
 };
 
