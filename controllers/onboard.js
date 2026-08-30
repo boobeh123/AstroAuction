@@ -2,38 +2,50 @@ const User = require('../models/User')
 
 module.exports = {
 
-    // getOnboard: async (req, res) => {
+    getOnboard: async (req, res) => {
 
-    //     try {
-    //         if (!req.user) {
-    //             return res.redirect('/login');
-    //         }
+        try {
+            if (req.user.onboardingComplete) {
+                return res.redirect('/');
+            }
 
-    //         if (req.user.onboardingComplete) {
-    //             return res.redirect('/auction');
-    //         }
+            res.render('onboard.ejs');
+        } catch(err) {
+            console.error(err)
+            res.status(500).render('errors/500.ejs');
+        }
 
-    //         res.render('onboard.ejs');
-    //     } catch(err) {
-    //         console.error(err)
-    //         res.status(500).render('500.ejs');
-    //     }
-
-    // },
+    },
 
 
-    // postOnboard: async (req, res) => {
-    //     try {
-    //         await User.findByIdAndUpdate(req.user.id, {
-    //             displayName: req.body.displayName,
-    //             onboardingComplete: true
-    //           });
+    postOnboard: async (req, res) => {
+        try {
+            const displayName = typeof req.body.displayName === 'string' ? req.body.displayName.trim() : ''
 
-    //           res.redirect('/auction');
-    //     } catch(err) {
-    //         console.error(err);
-    //         res.status(500).redirect('500.ejs');
-    //     }
-    // },
+            if (req.user.onboardingComplete) {
+              return res.redirect('/');
+            }
+
+            if (!displayName) {
+                req.flash('errors', { msg: 'Please enter a display name.', field: 'displayName' })
+                return res.redirect('/onboard')
+            }
+
+            if (displayName.length > 25) {
+                req.flash('errors', { msg: 'Display name cannot be longer than 25 characters.', field: 'displayName' })
+                return res.redirect('/onboard')
+            }
+
+            await User.findByIdAndUpdate(req.user.id, {
+                displayName,
+                onboardingComplete: true
+              });
+
+              res.redirect('/');
+        } catch(err) {
+            console.error(err);
+            res.status(500).render('errors/500.ejs');
+        }
+    },
     
 }
