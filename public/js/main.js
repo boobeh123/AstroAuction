@@ -2,7 +2,9 @@
 const flashes = document.querySelectorAll('.flash');
 const deleteForms = document.querySelectorAll('.deleteForm');
 const heroFrame = document.querySelector('.hero-image-frame');
-const canvas = document.getElementById('hero-particles');
+const canvas = document.querySelector('#hero-particles');
+const profileFileInput = document.querySelector('#profile-file');
+const profileFileName = document.querySelector('#profile-file-name');
 
 // Shared state
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -57,6 +59,11 @@ function drawSparkle(ctx, cx, cy, size, rotation) {
 }
 
 // Handler functions
+function handleProfileFileChange(event) {
+  const fileName = event.target.files[0]?.name;
+  profileFileName.textContent = fileName || 'No file chosen';
+}
+
 function handleFlashDismiss(flash) {
   const isError = flash.classList.contains('flash-error');
   const timeout = isError ? 7000 : 5000;
@@ -166,6 +173,10 @@ function handleDeleteConfirm(event) {
 }
 
 // Event listeners
+if (profileFileInput && profileFileName) {
+  profileFileInput.addEventListener('change', handleProfileFileChange);
+}
+
 flashes.forEach(handleFlashDismiss);
 
 deleteForms.forEach((deleteForm) => {
