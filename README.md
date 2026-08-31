@@ -45,6 +45,35 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.031
+📅 **Release Date:** August 30th, 2026
+
+## 📢 Developer's Notes - Optimizations, Resending email verification feature, Thoughts
+
+- The business owner would like to host an auction while livestreaming. A single item is being focused, talked about for a set time. Does the audience see the item through a camera or as a listing? When the item is sold, what does the process look like for registered users & visitors? Several items can be auctioned, is the auctioneer creating listings live or prepared prior? Listings must go from picture to ad with ease.
+  - An announcement feature
+  - An auction feature
+  - A listings feature - refactored
+
+- Signup & onboarding is enabled
+  - Added validation onto the form during `/onboard`
+  - Removed a vulnerability from `mailer.js`
+- Password recovery & reset is enabled
+  - Tokens are hashed before db stores it
+- Profiles are enabled
+  - Added validation onto the form seen on `/profile/edit`
+  - Uploading a profile picture with an existing one will destroy the previous picture
+  - Uploading a profile picture now displays the name of the file
+  - Deleting your account will destroy your profile picture
+  - Imported Node's built-in file system module to unlink temp files left by `multer.js`
+  - Moved the delete profile button from `/profile/edit` to `/profile`
+  - A button renamed & placeholder text updated
+- Optimized multer middleware
+- Email verification is enabled
+  - Tokens are hashed before being stored
+- Resending email verification email is added
+  - You can visit your profile and click a button to resend your verification email
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.030
 📅 **Release Date:** August 29th, 2026
 
