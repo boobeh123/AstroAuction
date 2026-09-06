@@ -15,6 +15,7 @@ const mainRoutes = require('./routes/main');
 const errorHandler = require('./middleware/errorHandler')
 const auctionRoutes = require('./routes/auction');
 const profileRoutes = require('./routes/profile');
+const { startAuctionCloser } = require('./services/auctionCloser');
 
 // Passport config
 require('./config/passport')(passport);
@@ -110,4 +111,10 @@ app.use(errorHandler)
 
 app.listen(process.env.PORT, ()=>{
     console.log('Server is running, you better catch it!')
+
+    // Sweeps for auctions whose time is up and closes them. Runs once
+    // immediately to catch anything that expired while the app was down, then
+    // every 60s. Mongoose buffers commands until the connection is ready, so
+    // this is safe to kick off here even though connectDB() isn't awaited.
+    startAuctionCloser()
 })    
