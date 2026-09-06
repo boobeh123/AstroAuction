@@ -10,5 +10,6 @@ router.delete('/deleteAuction/:id', ensureAuth, auctionController.deleteAuction)
 
 router.get('/viewAuction/:id', auctionController.getDetailedAuction)
 router.post('/viewAuction/:id/comments', ensureAuth, auctionController.postComment);
+router.post('/viewAuction/:id/bids', ensureAuth, auctionController.postBid);
 
 module.exports = router;
