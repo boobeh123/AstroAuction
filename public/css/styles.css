@@ -465,6 +465,10 @@ color: #A855F7;
   margin-bottom: var(--space-6);
 }
 
+.hero-text .btn {
+  margin-bottom: 0.25rem;
+}
+
 .hero-subtitle {
   font-size: 1.25rem;
   color: #B8C5D6;
