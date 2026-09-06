@@ -18,12 +18,15 @@
                     <span class="user-email"><span class="sr-only">Logged in as</span><%= user.displayName %></span>
                     <% if (currentPath === '/profile' || currentPath === '/profile/edit') { %>
                         <a href="/auction" class="btn btn-primary">Auctions</a>
-                        <% } else if (currentPath === '/auction' || currentPath === '/') { %>
-                            <a href="/profile" class="btn btn-primary">Profile</a>
-                            <% } else { %>
-                                <a href="/auction" class="btn btn-primary">Auctions</a>
+                        <% } else if (currentPath === '/auction') { %>
+                            <button type="button" id="open-create-listing-btn" class="btn btn-primary" aria-haspopup="dialog">+ Create Listing</button>
+                            <a href="/profile" class="btn btn-secondary">Profile</a>
+                            <% } else if (currentPath === '/') { %>
                                 <a href="/profile" class="btn btn-primary">Profile</a>
-                                <% } %>
+                                <% } else { %>
+                                    <a href="/auction" class="btn btn-primary">Auctions</a>
+                                    <a href="/profile" class="btn btn-primary">Profile</a>
+                                    <% } %>
                                 <a href="/logout" class="btn btn-secondary">Log out</a>
                                 <% } else { %>
                                     <a href="/login" class="btn btn-secondary">Log in</a>
