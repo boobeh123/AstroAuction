@@ -52,6 +52,39 @@
                 <p class="detailed-description"><%= listing.description %></p>
               </div>
             </div>
+
+            <div class="detailed-card comments-section" aria-labelledby="comments-heading">
+              <h2 class="section-title" id="comments-heading">Comments (<%= comments.length %>)</h2>
+
+              <% if (typeof user !== 'undefined' && user) { %>
+                <form action="/auction/viewAuction/<%= listing._id %>/comments" method="POST" class="comment-form">
+                  <label for="comment-body" class="sr-only">Add a comment</label>
+                  <textarea id="comment-body" name="body" rows="3" placeholder="Ask a question or leave a comment..." maxlength="1000" required></textarea>
+                  <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+              <% } else { %>
+                <p class="comments-signin-prompt"><a href="/login">Log in</a> to leave a comment.</p>
+              <% } %>
+
+              <% if (comments && comments.length > 0) { %>
+                <ul class="comments-list">
+                  <% comments.forEach((comment) => { %>
+                    <li class="comment-item">
+                      <img src="<%= comment.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="" class="comment-avatar">
+                      <div class="comment-body-wrap">
+                        <div class="comment-meta">
+                          <span class="comment-author"><%= comment.user.displayName %></span>
+                          <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString() %></span>
+                        </div>
+                        <p class="comment-text"><%= comment.body %></p>
+                      </div>
+                    </li>
+                  <% }) %>
+                </ul>
+              <% } else { %>
+                <p class="comments-empty">No comments yet. Be the first to ask a question!</p>
+              <% } %>
+            </div>
           </div>
           <aside class="detailed-auction-sidebar">
             <div class="detailed-card">
