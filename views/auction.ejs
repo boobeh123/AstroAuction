@@ -6,92 +6,7 @@
         <h1 class="auction-title">Auction Listings</h1>
         <p class="auction-subtitle">Create a listing and browse the latest items.</p>
       </header>
-      <div class="auction-layout">
-        <aside class="auction-sidebar">
-          <section class="auction-card" aria-labelledby="createListingTitle">
-            <% if (typeof user !== 'undefined' && user) { %>
-            <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-            <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
-              <div class="auction-form-group">
-                <label for="title">Title <span class="required">*</span></label>
-                <input id="title" type="text" name="title" placeholder="Enter item title" required aria-required="true" autocomplete="off">
-              </div>
-              <div class="auction-form-group">
-                <label for="description">Description <span class="required">*</span></label>
-                <textarea id="description" name="description" placeholder="Enter item description" rows="4" required aria-required="true"></textarea>
-              </div>
-              <div class="auction-form-group">
-                <label for="category">Category <span class="required">*</span></label> 
-                <select id="category" name="category" required aria-required="true">
-                  <option value="" disabled selected>Select a category</option>
-                  <option value="Art">Art</option>
-                  <option value="Antiques">Antiques</option>
-                  <option value="Coins & Collectibles">Coins & Collectibles</option>
-                  <option value="Jewelry & Watches">Jewelry & Watches</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Home Decor & Goods">Home Decor & Goods</option>
-                  <option value="Lawn & Garden">Lawn & Garden</option>
-                  <option value="Furniture">Furniture</option>
-                  <option value="Sports Goods">Sports Goods</option>
-                  <option value="Toys">Toys</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Cars">Cars</option>
-                  <option value="Construction">Construction</option>
-                  <option value="Services">Services</option>
-                </select>
-              </div>
-              <div class="auction-form-group">
-                <label for="file">Image</label>
-                <input id="file" type="file" name="file" accept="image/*" aria-describedby="imageHelp">
-                <small id="imageHelp">Optional - Upload an image of your sale</small>
-              </div>
-              <div class="auction-form-actions">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
-              </div>
-            </form>
-            <% } else { %>
-              <h2 class="auction-card-title" id="createListingTitle">Create Listing</h2>
-              <form action="/auction" method="POST" class="auction-form" aria-labelledby="createListingTitle" enctype="multipart/form-data">
-                <div class="auction-form-group">
-                  <label for="title">Title <span class="required">*</span></label>
-                  <input id="title" type="text" name="title" placeholder="Create an account to post" required aria-required="true" autocomplete="off" disabled>
-                </div>
-                <div class="auction-form-group">
-                  <label for="description">Description <span class="required">*</span></label>
-                  <textarea id="description" name="description" placeholder="Guests may browse" rows="4" required aria-required="true" disabled></textarea>
-                </div>
-                <div class="auction-form-group">
-                  <label for="category-guest">Category <span class="required">*</span></label> 
-                  <select id="category-guest" name="category" required aria-required="true" disabled>
-                    <option value="" disabled selected>Select a category</option>
-                    <option value="Art">Art</option>
-                    <option value="Antiques">Antiques</option>
-                    <option value="Coins & Collectibles">Coins & Collectibles</option>
-                    <option value="Jewelry & Watches">Jewelry & Watches</option>
-                    <option value="Fashion">Fashion</option>
-                    <option value="Home Decor & Goods">Home Decor & Goods</option>
-                    <option value="Lawn & Garden">Lawn & Garden</option>
-                    <option value="Furniture">Furniture</option>
-                    <option value="Sports Goods">Sports Goods</option>
-                    <option value="Toys">Toys</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Cars">Cars</option>
-                    <option value="Construction">Construction</option>
-                    <option value="Services">Services</option>
-                  </select>
-                </div>
-                <div class="auction-form-group">
-                  <label for="file">Image</label>
-                  <input id="file" type="file" name="file" accept="image/*" aria-describedby="imageHelp" disabled>
-                  <small id="imageHelp">Optional - Upload an image of your sale</small>
-                </div>
-                <div class="auction-form-actions">
-                  <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
-                </div>
-              </form>
-            <% } %>
-          </section>
-        </aside>
+      <div class="auction-layout auction-layout--single">
         <div class="auction-main">
           <section class="auction-card auction-card-list" aria-labelledby="latestListingsTitle">
             <header class="auction-list-header">
@@ -106,16 +21,17 @@
               <div class="auction-listings">
                 <% listings.forEach(listing => { %>
                   <article class="listing-card" id="listing-<%= listing.id %>">
-                    <% if (listing.image) { %>
-                      <div class="listing-card-media">
-                        <img class="listing-card-image" src="<%= listing.image %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
-                      </div>
+                    <div class="listing-card-media">
+                      <span class="listing-category-badge"><%= listing.category %></span>
+                      <% if (listing.images && listing.images.length > 0) { %>
+                        <img class="listing-card-image" src="<%= listing.images[0] %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
                       <% } %>
+                    </div>
                       <div class="listing-card-body">
                         <h3 class="listing-card-title"><%= listing.title %></h3>
                         <% if (listing.user) { %>
                           <div class="listing-card-seller">
-                            <img src="<%= listing.user.image %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
+                            <img src="<%= listing.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
                             <span class="seller-name">Posted by: <%= listing.user.displayName %></span>
                           </div>
                           <% } %>
@@ -134,11 +50,84 @@
           <% } else { %>
             <div class="auction-empty">
               <h3 class="auction-empty-title">No listings yet</h3>
-              <p class="auction-empty-text">Create your first listing using the form.</p>
+              <p class="auction-empty-text">Create your first listing using the Create Listing button above.</p>
             </div>
           <% } %>
         </section>
       </div>
   </div>
 </main>
+
+<% if (typeof user !== 'undefined' && user && user.onboardingComplete) { %>
+<div class="modal-overlay" id="create-listing-modal" role="dialog" aria-modal="true" aria-labelledby="create-listing-modal-title" hidden>
+  <div class="modal-panel">
+    <div class="modal-header">
+      <h2 class="modal-title" id="create-listing-modal-title">Create Listing</h2>
+      <button type="button" class="modal-close" id="create-listing-modal-close" aria-label="Close">&times;</button>
+    </div>
+    <form action="/auction" method="POST" enctype="multipart/form-data" id="create-listing-form">
+      <div class="form-group">
+        <label for="modal-title-input">Title <span class="required">*</span></label>
+        <input id="modal-title-input" type="text" name="title" placeholder="Enter item title" maxlength="100" required aria-required="true" autocomplete="off">
+        <span class="char-counter" id="title-counter">0 / 100</span>
+      </div>
+      <div class="form-group">
+        <label for="modal-desc-input">Description <span class="required">*</span></label>
+        <textarea id="modal-desc-input" name="description" placeholder="Enter item description" rows="3" maxlength="2000" required aria-required="true"></textarea>
+        <span class="char-counter" id="desc-counter">0 / 2000</span>
+      </div>
+      <div class="form-group">
+        <label for="modal-category-input">Category <span class="required">*</span></label>
+        <select id="modal-category-input" name="category" required aria-required="true">
+          <option value="" selected>Select a category</option>
+          <option value="Art">Art</option>
+          <option value="Antiques">Antiques</option>
+          <option value="Coins & Collectibles">Coins & Collectibles</option>
+          <option value="Jewelry & Watches">Jewelry & Watches</option>
+          <option value="Fashion">Fashion</option>
+          <option value="Home Decor & Goods">Home Decor & Goods</option>
+          <option value="Lawn & Garden">Lawn & Garden</option>
+          <option value="Furniture">Furniture</option>
+          <option value="Sports Goods">Sports Goods</option>
+          <option value="Toys">Toys</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Cars">Cars</option>
+          <option value="Construction">Construction</option>
+          <option value="Services">Services</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="video-toggle-label">Does this listing include a video?</label>
+        <div class="toggle-group" role="group" aria-labelledby="video-toggle-label">
+          <div class="toggle-option">
+            <input type="radio" name="has-video" id="video-no" value="no" checked>
+            <label for="video-no">No</label>
+          </div>
+          <div class="toggle-option">
+            <input type="radio" name="has-video" id="video-yes" value="yes">
+            <label for="video-yes">Yes</label>
+          </div>
+        </div>
+        <div class="video-url-field" id="video-url-field">
+          <input type="url" id="video-url-input" name="video" placeholder="https://youtube.com/watch?v=...">
+          <small>Paste a YouTube link — direct video upload from your phone isn't supported yet.</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Photos (optional, up to 10)</label>
+        <div class="dropzone" id="dropzone">
+          <input id="modal-file-input" type="file" name="file" accept="image/*" multiple>
+          <span class="dropzone-prompt" id="dropzone-prompt"><i class="fas fa-image" aria-hidden="true"></i>Drag photos here, or click to browse</span>
+        </div>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <span class="gallery-count" id="gallery-count">0 / 10 photos</span>
+      </div>
+      <div class="auction-form-actions">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+
 <%- include('./partials/footer.ejs') %>
