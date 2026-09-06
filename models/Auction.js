@@ -1,14 +1,40 @@
 const mongoose = require('mongoose')
 
+const CATEGORIES = [
+    'Art',
+    'Antiques',
+    'Coins & Collectibles',
+    'Jewelry & Watches',
+    'Fashion',
+    'Home Decor & Goods',
+    'Lawn & Garden',
+    'Furniture',
+    'Sports Goods',
+    'Toys',
+    'Electronics',
+    'Cars',
+    'Construction',
+    'Services',
+]
+
 const AuctionSchema = new mongoose.Schema({
-    title: { 
+    title: {
         type: String,
+        required: true,
+        trim: true,
+        maxlength: 100,
     },
     description: {
         type: String,
+        required: true,
+        trim: true,
+        maxlength: 2000,
     },
-    image: {
-        type: String,
+    images: {
+        type: [String],
+    },
+    cloudinaryIds: {
+        type: [String],
     },
     video: {
         type: String,
@@ -20,6 +46,8 @@ const AuctionSchema = new mongoose.Schema({
     },
     category: {
         type: String,
+        required: true,
+        enum: CATEGORIES,
     }
 },
     { timestamps: true }
