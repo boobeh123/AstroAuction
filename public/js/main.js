@@ -23,6 +23,10 @@ const imageLightboxImg = document.querySelector('#image-lightbox-img');
 const imageLightboxClose = document.querySelector('#image-lightbox-close');
 const navToggle = document.querySelector('#nav-toggle');
 const navActions = document.querySelector('#nav-actions');
+const saleTypeRadios = document.querySelectorAll('input[name="saleType"]');
+const fixedPriceFields = document.querySelector('#fixed-price-fields');
+const auctionFields = document.querySelector('#auction-fields');
+const countdowns = document.querySelectorAll('[data-ends-at]');
 
 // Shared state
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -125,6 +129,25 @@ function renderListingGallery() {
   listingFileInput.disabled = selectedListingFiles.length >= MAX_LISTING_IMAGES;
 
   syncListingFileInput();
+}
+
+// Formats remaining time at a granularity that matches how much is left:
+// days when it's far off, seconds when it's nearly over. Showing "3d 4h 12m 9s"
+// on a three-day auction is noise; showing "0d 0h 0m" on the last minute is
+// useless.
+function formatTimeRemaining(ms) {
+  if (ms <= 0) return 'Ended';
+
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  if (minutes > 0) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
 }
 
 function wireCharCounter(inputId, counterId, max) {
@@ -241,6 +264,41 @@ function handleNavOutsideClick(event) {
 
 function handleNavKeydown(event) {
   if (event.key === 'Escape') closeNavMenu();
+}
+
+// Toggles which pricing fields the create-listing modal shows.
+//
+// The `required` attribute is added and removed here rather than being set in
+// the HTML. A hidden input that is still marked required blocks form
+// submission with a validation error the browser cannot display, because it
+// can't focus an element nobody can see — the form just silently refuses to
+// submit with no visible explanation.
+function handleSaleTypeChange() {
+  const isAuction = document.getElementById('sale-auction').checked;
+
+  fixedPriceFields.hidden = isAuction;
+  auctionFields.hidden = !isAuction;
+
+  const priceInput = document.getElementById('modal-price-input');
+  const startingPriceInput = document.getElementById('modal-starting-price-input');
+
+  if (priceInput) priceInput.required = !isAuction;
+  if (startingPriceInput) startingPriceInput.required = isAuction;
+}
+
+function tickCountdowns() {
+  const now = Date.now();
+
+  countdowns.forEach((el) => {
+    const endsAt = new Date(el.dataset.endsAt).getTime();
+
+    if (Number.isNaN(endsAt)) return;
+
+    const remaining = endsAt - now;
+    el.textContent = formatTimeRemaining(remaining);
+    el.classList.toggle('is-urgent', remaining > 0 && remaining < 3600000);
+    el.classList.toggle('is-ended', remaining <= 0);
+  });
 }
 
 function handleFlashDismiss(flash) {
@@ -421,6 +479,18 @@ if (navToggle && navActions) {
   window.addEventListener('resize', () => {
     if (window.innerWidth > 768) closeNavMenu();
   });
+}
+
+if (saleTypeRadios.length && fixedPriceFields && auctionFields) {
+  saleTypeRadios.forEach((radio) => radio.addEventListener('change', handleSaleTypeChange));
+  // Runs once on load so `required` matches whichever option starts checked,
+  // rather than only becoming correct after the user touches the toggle.
+  handleSaleTypeChange();
+}
+
+if (countdowns.length) {
+  tickCountdowns();
+  setInterval(tickCountdowns, 1000);
 }
 
 flashes.forEach(handleFlashDismiss);
