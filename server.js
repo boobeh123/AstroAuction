@@ -13,7 +13,7 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const mainRoutes = require('./routes/main');
 const errorHandler = require('./middleware/errorHandler')
-// const auctionRoutes = require('./routes/auction');
+const auctionRoutes = require('./routes/auction');
 const profileRoutes = require('./routes/profile');
 
 // Passport config
@@ -35,15 +35,17 @@ app.use(helmet({
             scriptSrcAttr:  ["'unsafe-inline'"],
             styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
             fontSrc:        ["'self'", "https://fonts.gstatic.com", "https://kit.fontawesome.com", "https://ka-f.fontawesome.com", "https://cdnjs.cloudflare.com"],
-            imgSrc:         ["'self'", "data:", "https://res.cloudinary.com", "https://www.google-analytics.com", "https://placeholder.pics"],
+            imgSrc:         ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://www.google-analytics.com", "https://placeholder.pics"],
             connectSrc:     ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://ka-f.fontawesome.com"],
-            frameSrc:       ["'none'"],
+            frameSrc:       ["'self'", "https://www.youtube-nocookie.com"],
             objectSrc:      ["'none'"],
             upgradeInsecureRequests: [],
         },
     },
-    // X-Frame-Options: SAMEORIGIN — already covered by CSP frameSrc 'none'
-    // but kept for older browsers that don't support CSP
+    // X-Frame-Options: SAMEORIGIN — controls whether other sites can embed
+    // THIS page (clickjacking protection); separate concern from frameSrc,
+    // which controls what THIS page is allowed to embed. Kept for older
+    // browsers that don't support CSP's frame-ancestors.
     xFrameOptions: { action: 'sameorigin' },
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }))
@@ -95,7 +97,7 @@ app.use((req, res, next) => {
 })
 
 app.use('/', mainRoutes);
-// app.use('/auction', auctionRoutes);
+app.use('/auction', auctionRoutes);
 app.use('/profile', profileRoutes);
 
 // 404 handler — catches any request that didn't match a route above
