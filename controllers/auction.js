@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Auction = require('../models/Auction')
+const Comment = require('../models/Comment')
 const cloudinary = require("../middleware/cloudinary");
 const fs = require('fs/promises');
 
@@ -105,6 +106,7 @@ module.exports = {
                 }
 
                 await Auction.findByIdAndDelete(req.params.id)
+                await Comment.deleteMany({ auction: req.params.id })
                 console.log('Deleted listing')
                 res.redirect('/auction')
                 
@@ -130,9 +132,15 @@ module.exports = {
                 const youtubeId = extractYouTubeId(listing.video);
                 const videoEmbedUrl = youtubeId ? `https://www.youtube-nocookie.com/embed/${youtubeId}` : null;
 
+                const comments = await Comment.find({ auction: req.params.id })
+                    .sort({ createdAt: 1 })
+                    .populate('user', 'displayName image')
+                    .lean();
+
                 res.render('detailedAuction.ejs', {
                     listing: listing,
-                    videoEmbedUrl: videoEmbedUrl
+                    videoEmbedUrl: videoEmbedUrl,
+                    comments: comments
                 });
 
             } catch(err) {
@@ -140,5 +148,41 @@ module.exports = {
                 res.status(500).render('errors/500.ejs');
             }
         },
+
+    postComment: async (req, res) => {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+                return res.status(404).render('errors/404.ejs');
+            }
+
+            const auctionExists = await Auction.exists({ _id: req.params.id });
+            if (!auctionExists) {
+                return res.status(404).render('errors/404.ejs');
+            }
+
+            const body = typeof req.body.body === 'string' ? req.body.body.trim() : '';
+
+            if (!body) {
+                req.flash('errors', { msg: 'Please enter a comment.' });
+                return res.redirect(`/auction/viewAuction/${req.params.id}`);
+            }
+
+            if (body.length > 1000) {
+                req.flash('errors', { msg: 'Comments cannot be longer than 1000 characters.' });
+                return res.redirect(`/auction/viewAuction/${req.params.id}`);
+            }
+
+            await Comment.create({
+                body,
+                user: req.user.id,
+                auction: req.params.id,
+            });
+
+            res.redirect(`/auction/viewAuction/${req.params.id}`);
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('errors/500.ejs');
+        }
+    },
     
 }
