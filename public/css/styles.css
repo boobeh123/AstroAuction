@@ -327,6 +327,46 @@ p {
   /* border: 2px solid red; */
 }
 
+/* Hamburger toggle — hidden on desktop, shown only below the mobile breakpoint */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.nav-toggle-bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #E8E9F3;
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid #00D9FF;
+  outline-offset: 2px;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .user-email {
   color: #B8C5D6;
   font-size: 0.9rem;
@@ -1353,6 +1393,100 @@ color: #A855F7;
   outline-offset: 2px;
 }
 
+/* Comments section on the detail page */
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.comment-form textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(184, 197, 214, 0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  color: #E8E9F3;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: #A855F7;
+}
+
+.comment-form .btn {
+  align-self: flex-start;
+}
+
+.comments-signin-prompt,
+.comments-empty {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.comments-signin-prompt a {
+  color: #A855F7;
+}
+
+.comments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.comment-item {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.comment-body-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.comment-author {
+  color: #E8E9F3;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.comment-date {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
+.comment-text {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /**************************************************************
 * Onboard
 ***************************************************************/
@@ -2311,10 +2445,52 @@ color: #A855F7;
 @media (max-width: 768px) {
 
   /* nav partial */
+    .nav-container {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nav-toggle {
+      display: flex;
+    }
+
+    .nav-actions {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+      background: #14142b;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 0 0 12px 12px;
+      padding: 1rem;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+
+    .nav-actions.is-open {
+      display: flex;
+    }
+
+    .nav-actions a,
+    .nav-actions button,
+    .nav-actions span {
+      width: 100%;
+      text-align: center;
+    }
+
     .nav-actions a {
       /* border: 2px solid red; */
       font-size: .75rem;
       padding: 7.5px 12px !important;
+    }
+
+    .detailed-video-container {
+      border-radius: 8px;
     }
 
     .nav-brand i, .nav-brand span{
@@ -2488,6 +2664,10 @@ color: #A855F7;
     grid-template-columns: 1fr;
     /* grid-template-rows: auto 1fr; */
     /* border: 2px solid green; */
+  }
+
+  .listing-card-actions .deleteForm button {
+    width: 100%;
   }
 
   /* detailed auction */
