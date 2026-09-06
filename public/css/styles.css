@@ -1488,6 +1488,256 @@ color: #A855F7;
 }
 
 /**************************************************************
+* Bidding
+***************************************************************/
+
+/* --- Sale type fields in the create-listing modal --- */
+.sale-fields {
+  margin-top: 0.75rem;
+}
+
+.sale-fields[hidden] {
+  display: none;
+}
+
+.sale-fields small {
+  display: block;
+  color: #6B6AAF;
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+}
+
+/* --- Pricing block on listing cards --- */
+.listing-card-pricing {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.listing-card-price {
+  color: #E8E9F3;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.listing-card-price-label {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
+.listing-card-timer {
+  margin-left: auto;
+  color: #B8C5D6;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(184, 197, 214, 0.25);
+  white-space: nowrap;
+}
+
+.listing-card-timer.is-urgent,
+.listing-card-timer--ended {
+  color: #FBBF24;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.listing-card-timer.is-ended,
+.listing-card-timer--ended {
+  color: #6B6AAF;
+  border-color: rgba(107, 106, 175, 0.4);
+}
+
+/* --- Bid card on the detail page --- */
+.bid-headline {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bid-label {
+  color: #B8C5D6;
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.bid-amount {
+  color: #E8E9F3;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bid-count {
+  color: #6B6AAF;
+  font-size: 0.8rem;
+}
+
+.bid-countdown {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(184, 197, 214, 0.2);
+}
+
+.countdown-label {
+  color: #B8C5D6;
+  font-size: 0.8rem;
+}
+
+.countdown-value {
+  color: #E8E9F3;
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Under an hour left — the colour shift is a nudge, not the only signal,
+   since the text itself already says how long is left. */
+.countdown-value.is-urgent {
+  color: #FBBF24;
+}
+
+.countdown-value.is-ended {
+  color: #6B6AAF;
+}
+
+.bid-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bid-form label {
+  color: #B8C5D6;
+  font-size: 0.85rem;
+}
+
+.bid-input-row {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(184, 197, 214, 0.25);
+  border-radius: 8px;
+  padding: 0 0.75rem;
+}
+
+.bid-input-row:focus-within {
+  border-color: #A855F7;
+}
+
+.bid-currency {
+  color: #B8C5D6;
+  font-size: 0.95rem;
+  padding-right: 0.35rem;
+}
+
+.bid-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #E8E9F3;
+  font-size: 1rem;
+  font-family: inherit;
+  padding: 0.6rem 0;
+  min-width: 0;
+}
+
+.bid-input-row input:focus {
+  outline: none;
+}
+
+.bid-minimum {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
+.bid-submit {
+  margin-top: 0.25rem;
+}
+
+.bid-notice {
+  color: #B8C5D6;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.bid-notice a {
+  color: #A855F7;
+}
+
+.bid-ended-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(107, 106, 175, 0.2);
+  border: 1px solid rgba(107, 106, 175, 0.4);
+  color: #B8C5D6;
+  font-size: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.bid-ended-text {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.bid-ended-text strong {
+  color: #E8E9F3;
+}
+
+/* --- Bid history --- */
+.bid-history-card {
+  margin-top: 1rem;
+  padding: 1.5rem;
+}
+
+.bid-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bid-history-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.bid-history-user {
+  color: #E8E9F3;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bid-history-amount {
+  color: #A855F7;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.bid-history-date {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
+/**************************************************************
 * Onboard
 ***************************************************************/
 .onboarding-page {
