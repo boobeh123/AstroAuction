@@ -29,6 +29,22 @@
                     </div>
                       <div class="listing-card-body">
                         <h3 class="listing-card-title"><%= listing.title %></h3>
+                        <% if (listing.saleType === 'auction') { %>
+                          <div class="listing-card-pricing">
+                            <span class="listing-card-price"><%= formatMoney(listing.currentBid !== null && listing.currentBid !== undefined ? listing.currentBid : listing.startingPrice) %></span>
+                            <span class="listing-card-price-label"><%= listing.bidCount > 0 ? `${listing.bidCount} bid${listing.bidCount === 1 ? '' : 's'}` : 'Starting bid' %></span>
+                            <% if (isAuctionLive(listing)) { %>
+                              <span class="listing-card-timer" data-ends-at="<%= new Date(listing.endsAt).toISOString() %>">&mdash;</span>
+                            <% } else { %>
+                              <span class="listing-card-timer listing-card-timer--ended">Ended</span>
+                            <% } %>
+                          </div>
+                        <% } else if (listing.price !== null && listing.price !== undefined) { %>
+                          <div class="listing-card-pricing">
+                            <span class="listing-card-price"><%= formatMoney(listing.price) %></span>
+                            <span class="listing-card-price-label">Fixed price</span>
+                          </div>
+                        <% } %>
                         <% if (listing.user) { %>
                           <div class="listing-card-seller">
                             <img src="<%= listing.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
@@ -95,6 +111,40 @@
           <option value="Construction">Construction</option>
           <option value="Services">Services</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label id="sale-type-label">Listing type <span class="required">*</span></label>
+        <div class="toggle-group" role="group" aria-labelledby="sale-type-label">
+          <div class="toggle-option">
+            <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
+            <label for="sale-fixed">Fixed price</label>
+          </div>
+          <div class="toggle-option">
+            <input type="radio" name="saleType" id="sale-auction" value="auction">
+            <label for="sale-auction">Auction</label>
+          </div>
+        </div>
+
+        <div class="sale-fields" id="fixed-price-fields">
+          <label for="modal-price-input">Price</label>
+          <input type="number" id="modal-price-input" name="price" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal">
+        </div>
+
+        <div class="sale-fields" id="auction-fields" hidden>
+          <label for="modal-starting-price-input">Starting bid</label>
+          <input type="number" id="modal-starting-price-input" name="startingPrice" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal">
+
+          <label for="modal-increment-input">Minimum bid increment</label>
+          <input type="number" id="modal-increment-input" name="minIncrement" min="0.01" step="0.01" value="1.00" inputmode="decimal">
+
+          <label for="modal-duration-input">Duration</label>
+          <select id="modal-duration-input" name="durationDays">
+            <% durationChoices.forEach((days) => { %>
+              <option value="<%= days %>" <%= days === 7 ? 'selected' : '' %>><%= days %> day<%= days === 1 ? '' : 's' %></option>
+            <% }) %>
+          </select>
+          <small>Bidding closes automatically when the timer runs out.</small>
+        </div>
       </div>
       <div class="form-group">
         <label id="video-toggle-label">Does this listing include a video?</label>
