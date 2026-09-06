@@ -2685,3 +2685,9 @@ color: #A855F7;
   }
 
 }
+
+@media (max-width: 500px) {
+  .nav-container {
+    justify-content: space-around;
+  }
+}
