@@ -9,10 +9,32 @@
         </div>
         <div class="detailed-auction-layout">
           <div class="detailed-auction-main">
-            <% if (listing.image) { %>
-              <div class="detailed-image-container">
-                <img src="<%= listing.image %>" alt="<%= listing.title %>" class="detailed-image">
+            <% if (videoEmbedUrl) { %>
+              <div class="detailed-video-container">
+                <iframe src="<%= videoEmbedUrl %>" title="<%= listing.title %> video" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
               </div>
+              <% if (listing.images && listing.images.length > 0) { %>
+                <div class="detailed-image-strip" aria-label="Listing photos">
+                  <% listing.images.forEach((img, index) => { %>
+                    <button type="button" class="detailed-strip-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> larger">
+                      <img src="<%= img %>" alt="<%= listing.title %>" class="detailed-strip-image" loading="lazy">
+                    </button>
+                  <% }) %>
+                </div>
+              <% } %>
+            <% } else if (listing.images && listing.images.length > 0) { %>
+              <div class="detailed-image-container">
+                <img src="<%= listing.images[0] %>" alt="<%= listing.title %>" class="detailed-image" id="detailed-main-image">
+              </div>
+              <% if (listing.images.length > 1) { %>
+                <div class="detailed-image-thumbnails" aria-label="Listing photos">
+                  <% listing.images.forEach((img, index) => { %>
+                    <button type="button" class="detailed-image-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> of <%= listing.images.length %>" <%= index === 0 ? 'aria-current="true"' : '' %>>
+                      <img src="<%= img %>" alt="">
+                    </button>
+                  <% }) %>
+                </div>
+              <% } %>
             <% } else { %>
               <div class="detailed-image-container detailed-image-placeholder">
                 <i class="fas fa-image" aria-hidden="true"></i>
@@ -53,7 +75,7 @@
               <div class="detailed-card seller-card">
                 <h2 class="section-title">Seller</h2>
                 <div class="seller-info">
-                  <img src="<%= listing.user.image %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
+                  <img src="<%= listing.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
                   <div class="seller-details">
                     <h3 class="seller-name"><%= listing.user.displayName %></h3>
                     <p class="seller-joined">Member since <%= new Date(listing.user.createdAt).toLocaleDateString('en-US', { 
@@ -68,4 +90,12 @@
         </div>
       </div>
 </main>
+
+<% if (listing.images && listing.images.length > 0) { %>
+<div class="image-lightbox-overlay" id="image-lightbox" role="dialog" aria-modal="true" aria-label="Photo preview" hidden>
+  <button type="button" class="image-lightbox-close" id="image-lightbox-close" aria-label="Close">&times;</button>
+  <img src="" alt="" class="image-lightbox-img" id="image-lightbox-img">
+</div>
+<% } %>
+
 <%- include('./partials/footer.ejs') %>
