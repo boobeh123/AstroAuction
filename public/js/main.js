@@ -21,6 +21,8 @@ const detailedStripThumbs = document.querySelectorAll('.detailed-strip-thumb');
 const imageLightbox = document.querySelector('#image-lightbox');
 const imageLightboxImg = document.querySelector('#image-lightbox-img');
 const imageLightboxClose = document.querySelector('#image-lightbox-close');
+const navToggle = document.querySelector('#nav-toggle');
+const navActions = document.querySelector('#nav-actions');
 
 // Shared state
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -211,6 +213,36 @@ function handleLightboxKeydown(event) {
   if (event.key === 'Escape') closeImageLightbox();
 }
 
+function openNavMenu() {
+  navActions.classList.add('is-open');
+  navToggle.setAttribute('aria-expanded', 'true');
+  navToggle.setAttribute('aria-label', 'Close menu');
+}
+
+function closeNavMenu() {
+  navActions.classList.remove('is-open');
+  navToggle.setAttribute('aria-expanded', 'false');
+  navToggle.setAttribute('aria-label', 'Open menu');
+}
+
+function toggleNavMenu() {
+  if (navActions.classList.contains('is-open')) {
+    closeNavMenu();
+  } else {
+    openNavMenu();
+  }
+}
+
+function handleNavOutsideClick(event) {
+  if (!navActions.contains(event.target) && !navToggle.contains(event.target)) {
+    closeNavMenu();
+  }
+}
+
+function handleNavKeydown(event) {
+  if (event.key === 'Escape') closeNavMenu();
+}
+
 function handleFlashDismiss(flash) {
   const isError = flash.classList.contains('flash-error');
   const timeout = isError ? 7000 : 5000;
@@ -370,6 +402,24 @@ if (detailedStripThumbs.length && imageLightbox && imageLightboxClose) {
   imageLightboxClose.addEventListener('click', closeImageLightbox);
   imageLightbox.addEventListener('click', (event) => {
     if (event.target === imageLightbox) closeImageLightbox();
+  });
+}
+
+if (navToggle && navActions) {
+  navToggle.addEventListener('click', toggleNavMenu);
+  document.addEventListener('click', handleNavOutsideClick);
+  document.addEventListener('keydown', handleNavKeydown);
+
+  // Closing on any click inside covers both normal links (which navigate
+  // away anyway) and buttons like Create Listing, which open a different
+  // overlay — without this, the nav dropdown and that overlay could end up
+  // open at the same time.
+  navActions.addEventListener('click', (event) => {
+    if (event.target.closest('a, button')) closeNavMenu();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeNavMenu();
   });
 }
 
