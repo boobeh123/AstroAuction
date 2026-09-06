@@ -5,11 +5,30 @@ const heroFrame = document.querySelector('.hero-image-frame');
 const canvas = document.querySelector('#hero-particles');
 const profileFileInput = document.querySelector('#profile-file');
 const profileFileName = document.querySelector('#profile-file-name');
+const openListingModalBtn = document.querySelector('#open-create-listing-btn');
+const listingModal = document.querySelector('#create-listing-modal');
+const listingModalClose = document.querySelector('#create-listing-modal-close');
+const videoRadios = document.querySelectorAll('input[name="has-video"]');
+const videoUrlField = document.querySelector('#video-url-field');
+const listingFileInput = document.querySelector('#modal-file-input');
+const listingDropzone = document.querySelector('#dropzone');
+const listingGalleryGrid = document.querySelector('#gallery-grid');
+const listingGalleryCount = document.querySelector('#gallery-count');
+const listingDropzonePrompt = document.querySelector('#dropzone-prompt');
+const detailedMainImage = document.querySelector('#detailed-main-image');
+const detailedThumbnails = document.querySelectorAll('.detailed-image-thumb');
+const detailedStripThumbs = document.querySelectorAll('.detailed-strip-thumb');
+const imageLightbox = document.querySelector('#image-lightbox');
+const imageLightboxImg = document.querySelector('#image-lightbox-img');
+const imageLightboxClose = document.querySelector('#image-lightbox-close');
 
 // Shared state
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const RISE_COLOR = '232, 233, 243'; // #E8E9F3
 const TWINKLE_COLOR = '168, 85, 247'; // #A855F7
+const MAX_LISTING_IMAGES = 10;
+let selectedListingFiles = [];
+let lastFocusedStripThumb = null;
 
 // Helper functions
 function dismissFlash(flash) {
@@ -58,10 +77,138 @@ function drawSparkle(ctx, cx, cy, size, rotation) {
   ctx.fill();
 }
 
+function getModalFocusable() {
+  return listingModal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+}
+
+// Keeps the real <input type="file"> in sync with the JS-tracked selection,
+// since drag-and-drop and multi-step selection don't update it on their own —
+// without this, only whichever files were most recently dropped/picked would
+// actually be included when the form submits.
+function syncListingFileInput() {
+  const dataTransfer = new DataTransfer();
+  selectedListingFiles.forEach((file) => dataTransfer.items.add(file));
+  listingFileInput.files = dataTransfer.files;
+}
+
+function renderListingGallery() {
+  listingGalleryGrid.innerHTML = '';
+
+  selectedListingFiles.forEach((file, index) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'gallery-thumb';
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = `Selected photo ${index + 1}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'gallery-thumb-remove';
+    removeBtn.setAttribute('aria-label', `Remove photo ${index + 1}`);
+    removeBtn.textContent = '\u00d7';
+    removeBtn.addEventListener('click', () => {
+      selectedListingFiles.splice(index, 1);
+      renderListingGallery();
+    });
+
+    thumb.appendChild(img);
+    thumb.appendChild(removeBtn);
+    listingGalleryGrid.appendChild(thumb);
+  });
+
+  listingGalleryCount.textContent = `${selectedListingFiles.length} / ${MAX_LISTING_IMAGES} photos`;
+  listingGalleryCount.classList.toggle('gallery-count--full', selectedListingFiles.length >= MAX_LISTING_IMAGES);
+  listingDropzonePrompt.style.display = selectedListingFiles.length >= MAX_LISTING_IMAGES ? 'none' : '';
+  listingFileInput.disabled = selectedListingFiles.length >= MAX_LISTING_IMAGES;
+
+  syncListingFileInput();
+}
+
+function wireCharCounter(inputId, counterId, max) {
+  const input = document.getElementById(inputId);
+  const counter = document.getElementById(counterId);
+  if (!input || !counter) return;
+  input.addEventListener('input', () => {
+    const len = input.value.length;
+    counter.textContent = `${len} / ${max}`;
+    counter.classList.toggle('char-counter--near-limit', len >= max * 0.9);
+  });
+}
+
 // Handler functions
 function handleProfileFileChange(event) {
   const fileName = event.target.files[0]?.name;
   profileFileName.textContent = fileName || 'No file chosen';
+}
+
+function openListingModal() {
+  listingModal.hidden = false;
+  const focusable = getModalFocusable();
+  if (focusable.length) focusable[0].focus();
+  document.addEventListener('keydown', handleModalKeydown);
+}
+
+function closeListingModal() {
+  listingModal.hidden = true;
+  document.removeEventListener('keydown', handleModalKeydown);
+  openListingModalBtn.focus();
+}
+
+function handleModalKeydown(event) {
+  if (event.key === 'Escape') {
+    closeListingModal();
+    return;
+  }
+  if (event.key === 'Tab') {
+    const focusable = Array.from(getModalFocusable());
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+function handleVideoToggleChange() {
+  videoUrlField.classList.toggle('is-visible', document.getElementById('video-yes').checked);
+}
+
+function addListingFiles(fileList) {
+  const incoming = Array.from(fileList).filter((f) => f.type.startsWith('image/'));
+  const room = MAX_LISTING_IMAGES - selectedListingFiles.length;
+  selectedListingFiles = selectedListingFiles.concat(incoming.slice(0, room));
+  renderListingGallery();
+}
+
+function handleThumbnailClick(event) {
+  const thumb = event.currentTarget;
+  detailedMainImage.src = thumb.dataset.imageUrl;
+  detailedThumbnails.forEach((t) => t.removeAttribute('aria-current'));
+  thumb.setAttribute('aria-current', 'true');
+}
+
+function openImageLightbox(event) {
+  lastFocusedStripThumb = event.currentTarget;
+  imageLightboxImg.src = event.currentTarget.dataset.imageUrl;
+  imageLightbox.hidden = false;
+  imageLightboxClose.focus();
+  document.addEventListener('keydown', handleLightboxKeydown);
+}
+
+function closeImageLightbox() {
+  imageLightbox.hidden = true;
+  imageLightboxImg.src = '';
+  document.removeEventListener('keydown', handleLightboxKeydown);
+  if (lastFocusedStripThumb) lastFocusedStripThumb.focus();
+}
+
+function handleLightboxKeydown(event) {
+  if (event.key === 'Escape') closeImageLightbox();
 }
 
 function handleFlashDismiss(flash) {
@@ -175,6 +322,55 @@ function handleDeleteConfirm(event) {
 // Event listeners
 if (profileFileInput && profileFileName) {
   profileFileInput.addEventListener('change', handleProfileFileChange);
+}
+
+if (openListingModalBtn && listingModal && listingModalClose) {
+  openListingModalBtn.addEventListener('click', openListingModal);
+  listingModalClose.addEventListener('click', closeListingModal);
+  listingModal.addEventListener('click', (event) => {
+    if (event.target === listingModal) closeListingModal();
+  });
+}
+
+if (videoRadios.length && videoUrlField) {
+  videoRadios.forEach((radio) => radio.addEventListener('change', handleVideoToggleChange));
+}
+
+if (listingDropzone && listingFileInput && listingGalleryGrid && listingGalleryCount && listingDropzonePrompt) {
+  wireCharCounter('modal-title-input', 'title-counter', 100);
+  wireCharCounter('modal-desc-input', 'desc-counter', 2000);
+
+  listingFileInput.addEventListener('change', () => {
+    addListingFiles(listingFileInput.files);
+  });
+
+  ['dragenter', 'dragover'].forEach((evt) => {
+    listingDropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      listingDropzone.classList.add('dropzone--active');
+    });
+  });
+  ['dragleave', 'drop'].forEach((evt) => {
+    listingDropzone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      listingDropzone.classList.remove('dropzone--active');
+    });
+  });
+  listingDropzone.addEventListener('drop', (e) => {
+    addListingFiles(e.dataTransfer.files);
+  });
+}
+
+if (detailedMainImage && detailedThumbnails.length) {
+  detailedThumbnails.forEach((thumb) => thumb.addEventListener('click', handleThumbnailClick));
+}
+
+if (detailedStripThumbs.length && imageLightbox && imageLightboxClose) {
+  detailedStripThumbs.forEach((thumb) => thumb.addEventListener('click', openImageLightbox));
+  imageLightboxClose.addEventListener('click', closeImageLightbox);
+  imageLightbox.addEventListener('click', (event) => {
+    if (event.target === imageLightbox) closeImageLightbox();
+  });
 }
 
 flashes.forEach(handleFlashDismiss);
