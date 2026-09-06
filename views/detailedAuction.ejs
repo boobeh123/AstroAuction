@@ -52,8 +52,9 @@
                 <p class="detailed-description"><%= listing.description %></p>
               </div>
             </div>
+          </div>
 
-            <div class="detailed-card comments-section" aria-labelledby="comments-heading">
+          <div class="detailed-card comments-section" aria-labelledby="comments-heading">
               <h2 class="section-title" id="comments-heading">Comments (<%= comments.length %>)</h2>
 
               <% if (typeof user !== 'undefined' && user) { %>
@@ -85,8 +86,74 @@
                 <p class="comments-empty">No comments yet. Be the first to ask a question!</p>
               <% } %>
             </div>
-          </div>
-          <aside class="detailed-auction-sidebar">
+          <aside class="detailed-info-panel">
+            <% if (listing.saleType === 'auction') { %>
+              <div class="detailed-card bid-card">
+                <div class="bid-headline">
+                  <span class="bid-label"><%= listing.bidCount > 0 ? 'Current bid' : 'Starting bid' %></span>
+                  <span class="bid-amount"><%= formatMoney(listing.currentBid !== null && listing.currentBid !== undefined ? listing.currentBid : listing.startingPrice) %></span>
+                  <span class="bid-count"><%= listing.bidCount %> bid<%= listing.bidCount === 1 ? '' : 's' %></span>
+                </div>
+
+                <% if (auctionLive) { %>
+                  <div class="bid-countdown">
+                    <span class="countdown-label">Time left</span>
+                    <span class="countdown-value" data-ends-at="<%= new Date(listing.endsAt).toISOString() %>">&mdash;</span>
+                  </div>
+
+                  <% if (typeof user !== 'undefined' && user) { %>
+                    <% if (listing.user && listing.user._id.toString() === user.id) { %>
+                      <p class="bid-notice">This is your listing, so you can't bid on it.</p>
+                    <% } else { %>
+                      <form action="/auction/viewAuction/<%= listing._id %>/bids" method="POST" class="bid-form">
+                        <label for="bid-amount">Your bid</label>
+                        <div class="bid-input-row">
+                          <span class="bid-currency">$</span>
+                          <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
+                        </div>
+                        <small class="bid-minimum">Minimum bid: <%= formatMoney(minNextBid) %></small>
+                        <button type="submit" class="btn btn-primary bid-submit">Place Bid</button>
+                      </form>
+                    <% } %>
+                  <% } else { %>
+                    <p class="bid-notice"><a href="/login">Log in</a> to place a bid.</p>
+                  <% } %>
+                <% } else { %>
+                  <div class="bid-ended">
+                    <span class="bid-ended-badge">Auction ended</span>
+                    <% if (listing.bidCount > 0) { %>
+                      <p class="bid-ended-text">Won with a bid of <strong><%= formatMoney(listing.currentBid) %></strong>.</p>
+                    <% } else { %>
+                      <p class="bid-ended-text">This auction closed without any bids.</p>
+                    <% } %>
+                  </div>
+                <% } %>
+              </div>
+
+              <% if (bids && bids.length > 0) { %>
+                <div class="detailed-card bid-history-card">
+                  <h2 class="section-title">Bid History</h2>
+                  <ul class="bid-history-list">
+                    <% bids.forEach((bid) => { %>
+                      <li class="bid-history-item">
+                        <span class="bid-history-user"><%= bid.user ? bid.user.displayName : 'Removed user' %></span>
+                        <span class="bid-history-amount"><%= formatMoney(bid.amount) %></span>
+                        <span class="bid-history-date"><%= new Date(bid.createdAt).toLocaleDateString() %></span>
+                      </li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+            <% } else if (listing.price !== null && listing.price !== undefined) { %>
+              <div class="detailed-card bid-card">
+                <div class="bid-headline">
+                  <span class="bid-label">Price</span>
+                  <span class="bid-amount"><%= formatMoney(listing.price) %></span>
+                </div>
+                <p class="bid-notice">Contact the seller using the comments below.</p>
+              </div>
+            <% } %>
+
             <div class="detailed-card">
               <h2 class="section-title">Listing Information</h2>
               <div class="info-list">
