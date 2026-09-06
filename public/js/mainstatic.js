@@ -1,47 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Copyright year
-    const yearSpan = document.querySelector('#copyright');
-    if (yearSpan) {
-        yearSpan.innerHTML = `&copy; ${new Date().getFullYear()} The Lost And Found LLC. All rights reserved.`;
+  // 1. DOM selectors
+  const copyrightEl = document.querySelector('#copyright');
+  const navToggle = document.querySelector('#navToggle');
+  const navMenu = document.querySelector('#navMenu');
+  const navLinks = document.querySelectorAll('.navLink');
+
+  // 2. Helper functions
+  const setCopyrightYear = () => {
+    if (!copyrightEl) return;
+    copyrightEl.innerHTML = `&copy; ${new Date().getFullYear()} The Lost And Found LLC. All rights reserved.`;
+  };
+
+  const isNavOpen = () => navToggle?.getAttribute('aria-expanded') === 'true';
+
+  const openNav = () => {
+    if (!navToggle || !navMenu) return;
+    navToggle.setAttribute('aria-expanded', 'true');
+    navMenu.classList.add('isActive');
+  };
+
+  const closeNav = () => {
+    if (!navToggle || !navMenu) return;
+    navToggle.setAttribute('aria-expanded', 'false');
+    navMenu.classList.remove('isActive');
+  };
+
+  const toggleNav = () => {
+    if (isNavOpen()) {
+      closeNav();
+    } else {
+      openNav();
     }
+  };
 
-    // Mobile menu toggle
-    const navToggle = document.querySelector('#nav-toggle');
-    const navMenu = document.querySelector('#nav-menu');
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', () => {
-            const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
-            navToggle.setAttribute('aria-expanded', !isExpanded);
-            navMenu.classList.toggle('is-active');
-        });
-    }
+  // 3. Main logic / handler functions
+  const handleNavToggleClick = () => toggleNav();
 
-    // Close mobile menu when clicking a nav link
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navToggle && navMenu) {
-                navToggle.setAttribute('aria-expanded', 'false');
-                navMenu.classList.remove('is-active');
-            }
-        });
-    });
+  const handleNavLinkClick = () => closeNav();
 
-    // Close mobile menu when clicking outside nav menu
-    document.addEventListener('click', (e) => {
-        if (navToggle && navMenu && !navToggle.contains(e.target) && !navMenu.contains(e.target)) {
-            navToggle.setAttribute('aria-expanded', 'false');
-            navMenu.classList.remove('is-active');
-        }
-    });
+  const handleOutsideClick = (event) => {
+    if (!navToggle || !navMenu) return;
+    const clickedOutside = !navToggle.contains(event.target) && !navMenu.contains(event.target);
+    if (clickedOutside) closeNav();
+  };
 
-    // Close mobile menu on escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navToggle) {
-            navToggle.setAttribute('aria-expanded', 'false');
-            navMenu?.classList.remove('is-active');
-        }
-    });
+  const handleEscapeKey = (event) => {
+    if (event.key === 'Escape') closeNav();
+  };
 
+  setCopyrightYear();
+
+  // 4. Event listeners
+  if (navToggle) {
+    navToggle.addEventListener('click', handleNavToggleClick);
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', handleNavLinkClick);
+  });
+
+  document.addEventListener('click', handleOutsideClick);
+  document.addEventListener('keydown', handleEscapeKey);
 });
