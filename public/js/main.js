@@ -506,3 +506,12 @@ if (heroFrame && 'ResizeObserver' in window) {
 if (canvas) {
   initHeroParticles();
 }
+
+// Exposes pure helpers for unit testing. In a browser loaded via <script>,
+// `module` is undefined, so this block is skipped entirely and has no effect
+// on production behaviour — it exists only so Jest can import these functions
+// instead of re-implementing them in the test file, where they could drift
+// out of sync with the real ones.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { formatTimeRemaining };
+}
