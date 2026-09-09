@@ -1701,7 +1701,7 @@ color: #A855F7;
 
 /* --- Bid history --- */
 .bid-history-card {
-  margin-top: 1rem;
+  margin: 1rem 0;
   padding: 1.5rem;
 }
 
