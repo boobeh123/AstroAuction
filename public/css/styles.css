@@ -647,6 +647,23 @@ color: #A855F7;
   .orbit-particle:nth-child(2) { left: calc(50% + (var(--frame-size, 600px) * 0.58)); }
   .orbit-particle:nth-child(3) { top: calc(50% + (var(--frame-size, 600px) * 0.58)); }
   .orbit-particle:nth-child(4) { left: calc(50% - (var(--frame-size, 600px) * 0.58)); }
+
+  /* Kept visible via a static border and glow rather than removed outright —
+     a highlighted listing should still read as highlighted at a glance, just
+     without the pulsing motion or the scale breathing. The dot inside the
+     LIVE pill stops animating too, but the pill itself stays put; the motion
+     is what's being removed here, not the information. */
+  .listing-card.is-highlighted {
+    animation: none;
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.35);
+    transform: none;
+  }
+
+  .listing-live-dot {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 /**************************************************************
@@ -1025,6 +1042,118 @@ color: #A855F7;
   color: #E8D9FF;
   backdrop-filter: blur(4px);
   z-index: 1;
+}
+
+/* Highlight toggle — mirrors the category badge's position on the opposite
+   side, so the two sit on the same row across the top of the card. */
+.listing-highlight-form {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+}
+
+.listing-highlight-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(17, 17, 39, 0.6);
+  border: 1px solid rgba(184, 197, 214, 0.3);
+  color: #B8C5D6;
+  font-size: 0.85rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.listing-highlight-toggle:hover {
+  border-color: rgba(251, 191, 36, 0.6);
+  color: #FBBF24;
+}
+
+.listing-highlight-toggle:focus-visible {
+  outline: 2px solid #00D9FF;
+  outline-offset: 2px;
+}
+
+/* Active state uses color, not an icon-style swap (solid vs. outline star) —
+   the Font Awesome kit loaded here isn't guaranteed to include both styles,
+   so color is the more robust signal regardless of which is available. */
+.listing-highlight-toggle.is-active {
+  background: rgba(251, 191, 36, 0.25);
+  border-color: rgba(251, 191, 36, 0.7);
+  color: #FBBF24;
+}
+
+/* Card glow — applied to the whole card (.listing-card), not just the image,
+   so the border and glow wrap the entire unit: title and price included, not
+   only the photo. Visible to every visitor, not just admins, since the point
+   is for anyone watching the stream to spot the live item at a glance.
+
+   Three layers work together rather than one effect doing everything:
+   border-color and box-shadow both pulse for color, and a scale transform
+   pulses in step with them for actual motion — a color shift alone reads as
+   "different," a size shift alone reads as "glitchy," together they read as
+   "breathing." */
+.listing-card.is-highlighted {
+  animation: highlight-pulse 4.8s ease-in-out infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    border-color: rgba(251, 191, 36, 0.5);
+    box-shadow:
+      0 0 0 1px rgba(251, 191, 36, 0.3),
+      0 0 20px rgba(251, 191, 36, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    border-color: rgba(251, 191, 36, 1);
+    box-shadow:
+      0 0 0 2px rgba(251, 191, 36, 0.9),
+      0 0 40px rgba(251, 191, 36, 0.55),
+      0 0 70px rgba(251, 191, 36, 0.25);
+    transform: scale(1.015);
+  }
+}
+
+/* LIVE pill — a second, independent signal rather than a more intense version
+   of the same one. Sits along the bottom of the image so it can't collide
+   with the category badge or highlight button, both anchored to the top. */
+.listing-live-pill {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.55rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(251, 191, 36, 0.9);
+  color: #1A1B3A;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+}
+
+.listing-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: red;
+  animation: live-dot-pulse 4.8s ease-in-out infinite;
+}
+
+@keyframes live-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 .listing-card-image {
@@ -1521,7 +1650,7 @@ color: #A855F7;
 }
 
 .listing-card-price {
-  color: #E8E9F3;
+  color: green;
   font-size: 1.15rem;
   font-weight: 600;
 }
