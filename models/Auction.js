@@ -42,6 +42,10 @@ const AuctionSchema = new mongoose.Schema({
     video: {
         type: String,
     },
+    highlightedAt: {
+        type: Date,
+        default: null,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
