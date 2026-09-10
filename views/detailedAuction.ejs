@@ -58,7 +58,7 @@
               <h2 class="section-title" id="comments-heading">Comments (<%= comments.length %>)</h2>
 
               <% if (typeof user !== 'undefined' && user) { %>
-                <form action="/auction/viewAuction/<%= listing._id %>/comments" method="POST" class="comment-form">
+                <form action="/auction/postComment/<%= listing._id %>" method="POST" class="comment-form">
                   <label for="comment-body" class="sr-only">Add a comment</label>
                   <textarea id="comment-body" name="body" rows="3" placeholder="Ask a question or leave a comment..." maxlength="1000" required></textarea>
                   <button type="submit" class="btn btn-primary">Post Comment</button>
@@ -105,7 +105,7 @@
                     <% if (listing.user && listing.user._id.toString() === user.id) { %>
                       <p class="bid-notice">This is your listing, so you can't bid on it.</p>
                     <% } else { %>
-                      <form action="/auction/viewAuction/<%= listing._id %>/bids" method="POST" class="bid-form">
+                      <form action="/auction/postBid/<%= listing._id %>" method="POST" class="bid-form">
                         <label for="bid-amount">Your bid</label>
                         <div class="bid-input-row">
                           <span class="bid-currency">$</span>
