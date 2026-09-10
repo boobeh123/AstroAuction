@@ -20,9 +20,19 @@
             <% if (listings && listings.length > 0) { %>
               <div class="auction-listings">
                 <% listings.forEach(listing => { %>
-                  <article class="listing-card" id="listing-<%= listing.id %>">
+                  <article class="listing-card<%= isHighlighted(listing) ? ' is-highlighted' : '' %>" id="listing-<%= listing.id %>">
                     <div class="listing-card-media">
                       <span class="listing-category-badge"><%= listing.category %></span>
+                      <% if (typeof user !== 'undefined' && user && (user.role === 'admin' || user.role === 'auctioneer')) { %>
+                        <form action="/auction/toggleSpotlight/<%= listing._id %>" method="POST" class="listing-highlight-form">
+                          <button type="submit" class="listing-highlight-toggle<%= isHighlighted(listing) ? ' is-active' : '' %>" aria-pressed="<%= isHighlighted(listing) ? 'true' : 'false' %>" aria-label="<%= isHighlighted(listing) ? 'Remove highlight from this listing' : 'Highlight this listing' %>">
+                            <i class="fas fa-star" aria-hidden="true"></i>
+                          </button>
+                        </form>
+                      <% } %>
+                      <% if (isHighlighted(listing)) { %>
+                        <span class="listing-live-pill"><span class="listing-live-dot" aria-hidden="true"></span>Live Now</span>
+                      <% } %>
                       <% if (listing.images && listing.images.length > 0) { %>
                         <img class="listing-card-image" src="<%= listing.images[0] %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
                       <% } %>
