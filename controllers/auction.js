@@ -14,6 +14,7 @@ const {
     formatMoney,
     DURATION_CHOICES,
 } = require('../utils/bidding');
+const { isHighlighted, HIGHLIGHT_DURATION_MS } = require('../utils/highlight');
 
 // Handles youtube.com/watch?v=, youtu.be/, and youtube.com/embed/ links,
 // with or without extra query params (timestamps, playlists, etc).
@@ -47,6 +48,7 @@ module.exports = {
                 listings: listings,
                 formatMoney: formatMoney,
                 isAuctionLive: isAuctionLive,
+                isHighlighted: isHighlighted,
                 durationChoices: DURATION_CHOICES,
             });
         } catch(err) {
@@ -410,6 +412,35 @@ module.exports = {
             req.flash('success', `Your bid of ${formatMoney(amount)} has been placed.`);
             res.redirect(redirectBack);
 
+        } catch (err) {
+            console.error(err);
+            res.status(500).render('errors/500.ejs');
+        }
+    },
+
+    postToggleHighlight: async (req, res) => {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+                return res.status(404).render('errors/404.ejs');
+            }
+
+            const listing = await Auction.findById(req.params.id).lean();
+
+            if (!listing) {
+                return res.status(404).render('errors/404.ejs');
+            }
+
+            if (isHighlighted(listing)) {
+                await Auction.findByIdAndUpdate(req.params.id, { highlightedAt: null });
+            } else {
+                await Auction.updateMany(
+                    { _id: { $ne: req.params.id }, highlightedAt: { $ne: null } },
+                    { $set: { highlightedAt: null } }
+                );
+                await Auction.findByIdAndUpdate(req.params.id, { highlightedAt: new Date() });
+            }
+
+            res.redirect('/auction');
         } catch (err) {
             console.error(err);
             res.status(500).render('errors/500.ejs');
