@@ -17,15 +17,16 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * User profiles & profile pictures
 
 ## Optimizations
+* Edit/Delete comments
 * ~~Design/develop landing on `/auction` route~~
   * ~~Attach a user to listings~~
   * ~~Detailed listing page~~
-  * A scrolling red banner which is displayed to all users
+  * ~~A scrolling red banner which is displayed to all users~~
     * ~~May need to research how~~
       * Websockets
   * Embed a video player which represents a livestream or an anchor href to the livestream?
     * May need to research if allowed/TOS
-      * Safest bet would be to use scrolling red banner to link to Instagram site/live feed
+      * ~~Safest bet would be to use scrolling red banner to link to Instagram site/live feed~~
     * Craigslist style QR Code 
       * May need to research how
 * ~~Design/develop landing & functionality on `/profile` route~~
@@ -37,7 +38,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * ~~Auction schema~~
 * ~~Nodemailer for contact form~~
 * ~~Multer/cloudinary~~
-* Unit tests
+* ~~Unit tests~~
 * Integration tests
 * E2E tests
 
@@ -45,6 +46,15 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 0.9.036
+📅 **Release Date:** September 10th, 2026
+
+## 📢 Developer's Notes - Scrolling (red) banner
+
+- This was one of the features the business owner wanted. But the banner isn't red.
+- Most of the optimizations I noted are done, is this v1.0?
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 0.9.035
 📅 **Release Date:** September 9th, 2026
 
