@@ -16,6 +16,9 @@ const errorHandler = require('./middleware/errorHandler')
 const auctionRoutes = require('./routes/auction');
 const profileRoutes = require('./routes/profile');
 const { startAuctionCloser } = require('./services/auctionCloser');
+const Auction = require('./models/Auction');
+const { isHighlighted } = require('./utils/highlight');
+const { formatMoney } = require('./utils/bidding');
 
 // Passport config
 require('./config/passport')(passport);
@@ -95,6 +98,21 @@ app.use((req, res, next) => {
     res.locals.info    = []
     next(err)
   }
+})
+
+app.use(async (req, res, next) => {
+  try {
+    const candidate = await Auction.findOne({ highlightedAt: { $ne: null } })
+      .select('title saleType price startingPrice currentBid status endsAt highlightedAt')
+      .lean()
+    res.locals.highlightedListing = candidate && isHighlighted(candidate) ? candidate : null
+    res.locals.formatMoney = formatMoney
+  } catch (err) {
+    console.error('Failed to load highlighted listing for banner:', err.message)
+    res.locals.highlightedListing = null
+    res.locals.formatMoney = formatMoney
+  }
+  next()
 })
 
 app.use('/', mainRoutes);
