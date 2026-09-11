@@ -1,0 +1,22 @@
+<% if (typeof highlightedListing !== 'undefined' && highlightedListing
+      && !(typeof currentPath !== 'undefined' && currentPath && currentPath.startsWith('/auction'))) { %>
+  <div class="highlight-banner">
+    <div class="highlight-banner-track">
+      <% for (let copy = 0; copy < 2; copy++) { %>
+        <a href="/auction/viewAuction/<%= highlightedListing._id %>"
+           class="highlight-banner-content"
+           <%= copy === 1 ? 'aria-hidden="true" tabindex="-1"' : '' %>>
+          <span class="highlight-banner-dot" aria-hidden="true"></span>
+          <strong>Live Now:</strong> <%= highlightedListing.title %>
+          <% if (highlightedListing.saleType === 'auction' && highlightedListing.status === 'open' && highlightedListing.endsAt) { %>
+            &mdash; Current bid <%= formatMoney(highlightedListing.currentBid !== null && highlightedListing.currentBid !== undefined ? highlightedListing.currentBid : highlightedListing.startingPrice) %>,
+            ends in <span class="highlight-banner-countdown" data-ends-at="<%= new Date(highlightedListing.endsAt).toISOString() %>">&mdash;</span>
+          <% } else if (highlightedListing.saleType === 'fixed' && highlightedListing.price !== null && highlightedListing.price !== undefined) { %>
+            &mdash; <%= formatMoney(highlightedListing.price) %>
+          <% } %>
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      <% } %>
+    </div>
+  </div>
+<% } %>
