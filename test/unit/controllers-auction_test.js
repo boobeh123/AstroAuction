@@ -426,3 +426,147 @@ describe('postComment', () => {
         expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
     });
 });
+
+describe('postToggleHighlight', () => {
+    const HOUR = 60 * 60 * 1000;
+
+    function highlightRequest(userId = BIDDER_ID) {
+        return mockRequest({
+            params: { id: LOT_ID },
+            user: { id: userId, role: 'admin' },
+        });
+    }
+
+    function listing(overrides = {}) {
+        return {
+            _id: LOT_ID,
+            title: 'Vintage lamp',
+            saleType: 'auction',
+            user: SELLER_ID,
+            highlightedAt: null,
+            ...overrides,
+        };
+    }
+
+    beforeEach(() => {
+        Auction.findByIdAndUpdate.mockResolvedValue({});
+        Auction.updateMany.mockResolvedValue({ modifiedCount: 0 });
+    });
+
+    test('404s on a malformed listing id', async () => {
+        const req = mockRequest({ params: { id: 'not-an-objectid' }, user: { id: BIDDER_ID, role: 'admin' } });
+        const res = mockResponse();
+
+        await auctionController.postToggleHighlight(req, res);
+
+        expect(res.statusCode).toBe(404);
+        expect(Auction.findByIdAndUpdate).not.toHaveBeenCalled();
+        expect(Auction.updateMany).not.toHaveBeenCalled();
+    });
+
+    test('404s when the listing does not exist', async () => {
+        Auction.findById.mockReturnValue(mockQuery(null));
+
+        const res = mockResponse();
+        await auctionController.postToggleHighlight(highlightRequest(), res);
+
+        expect(res.statusCode).toBe(404);
+        expect(Auction.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    test('turning a highlight ON clears every other listing first', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: null })));
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        // Only one listing may be highlighted at a time. The clear has to
+        // exclude the listing being turned on, or it would immediately undo
+        // the very write that follows it.
+        expect(Auction.updateMany).toHaveBeenCalledTimes(1);
+        const [filter, update] = Auction.updateMany.mock.calls[0];
+        expect(filter._id.$ne).toBe(LOT_ID);
+        expect(filter.highlightedAt.$ne).toBeNull();
+        expect(update.$set.highlightedAt).toBeNull();
+    });
+
+    test('turning a highlight ON stamps the listing with a current timestamp', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: null })));
+
+        const before = Date.now();
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+        const after = Date.now();
+
+        const [id, update] = Auction.findByIdAndUpdate.mock.calls[0];
+        expect(id).toBe(LOT_ID);
+        expect(update.highlightedAt).toBeInstanceOf(Date);
+        expect(update.highlightedAt.getTime()).toBeGreaterThanOrEqual(before);
+        expect(update.highlightedAt.getTime()).toBeLessThanOrEqual(after);
+    });
+
+    test('turning a highlight OFF nulls the timestamp', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: new Date() })));
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        const [id, update] = Auction.findByIdAndUpdate.mock.calls[0];
+        expect(id).toBe(LOT_ID);
+        expect(update.highlightedAt).toBeNull();
+    });
+
+    test('turning a highlight OFF does not touch any other listing', async () => {
+        // Nothing else is highlighted anyway — only one can be — so sweeping
+        // the collection here would be a pointless write on every toggle-off.
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: new Date() })));
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        expect(Auction.updateMany).not.toHaveBeenCalled();
+    });
+
+    // A stale timestamp past the 12-hour window reads as not-highlighted, so
+    // clicking treats it as a fresh turn-on rather than a turn-off. Without
+    // this, an expired highlight would need two clicks to come back on.
+    test('an expired highlight is treated as off, so one click turns it on', async () => {
+        Auction.findById.mockReturnValue(
+            mockQuery(listing({ highlightedAt: new Date(Date.now() - 13 * HOUR) }))
+        );
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        expect(Auction.updateMany).toHaveBeenCalledTimes(1);
+        const [, update] = Auction.findByIdAndUpdate.mock.calls[0];
+        expect(update.highlightedAt).toBeInstanceOf(Date);
+    });
+
+    test('redirects back to the listings grid', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing()));
+
+        const res = mockResponse();
+        await auctionController.postToggleHighlight(highlightRequest(), res);
+
+        expect(res.redirectedTo).toBe('/auction');
+    });
+
+    // Any auctioneer can spotlight any listing, including one they did not
+    // post — the person running the stream may be discussing someone else's
+    // item. This asserts there is no ownership check, which is deliberate.
+    test('an auctioneer can highlight a listing posted by someone else', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ user: SELLER_ID })));
+
+        const res = mockResponse();
+        await auctionController.postToggleHighlight(highlightRequest(RIVAL_ID), res);
+
+        expect(res.redirectedTo).toBe('/auction');
+        expect(res.statusCode).not.toBe(403);
+    });
+
+    test('renders the 500 page if the database throws', async () => {
+        Auction.findById.mockImplementation(() => { throw new Error('connection lost'); });
+
+        const res = mockResponse();
+        await auctionController.postToggleHighlight(highlightRequest(), res);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.rendered).toBe('errors/500.ejs');
+    });
+});
