@@ -15,6 +15,7 @@ const mainRoutes = require('./routes/main');
 const errorHandler = require('./middleware/errorHandler')
 const auctionRoutes = require('./routes/auction');
 const profileRoutes = require('./routes/profile');
+const tutorialRoutes = require('./routes/tutorial');
 const { startAuctionCloser } = require('./services/auctionCloser');
 const Auction = require('./models/Auction');
 const { isHighlighted } = require('./utils/highlight');
@@ -118,6 +119,7 @@ app.use(async (req, res, next) => {
 app.use('/', mainRoutes);
 app.use('/auction', auctionRoutes);
 app.use('/profile', profileRoutes);
+app.use('/tutorial', tutorialRoutes);
 
 // 404 handler — catches any request that didn't match a route above
 app.use((req, res) => {
