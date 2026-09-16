@@ -52,6 +52,10 @@ const UserSchema = new mongoose.Schema({
       type: String,
       default: 'user',
     },
+    tutorialStep: {
+      type: Number,
+      default: 0,
+    },
 },
     { timestamps: true }
 )
