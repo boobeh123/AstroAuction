@@ -1,0 +1,16 @@
+<% if (typeof user !== 'undefined' && user && user.tutorialStep === 0
+      && typeof currentPath !== 'undefined' && currentPath === '/auction') { %>
+  <div class="coach-backdrop" id="tutorial-backdrop" aria-hidden="true" hidden></div>
+  <div class="coach-highlight" id="tutorial-highlight" aria-hidden="true" hidden></div>
+  <div class="coach-tooltip" id="tutorial-tooltip" role="dialog" aria-label="Tutorial" hidden>
+    <div class="coach-tooltip-arrow" aria-hidden="true"></div>
+    <p class="coach-tooltip-text" id="tutorial-tooltip-text"></p>
+    <div class="coach-tooltip-footer">
+      <span class="coach-step-count" id="tutorial-step-count"></span>
+      <div class="coach-actions">
+        <button type="button" class="coach-skip" id="tutorial-skip">Skip tour</button>
+        <button type="button" class="coach-next" id="tutorial-next" hidden>Next</button>
+      </div>
+    </div>
+  </div>
+<% } %>
