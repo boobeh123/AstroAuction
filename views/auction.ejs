@@ -124,7 +124,7 @@
       </div>
       <div class="form-group">
         <label id="sale-type-label">Listing type <span class="required">*</span></label>
-        <div class="toggle-group" role="group" aria-labelledby="sale-type-label">
+        <div class="toggle-group" id="sale-type-toggle" role="group" aria-labelledby="sale-type-label">
           <div class="toggle-option">
             <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
             <label for="sale-fixed">Fixed price</label>
@@ -156,7 +156,7 @@
           <small>Bidding closes automatically when the timer runs out.</small>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="video-type-toggle">
         <label id="video-toggle-label">Does this listing include a video?</label>
         <div class="toggle-group" role="group" aria-labelledby="video-toggle-label">
           <div class="toggle-option">
