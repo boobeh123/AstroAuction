@@ -2834,6 +2834,150 @@ color: #A855F7;
   margin: 0;
 }
 /**************************************************************
+* Tutorial
+***************************************************************/
+.coach-backdrop {
+  position: fixed;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 1099;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+  transition: top 0.15s ease, left 0.15s ease, width 0.15s ease, height 0.15s ease;
+}
+.coach-highlight {
+  position: fixed;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 1100;
+  animation: coach-breathe 2.2s ease-in-out infinite;
+  transition: top 0.15s ease, left 0.15s ease, width 0.15s ease, height 0.15s ease;
+}
+
+@keyframes coach-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.coach-tooltip {
+  position: fixed;
+  width: 260px;
+  background: rgba(17, 17, 39, 0.92);
+  backdrop-filter: blur(12px);
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  padding: 1.1rem;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  z-index: 1101;
+  transition: top 0.15s ease, left 0.15s ease;
+}
+
+.coach-tooltip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  animation: coach-ripple 1.2s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes coach-ripple {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.12); opacity: 0; }
+}
+
+.coach-tooltip-arrow {
+  position: absolute;
+  top: -9px;
+  left: 24px;
+  width: 16px;
+  height: 16px;
+  background: rgba(17, 17, 39, 0.92);
+  border-left: 2px solid #ffffff;
+  border-top: 2px solid #ffffff;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.coach-tooltip--above .coach-tooltip-arrow {
+  top: auto;
+  bottom: -9px;
+  transform: rotate(225deg);
+}
+
+.coach-tooltip-text {
+  color: #E8E9F3;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.coach-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coach-step-count {
+  color: #B8C5D6;
+  font-size: 0.75rem;
+}
+
+.coach-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.coach-skip {
+  background: none;
+  border: none;
+  color: #B8C5D6;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  font-family: inherit;
+}
+
+.coach-skip:hover { color: #E8E9F3; }
+.coach-skip:focus-visible { outline: 2px solid #00D9FF; outline-offset: 2px; }
+
+.coach-next {
+  background: #FBBF24;
+  color: #1A1B3A;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.coach-next:focus-visible { outline: 2px solid #00D9FF; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-backdrop {
+    transition: none;
+  }
+
+  .coach-highlight {
+    animation: none;
+    opacity: 0.85;
+    transition: none;
+  }
+
+  .coach-tooltip {
+    transition: none;
+  }
+
+  .coach-tooltip::before {
+    animation: none;
+    display: none;
+  }
+}
+
+/**************************************************************
 * Footer todo
 ***************************************************************/
 /* .auction-footer {
