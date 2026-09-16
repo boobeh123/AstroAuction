@@ -27,6 +27,13 @@ const saleTypeRadios = document.querySelectorAll('input[name="saleType"]');
 const fixedPriceFields = document.querySelector('#fixed-price-fields');
 const auctionFields = document.querySelector('#auction-fields');
 const countdowns = document.querySelectorAll('[data-ends-at]');
+const tutorialHighlight = document.querySelector('#tutorial-highlight');
+const tutorialBackdrop = document.querySelector('#tutorial-backdrop');
+const tutorialTooltip = document.querySelector('#tutorial-tooltip');
+const tutorialTooltipText = document.querySelector('#tutorial-tooltip-text');
+const tutorialStepCount = document.querySelector('#tutorial-step-count');
+const tutorialSkipBtn = document.querySelector('#tutorial-skip');
+const tutorialNextBtn = document.querySelector('#tutorial-next');
 
 // Shared state
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -301,6 +308,164 @@ function tickCountdowns() {
   });
 }
 
+const TUTORIAL_STEPS = [
+  {
+    target: '#open-create-listing-btn',
+    text: 'The Create Listing button is how you list an item for sale — either at a fixed price or as a timed auction.',
+    waitForTargetClick: true,
+  },
+  {
+    target: '#modal-title-input',
+    text: 'Give your post a title.',
+  },
+  {
+    target: '#modal-category-input',
+    text: 'Label your item by category.',
+  },
+  {
+    target: '#sale-type-toggle',
+    text: 'Select Auction to enable bidding. Fixed Price is default.',
+  },
+  {
+    target: '#video-type-toggle',
+    text: 'Only YouTube URLs accepted.',
+  },
+  {
+    target: '#dropzone',
+    text: 'Accepts up to 10 photos. 10MB size limit.',
+  },
+];
+
+let tutorialIndex = 0;
+
+// Fixed-position overlay, coordinates from getBoundingClientRect()
+function positionCoachmark(target) {
+  const rect = target.getBoundingClientRect();
+  const top = rect.top - 6;
+  const left = rect.left - 6;
+  const width = rect.width + 12;
+  const height = rect.height + 12;
+
+  tutorialHighlight.style.top = `${top}px`;
+  tutorialHighlight.style.left = `${left}px`;
+  tutorialHighlight.style.width = `${width}px`;
+  tutorialHighlight.style.height = `${height}px`;
+  tutorialBackdrop.style.top = `${top}px`;
+  tutorialBackdrop.style.left = `${left}px`;
+  tutorialBackdrop.style.width = `${width}px`;
+  tutorialBackdrop.style.height = `${height}px`;
+
+  // Tooltip sits below the target by default
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const estimatedTooltipHeight = 160;
+  const placeAbove = spaceBelow < estimatedTooltipHeight + 20;
+
+  if (placeAbove) {
+    tutorialTooltip.style.top = `${rect.top - 12}px`;
+    tutorialTooltip.style.transform = 'translateY(-100%)';
+    tutorialTooltip.classList.add('coach-tooltip--above');
+  } else {
+    tutorialTooltip.style.top = `${rect.bottom + 18}px`;
+    tutorialTooltip.style.transform = 'none';
+    tutorialTooltip.classList.remove('coach-tooltip--above');
+  }
+
+  const idealLeft = rect.left + rect.width / 2 - 130; // center a 260px-wide box
+  const clampedLeft = Math.max(12, Math.min(idealLeft, window.innerWidth - 272));
+  tutorialTooltip.style.left = `${clampedLeft}px`;
+}
+
+function showTutorialStep(index) {
+  const step = TUTORIAL_STEPS[index];
+  const target = document.querySelector(step.target);
+
+  if (!target) {
+    // Whatever this step needs isn't on the page — skip past it
+    advanceTutorial();
+    return;
+  }
+
+  target.scrollIntoView({ block: 'center', behavior: 'instant' });
+  requestAnimationFrame(() => {
+    tutorialTooltipText.textContent = step.text;
+    tutorialStepCount.textContent = `Step ${index + 1} of ${TUTORIAL_STEPS.length}`;
+    tutorialNextBtn.hidden = Boolean(step.waitForTargetClick);
+
+    positionCoachmark(target);
+    tutorialBackdrop.hidden = false;
+    tutorialHighlight.hidden = false;
+    tutorialTooltip.hidden = false;
+
+    if (step.waitForTargetClick) {
+      target.addEventListener('click', handleTutorialTargetClick, { once: true });
+    }
+  });
+}
+
+function handleTutorialTargetClick() {
+  advanceTutorial();
+}
+
+function advanceTutorial() {
+  tutorialIndex += 1;
+
+  if (tutorialIndex >= TUTORIAL_STEPS.length) {
+    endTutorial();
+    return;
+  }
+
+  showTutorialStep(tutorialIndex);
+}
+
+function endTutorial() {
+  tutorialBackdrop.hidden = true;
+  tutorialHighlight.hidden = true;
+  tutorialTooltip.hidden = true;
+  tutorialIndex = TUTORIAL_STEPS.length;
+
+  fetch('/tutorial/dismiss', { method: 'POST' }).catch((err) => {
+    console.error('Failed to dismiss tutorial:', err);
+  });
+}
+
+function handleTutorialNextClick() {
+  advanceTutorial();
+}
+
+function handleTutorialSkipClick() {
+  endTutorial();
+}
+
+function handleTutorialReposition() {
+  if (tutorialIndex >= TUTORIAL_STEPS.length || tutorialHighlight.hidden) return;
+  const step = TUTORIAL_STEPS[tutorialIndex];
+  const target = document.querySelector(step.target);
+  if (target) positionCoachmark(target);
+}
+
+function watchForModalClose() {
+  if (!listingModal) return;
+
+  const observer = new MutationObserver(() => {
+    if (listingModal.hidden && tutorialIndex >= 1 && tutorialIndex < TUTORIAL_STEPS.length) {
+      endTutorial();
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(listingModal, { attributes: true, attributeFilter: ['hidden'] });
+}
+
+function startTutorial() {
+  if (navToggle && navActions && getComputedStyle(navToggle).display !== 'none') {
+    navActions.classList.add('is-open');
+    navToggle.setAttribute('aria-expanded', 'true');
+  }
+
+  watchForModalClose();
+  showTutorialStep(0);
+}
+
 function handleFlashDismiss(flash) {
   const isError = flash.classList.contains('flash-error');
   const timeout = isError ? 7000 : 5000;
@@ -491,6 +656,15 @@ if (saleTypeRadios.length && fixedPriceFields && auctionFields) {
 if (countdowns.length) {
   tickCountdowns();
   setInterval(tickCountdowns, 1000);
+}
+
+if (tutorialHighlight && tutorialTooltip) {
+  tutorialSkipBtn.addEventListener('click', handleTutorialSkipClick);
+  tutorialNextBtn.addEventListener('click', handleTutorialNextClick);
+  window.addEventListener('resize', handleTutorialReposition);
+  window.addEventListener('scroll', handleTutorialReposition, true);
+
+  startTutorial();
 }
 
 flashes.forEach(handleFlashDismiss);
