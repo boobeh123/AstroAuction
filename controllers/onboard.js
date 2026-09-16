@@ -20,11 +20,11 @@ module.exports = {
 
     postOnboard: async (req, res) => {
         try {
-            const displayName = typeof req.body.displayName === 'string' ? req.body.displayName.trim() : ''
-
             if (req.user.onboardingComplete) {
               return res.redirect('/');
             }
+
+            const displayName = typeof req.body.displayName === 'string' ? req.body.displayName.trim() : ''
 
             if (!displayName) {
                 req.flash('errors', { msg: 'Please enter a display name.', field: 'displayName' })
@@ -41,7 +41,7 @@ module.exports = {
                 onboardingComplete: true
               });
 
-              res.redirect('/');
+              res.redirect('/auction');
         } catch(err) {
             console.error(err);
             res.status(500).render('errors/500.ejs');
