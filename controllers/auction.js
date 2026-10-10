@@ -356,17 +356,22 @@ module.exports = {
             // is the pre-bid state, which is where the outbid user's identity
             // lives. Reading that separately afterwards would be a race of
             // its own: by then currentBidder has already been overwritten.
+            //
+            // mongoose.trusted() marks these operators as the app's own, so
+            // the sanitizeFilter guard in config/database.js leaves them alone.
+            // Without it, this filter would quietly match nothing and every
+            // bid would be rejected.
             const previousState = await Auction.findOneAndUpdate(
                 {
                     _id: listingId,
                     saleType: 'auction',
                     status: 'open',
-                    endsAt: { $gt: new Date() },
+                    endsAt: mongoose.trusted({ $gt: new Date() }),
                     $or: [
                         // First bid: has to meet the starting price.
-                        { currentBid: null, startingPrice: { $lte: amount } },
+                        { currentBid: null, startingPrice: mongoose.trusted({ $lte: amount }) },
                         // Later bids: have to clear the current bid by the increment.
-                        { currentBid: { $ne: null, $lte: threshold } },
+                        { currentBid: mongoose.trusted({ $ne: null, $lte: threshold }) },
                     ],
                 },
                 {
@@ -433,8 +438,12 @@ module.exports = {
             if (isHighlighted(listing)) {
                 await Auction.findByIdAndUpdate(req.params.id, { highlightedAt: null });
             } else {
+                // trusted(): see the note in postBid
                 await Auction.updateMany(
-                    { _id: { $ne: req.params.id }, highlightedAt: { $ne: null } },
+                    {
+                        _id: mongoose.trusted({ $ne: req.params.id }),
+                        highlightedAt: mongoose.trusted({ $ne: null }),
+                    },
                     { $set: { highlightedAt: null } }
                 );
                 await Auction.findByIdAndUpdate(req.params.id, { highlightedAt: new Date() });
