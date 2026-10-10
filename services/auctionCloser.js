@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Auction = require('../models/Auction');
+const Auction = require('../model/Auction');
 const {
     sendAuctionWonEmail,
     sendAuctionEndedSellerEmail,

@@ -1,5 +1,5 @@
 const { matchedData } = require('express-validator')
-const User = require('../models/User')
+const User = require('../model/User')
 const { formErrors } = require('../middleware/validators')
 
 // Unexpected errors aren't caught here: Express 5 passes anything thrown in

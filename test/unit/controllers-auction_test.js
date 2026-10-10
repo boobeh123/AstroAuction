@@ -1,12 +1,12 @@
-jest.mock('../../models/Auction');
-jest.mock('../../models/Comment');
-jest.mock('../../models/Bid');
+jest.mock('../../model/Auction');
+jest.mock('../../model/Comment');
+jest.mock('../../model/Bid');
 jest.mock('../../middleware/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
 
-const Auction = require('../../models/Auction');
-const Bid = require('../../models/Bid');
+const Auction = require('../../model/Auction');
+const Bid = require('../../model/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
 const auctionController = require('../../controllers/auction');
 const { validateBid, validateComment } = require('../../middleware/validators');
@@ -355,7 +355,7 @@ describe('postBid — failure handling', () => {
 });
 
 describe('postComment', () => {
-    const Comment = require('../../models/Comment');
+    const Comment = require('../../model/Comment');
 
     beforeEach(() => {
         Comment.create.mockResolvedValue({});

@@ -17,7 +17,7 @@ const auctionRoutes = require('./routes/auction');
 const profileRoutes = require('./routes/profile');
 const tutorialRoutes = require('./routes/tutorial');
 const { startAuctionCloser } = require('./services/auctionCloser');
-const Auction = require('./models/Auction');
+const Auction = require('./model/Auction');
 const { isHighlighted } = require('./utils/highlight');
 const { formatMoney } = require('./utils/bidding');
 
