@@ -1,5 +1,5 @@
 jest.mock('../../model/User');
-jest.mock('../../middleware/cloudinary');
+jest.mock('../../config/cloudinary');
 
 const User = require('../../model/User');
 const profileController = require('../../controller/profileController');

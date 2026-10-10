@@ -14,7 +14,7 @@
  * should.
  */
 jest.mock('../../config/mailer');
-jest.mock('../../middleware/cloudinary');
+jest.mock('../../config/cloudinary');
 
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -25,7 +25,7 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const connectDB = require('../../config/database');
 const mailer = require('../../config/mailer');
-const cloudinary = require('../../middleware/cloudinary');
+const cloudinary = require('../../config/cloudinary');
 const Auction = require('../../model/Auction');
 const User = require('../../model/User');
 const auctionController = require('../../controller/auctionController');

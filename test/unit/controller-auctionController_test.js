@@ -1,7 +1,7 @@
 jest.mock('../../model/Auction');
 jest.mock('../../model/Comment');
 jest.mock('../../model/Bid');
-jest.mock('../../middleware/cloudinary');
+jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
 
