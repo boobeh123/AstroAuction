@@ -51,6 +51,37 @@ function emailedHtml() {
     return sendMail.mock.calls[0][0].html;
 }
 
+describe('passwords must be at least 8 characters', () => {
+    const SEVEN_CHARS = 'abc1234';
+
+    test('postSignup rejects a 7-character password before touching the database', async () => {
+        const req = mockRequest({
+            body: { email: 'newbidder@example.com', password: SEVEN_CHARS, confirmPassword: SEVEN_CHARS },
+        });
+        const res = mockResponse();
+
+        await authController.postSignup(req, res, jest.fn());
+
+        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long' });
+        expect(User.findOne).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledTimes(1);
+    });
+
+    test('postResetPassword rejects a 7-character password before looking up the token', async () => {
+        const req = mockRequest({
+            params: { token: 'abc123' },
+            body: { password: SEVEN_CHARS, confirmPassword: SEVEN_CHARS },
+        });
+        const res = mockResponse();
+
+        await authController.postResetPassword(req, res, jest.fn());
+
+        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long.' });
+        expect(User.findOne).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/recover/abc123');
+    });
+});
+
 describe('emailed links ignore the Host header', () => {
     test('postSignup builds the verification link from APP_URL', async () => {
         User.findOne.mockResolvedValue(null);

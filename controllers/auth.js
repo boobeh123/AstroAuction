@@ -40,7 +40,7 @@ module.exports = {
     postSignup: async (req, res, next) => {
       const validationErrors = []
       if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
-      if (!validator.isLength(req.body.password, { min: 3 })) validationErrors.push({ msg: 'Password must be at least 3 characters long' })
+      if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
       if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' })
     
       if (validationErrors.length) {
@@ -602,8 +602,8 @@ module.exports = {
         if (typeof req.body.password !== 'string' || typeof req.body.confirmPassword !== 'string') {
           validationErrors.push({ msg: 'Invalid request.' });
         } else {
-          if (!validator.isLength(req.body.password, { min: 3 })) {
-            validationErrors.push({ msg: 'Password must be at least 3 characters long.' });
+          if (!validator.isLength(req.body.password, { min: 8 })) {
+            validationErrors.push({ msg: 'Password must be at least 8 characters long.' });
           }
           if (req.body.password !== req.body.confirmPassword) {
             validationErrors.push({ msg: 'Passwords do not match.' });
