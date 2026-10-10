@@ -1,6 +1,8 @@
+const { matchedData } = require('express-validator')
 const User = require('../models/User')
 const cloudinary = require("../middleware/cloudinary");
 const fs = require('fs/promises');
+const { formErrors } = require('../middleware/validators')
 
 // Unexpected errors aren't caught here: Express 5 passes anything thrown in
 // these handlers to middleware/errorHandler.js, which logs it and shows the
@@ -51,17 +53,14 @@ module.exports = {
     },
 
     updateProfile: async (req, res) => {
-        const displayName = typeof req.body.userName === 'string' ? req.body.userName.trim() : ''
-
-        if (!displayName) {
-            req.flash('errors', { msg: 'Please enter a display name.', field: 'displayName' })
+        const errors = formErrors(req)
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array())
             return res.redirect('/profile/edit')
         }
 
-        if (displayName.length > 25) {
-            req.flash('errors', { msg: 'Display name cannot be longer than 25 characters.', field: 'displayName' })
-            return res.redirect('/profile/edit')
-        }
+        // The edit form names its display name field "userName"
+        const { userName: displayName } = matchedData(req)
 
         await User.findByIdAndUpdate(req.user._id, {
             displayName,

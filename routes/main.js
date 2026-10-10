@@ -11,6 +11,7 @@ const {
   validateLogin,
   validateForgotPassword,
   validateResetPassword,
+  validateOnboard,
 } = require('../middleware/validators');
 
 
@@ -28,7 +29,7 @@ router.get('/recover/:token', authController.getResetPassword);
 router.post('/recover/:token', authLimiter, validateResetPassword, authController.postResetPassword);
 
 router.get('/onboard', ensureAuth, onboardController.getOnboard);
-router.post('/onboard', ensureAuth, onboardController.postOnboard);
+router.post('/onboard', ensureAuth, validateOnboard, onboardController.postOnboard);
 
 router.get('/terms', termController.getTerms);
 router.get('/privacy', termController.getPrivacy);

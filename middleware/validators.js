@@ -42,6 +42,16 @@ const isMoney = (value) => parseMoney(value) !== null
 const forFixedPrice = body('saleType').equals('fixed')
 const forAuction = body('saleType').equals('auction')
 
+// The name other people see, set during onboarding and on the edit page.
+// The onboarding page already tells people it's 2 to 25 characters.
+const displayNameField = (field) =>
+  body(field)
+    .isString().withMessage('Please enter a display name.').bail()
+    .trim()
+    .notEmpty().withMessage('Please enter a display name.').bail()
+    .isLength({ min: 2 }).withMessage('Display name must be at least 2 characters.').bail()
+    .isLength({ max: 25 }).withMessage('Display name cannot be longer than 25 characters.')
+
 // A text field that has to be filled in, with a maximum length
 const requiredText = (field, missingMessage, maxLength, tooLongMessage) =>
   body(field)
@@ -133,5 +143,14 @@ module.exports = {
 
   validateComment: [
     requiredText('body', 'Please enter a comment.', 1000, 'Comments cannot be longer than 1000 characters.'),
+  ],
+
+  validateOnboard: [
+    displayNameField('displayName'),
+  ],
+
+  // The edit form names its display name field "userName"
+  validateProfileEdit: [
+    displayNameField('userName'),
   ],
 }

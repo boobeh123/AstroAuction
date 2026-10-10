@@ -1,4 +1,6 @@
+const { matchedData } = require('express-validator')
 const User = require('../models/User')
+const { formErrors } = require('../middleware/validators')
 
 // Unexpected errors aren't caught here: Express 5 passes anything thrown in
 // these handlers to middleware/errorHandler.js, which logs it and shows the
@@ -19,17 +21,13 @@ module.exports = {
             return res.redirect('/');
         }
 
-        const displayName = typeof req.body.displayName === 'string' ? req.body.displayName.trim() : ''
-
-        if (!displayName) {
-            req.flash('errors', { msg: 'Please enter a display name.', field: 'displayName' })
+        const errors = formErrors(req)
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array())
             return res.redirect('/onboard')
         }
 
-        if (displayName.length > 25) {
-            req.flash('errors', { msg: 'Display name cannot be longer than 25 characters.', field: 'displayName' })
-            return res.redirect('/onboard')
-        }
+        const { displayName } = matchedData(req)
 
         await User.findByIdAndUpdate(req.user.id, {
             displayName,
