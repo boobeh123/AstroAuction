@@ -192,14 +192,6 @@ p {
 /**************************************************************
 * Accessibility
 ***************************************************************/
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
   .skip-link {
     position: absolute;
     left: -999px;
@@ -691,51 +683,6 @@ color: #A855F7;
 @keyframes orbit-spin {
   from { transform: rotate(0deg) translateX(calc(var(--frameSize, 600px) * 0.58)) rotate(0deg); }
   to   { transform: rotate(360deg) translateX(calc(var(--frameSize, 600px) * 0.58)) rotate(-360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .orbit-particle { animation: none; }
-  .orbit-particle:nth-child(1) { top: calc(50% - (var(--frameSize, 600px) * 0.58)); }
-  .orbit-particle:nth-child(2) { left: calc(50% + (var(--frameSize, 600px) * 0.58)); }
-  .orbit-particle:nth-child(3) { top: calc(50% + (var(--frameSize, 600px) * 0.58)); }
-  .orbit-particle:nth-child(4) { left: calc(50% - (var(--frameSize, 600px) * 0.58)); }
-
-  /* Kept visible via a static border and glow rather than removed outright —
-     a highlighted listing should still read as highlighted at a glance, just
-     without the pulsing motion or the scale breathing. The dot inside the
-     LIVE pill stops animating too, but the pill itself stays put; the motion
-     is what's being removed here, not the information. */
-  .listing-card.is-highlighted {
-    animation: none;
-    border-color: rgba(251, 191, 36, 0.9);
-    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.35);
-    transform: none;
-  }
-
-  .listing-live-dot {
-    animation: none;
-    opacity: 1;
-  }
-
-    .highlight-banner-track {
-    animation: none;
-    width: 100%;
-  }
-
-  .highlight-banner-content:nth-child(2) {
-    display: none;
-  }
-
-  .highlight-banner-content {
-    white-space: normal;
-    justify-content: center;
-    padding: 0 1rem;
-  }
-
-  .highlight-banner-dot {
-    animation: none;
-    opacity: 1;
-  }
 }
 
 /**************************************************************
@@ -2974,27 +2921,6 @@ color: #A855F7;
 
 .coach-next:focus-visible { outline: 2px solid #00D9FF; outline-offset: 2px; }
 
-@media (prefers-reduced-motion: reduce) {
-  .coach-backdrop {
-    transition: none;
-  }
-
-  .coach-highlight {
-    animation: none;
-    opacity: 0.85;
-    transition: none;
-  }
-
-  .coach-tooltip {
-    transition: none;
-  }
-
-  .coach-tooltip::before {
-    animation: none;
-    display: none;
-  }
-}
-
 /**************************************************************
 * Footer todo
 ***************************************************************/
@@ -3306,5 +3232,81 @@ color: #A855F7;
 @media (max-width: 500px) {
   .nav-container {
     justify-content: space-around;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Hero: the orbiting particles hold still at four points around the image */
+  .orbit-particle { animation: none; }
+  .orbit-particle:nth-child(1) { top: calc(50% - (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(2) { left: calc(50% + (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(3) { top: calc(50% + (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(4) { left: calc(50% - (var(--frameSize, 600px) * 0.58)); }
+
+  /* Kept visible via a static border and glow rather than removed outright —
+     a highlighted listing should still read as highlighted at a glance, just
+     without the pulsing motion or the scale breathing. The dot inside the
+     LIVE pill stops animating too, but the pill itself stays put; the motion
+     is what's being removed here, not the information. */
+  .listing-card.is-highlighted {
+    animation: none;
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.7), 0 0 25px rgba(251, 191, 36, 0.35);
+    transform: none;
+  }
+
+  .listing-live-dot {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* Highlight banner: stops scrolling and shows its message once, centered */
+  .highlight-banner-track {
+    animation: none;
+    width: 100%;
+  }
+
+  .highlight-banner-content:nth-child(2) {
+    display: none;
+  }
+
+  .highlight-banner-content {
+    white-space: normal;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .highlight-banner-dot {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* Tutorial */
+  .coach-backdrop {
+    transition: none;
+  }
+
+  .coach-highlight {
+    animation: none;
+    opacity: 0.85;
+    transition: none;
+  }
+
+  .coach-tooltip {
+    transition: none;
+  }
+
+  .coach-tooltip::before {
+    animation: none;
+    display: none;
   }
 }
