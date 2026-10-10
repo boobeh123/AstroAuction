@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Auction = require('../models/Auction');
 const {
     sendAuctionWonEmail,
@@ -5,6 +6,12 @@ const {
 } = require('../config/mailer');
 
 const SWEEP_INTERVAL_MS = 60_000;
+
+// Matches an end time that has already passed. mongoose.trusted() tells the
+// sanitizeFilter guard in config/database.js that this $lte is the app's own.
+// Without it, the sweep would quietly find nothing and auctions would never
+// close.
+const hasEnded = (now) => mongoose.trusted({ $lte: now });
 
 let sweepTimer = null;
 
@@ -30,7 +37,7 @@ async function closeAuctionIfDue(auctionId) {
             _id: auctionId,
             saleType: 'auction',
             status: 'open',
-            endsAt: { $lte: now },
+            endsAt: hasEnded(now),
         },
         {
             $set: { status: 'ended', closedAt: now },
@@ -87,7 +94,7 @@ async function closeExpiredAuctions() {
     const due = await Auction.find({
         saleType: 'auction',
         status: 'open',
-        endsAt: { $lte: new Date() },
+        endsAt: hasEnded(new Date()),
     })
         .select('_id')
         .lean();

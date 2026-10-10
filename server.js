@@ -1,6 +1,7 @@
 require('dotenv').config({ path: './config/.env' })
 
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
 const helmet = require('helmet');
 const logger = require('morgan');
@@ -70,7 +71,10 @@ app.use(helmet({
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }))
 app.use(logger('dev'));
-app.use(express.urlencoded({ extended: true }));
+// extended: false keeps every form field a plain string. With extended: true,
+// a field named email[$ne] arrived as the object { $ne: ... }, which is how
+// database operators get smuggled into queries.
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static('public'));
 //Use forms for put / delete
@@ -120,7 +124,9 @@ app.use((req, res, next) => {
 
 app.use(async (req, res, next) => {
   try {
-    const candidate = await Auction.findOne({ highlightedAt: { $ne: null } })
+    // trusted(): this $ne is the app's own, so the sanitizeFilter guard in
+    // config/database.js lets it through
+    const candidate = await Auction.findOne({ highlightedAt: mongoose.trusted({ $ne: null }) })
       .select('title saleType price startingPrice currentBid status endsAt highlightedAt')
       .lean()
     res.locals.highlightedListing = candidate && isHighlighted(candidate) ? candidate : null

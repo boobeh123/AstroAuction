@@ -1,9 +1,15 @@
 const passport = require('passport')
 const validator = require('validator')
+const mongoose = require('mongoose')
 const User = require('../models/User')
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../config/mailer');
 const crypto = require('crypto');
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex')
+
+// Matches an expiry time that hasn't passed yet. mongoose.trusted() tells the
+// sanitizeFilter guard in config/database.js that this $gt is the app's own,
+// not something sent in a request. Without it, every link would look expired.
+const notExpired = () => mongoose.trusted({ $gt: Date.now() })
 
 module.exports = {
 
@@ -151,7 +157,7 @@ module.exports = {
 
         const user = await User.findOne({
           verificationToken: hashToken(req.params.token),
-          verificationTokenExpires: { $gt: Date.now() }
+          verificationTokenExpires: notExpired()
         });
 
         if (!user) {
@@ -269,7 +275,7 @@ module.exports = {
       try {
         const user = await User.findOne({
           passwordResetToken:   hashToken(req.params.token),
-          passwordResetExpires: { $gt: Date.now() },
+          passwordResetExpires: notExpired(),
         });
 
         if (!user) {
@@ -307,7 +313,7 @@ module.exports = {
 
         const user = await User.findOne({
           passwordResetToken:   hashToken(req.params.token),
-          passwordResetExpires: { $gt: Date.now() },
+          passwordResetExpires: notExpired(),
         });
 
         if (!user) {

@@ -11,15 +11,17 @@
  */
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const connectDB = require('../../config/database');
 const { round2 } = require('../../utils/bidding');
 
 let mongod;
 let Auction;
 let sellerId;
 
-// Mirrors the exact filter used by postBid. Kept in the test rather than
-// imported so that if someone weakens the real filter, this test still
-// exercises the correct one and the difference shows up as a failure.
+// Mirrors the exact filter used by postBid, including the mongoose.trusted()
+// wrappers it needs to get past the sanitizeFilter guard. Kept in the test
+// rather than imported so that if someone weakens the real filter, this test
+// still exercises the correct one and the difference shows up as a failure.
 async function attemptBid(listingId, bidderId, amount, minIncrement) {
     const threshold = round2(amount - minIncrement);
 
@@ -28,10 +30,10 @@ async function attemptBid(listingId, bidderId, amount, minIncrement) {
             _id: listingId,
             saleType: 'auction',
             status: 'open',
-            endsAt: { $gt: new Date() },
+            endsAt: mongoose.trusted({ $gt: new Date() }),
             $or: [
-                { currentBid: null, startingPrice: { $lte: amount } },
-                { currentBid: { $ne: null, $lte: threshold } },
+                { currentBid: null, startingPrice: mongoose.trusted({ $lte: amount }) },
+                { currentBid: mongoose.trusted({ $ne: null, $lte: threshold }) },
             ],
         },
         {
@@ -59,7 +61,10 @@ function makeAuction(overrides = {}) {
 
 beforeAll(async () => {
     mongod = await MongoMemoryServer.create();
-    await mongoose.connect(mongod.getUri());
+    // Connect the way the app does, so the sanitizeFilter guard is on here too
+    process.env.DB_STRING = mongod.getUri();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    await connectDB();
     Auction = require('../../models/Auction');
     sellerId = new mongoose.Types.ObjectId();
 }, 60_000);
@@ -67,6 +72,7 @@ beforeAll(async () => {
 afterAll(async () => {
     await mongoose.disconnect();
     if (mongod) await mongod.stop();
+    jest.restoreAllMocks();
 });
 
 afterEach(async () => {
@@ -123,7 +129,7 @@ describe('concurrent bidding', () => {
                     _id: lot._id,
                     saleType: 'auction',
                     status: 'open',
-                    endsAt: { $lte: new Date() },
+                    endsAt: mongoose.trusted({ $lte: new Date() }),
                 },
                 { $set: { status: 'ended', closedAt: new Date() } },
                 { returnDocument: 'after' }
