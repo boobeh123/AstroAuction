@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const homeController = require('../controller/homeController');
 const authController = require('../controller/authController');
-const onboardController = require('../controller/onboardController');
-const termController = require('../controller/termController');
 const { ensureAuth } = require('../middleware/auth');
 const { loginLimiter, authLimiter } = require('../middleware/rateLimiters');
 const {
@@ -11,11 +8,8 @@ const {
   validateLogin,
   validateForgotPassword,
   validateResetPassword,
-  validateOnboard,
 } = require('../middleware/validators');
 
-
-router.get('/', homeController.getIndex);
 
 router.get('/login', authController.getLogin);
 router.get('/signup', authController.getSignup);
@@ -28,10 +22,8 @@ router.post('/recover', authLimiter, validateForgotPassword, authController.post
 router.get('/recover/:token', authController.getResetPassword);
 router.post('/recover/:token', authLimiter, validateResetPassword, authController.postResetPassword);
 
-router.get('/onboard', ensureAuth, onboardController.getOnboard);
-router.post('/onboard', ensureAuth, validateOnboard, onboardController.postOnboard);
-
-router.get('/terms', termController.getTerms);
-router.get('/privacy', termController.getPrivacy);
+// The "resend verification email" button is on the profile page, so its URL
+// stays under /profile. The route lives here with the rest of authController.
+router.post('/profile/resend-verification', authLimiter, ensureAuth, authController.postResendVerification);
 
 module.exports = router;

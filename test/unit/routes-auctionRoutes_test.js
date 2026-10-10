@@ -34,7 +34,7 @@ function buildApp({ authenticated, role = 'user', emailVerified = true }) {
 
     // Required after the middleware above so the router picks up the fake
     // auth state rather than a real session.
-    const auctionRoutes = require('../../routes/auction');
+    const auctionRoutes = require('../../routes/auctionRoutes');
     app.use('/auction', auctionRoutes);
 
     // ensureAuctioneer renders errors/403.ejs on rejection. No view engine is
