@@ -1,25 +1,11 @@
 module.exports = {
 
     getTerms: async (req, res) => {
-
-        try {
-            res.render('terms.ejs');
-        } catch(err) {
-            console.error(err)
-            res.status(500).render('500.ejs');
-        }
-
+        res.render('terms.ejs');
     },
 
     getPrivacy: async (req, res) => {
-
-        try {
-            res.render('privacy.ejs');
-        } catch(err) {
-            console.error(err)
-            res.status(500).render('500.ejs');
-        }
-
+        res.render('privacy.ejs');
     }
-        
+
 }

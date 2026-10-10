@@ -1,17 +1,16 @@
+const { matchedData } = require('express-validator')
 const User = require('../models/User')
 const cloudinary = require("../middleware/cloudinary");
 const fs = require('fs/promises');
+const { formErrors } = require('../middleware/validators')
 
+// Unexpected errors aren't caught here: Express 5 passes anything thrown in
+// these handlers to middleware/errorHandler.js, which logs it and shows the
+// 500 page.
 module.exports = {
 
     getProfile: async (req, res) => {
-        try {
-            res.render('profile.ejs');
-        } catch(err) {
-            console.error(err)
-            res.status(500).render('errors/500.ejs');
-        }
-
+        res.render('profile.ejs');
     },
 
     uploadProfilePicture: async (req, res) => {
@@ -40,9 +39,6 @@ module.exports = {
 
             console.log('Profile picture added')
             res.redirect('/profile')
-        } catch(err) {
-            console.error(err);
-            res.status(500).render('errors/500.ejs');
         } finally {
             if (req.file) {
                 await fs.unlink(req.file.path).catch((unlinkErr) => {
@@ -53,75 +49,54 @@ module.exports = {
     },
 
     getEditProfile: async (req, res) => {
-        try {
-            res.render('editProfile.ejs');
-        } catch(err) {
-            console.error(err)
-            res.status(500).render('errors/500.ejs');
-        }
-        
+        res.render('editProfile.ejs');
     },
 
     updateProfile: async (req, res) => {
-        try {
-            const displayName = typeof req.body.userName === 'string' ? req.body.userName.trim() : ''
-
-            if (!displayName) {
-                req.flash('errors', { msg: 'Please enter a display name.', field: 'displayName' })
-                return res.redirect('/profile/edit')
-            }
-
-            if (displayName.length > 25) {
-                req.flash('errors', { msg: 'Display name cannot be longer than 25 characters.', field: 'displayName' })
-                return res.redirect('/profile/edit')
-            }
-
-            await User.findByIdAndUpdate(req.user._id, {
-                displayName,
-            })
-
-            console.log('Profile updated')
-            res.redirect('/profile')
-        } catch(err) {
-            console.error(err)
-            res.status(500).render('errors/500.ejs');
+        const errors = formErrors(req)
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array())
+            return res.redirect('/profile/edit')
         }
-        
+
+        // The edit form names its display name field "userName"
+        const { userName: displayName } = matchedData(req)
+
+        await User.findByIdAndUpdate(req.user._id, {
+            displayName,
+        })
+
+        console.log('Profile updated')
+        res.redirect('/profile')
     },
+
     deleteProfile: async (req, res) => {
-        try {
+        if (req.params.id !== req.user._id.toString()) {
+            req.flash('error', 'You can only delete your own account');
+            return res.status(403).render('errors/403.ejs');
+        }
 
-            if (req.params.id !== req.user._id.toString()) {
-                req.flash('error', 'You can only delete your own account');
-                return res.status(403).render('errors/403.ejs');
-            }
+        const currentUser = await User.findById(req.user._id).lean();
 
-            const currentUser = await User.findById(req.user._id).lean();
-            
-            if (!currentUser) {
-                req.flash('error', 'User not found');
+        if (!currentUser) {
+            req.flash('error', 'User not found');
+            return res.redirect('/');
+        }
+
+        if (currentUser.cloudinaryId) {
+            await cloudinary.uploader.destroy(currentUser.cloudinaryId)
+        }
+
+        await User.deleteOne({_id: req.user._id});
+
+        req.logout((err) => {
+            if (err) {
+                console.error('Logout error:', err);
                 return res.redirect('/');
             }
 
-            if (currentUser.cloudinaryId) {
-                await cloudinary.uploader.destroy(currentUser.cloudinaryId)
-            }
-            
-            await User.deleteOne({_id: req.user._id});
-
-            req.logout((err) => {
-                if (err) {
-                    console.error('Logout error:', err);
-                    return res.redirect('/');
-                }
-
-                console.log('Profile deleted')
-                res.redirect('/');
-            });
-        } catch (err) {
-            console.log(err);
-            req.flash('error', 'Failed to delete profile. Please try again.');
-            res.status(500).render('errors/500.ejs');
-        }
+            console.log('Profile deleted')
+            res.redirect('/');
+        });
     },
 }
