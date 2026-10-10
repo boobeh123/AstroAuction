@@ -9,7 +9,7 @@
  * already showed.
  **************************************************************/
 const { body, validationResult } = require('express-validator')
-const { CATEGORIES, SALE_TYPES } = require('../models/Auction')
+const { CATEGORIES, SALE_TYPES } = require('../model/Auction')
 const { parseMoney, DURATION_CHOICES } = require('../utils/bidding')
 
 // Only the message goes into the flash. express-validator's default error

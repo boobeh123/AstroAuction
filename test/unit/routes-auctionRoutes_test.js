@@ -1,8 +1,8 @@
-jest.mock('../../controllers/auction');
+jest.mock('../../controller/auctionController');
 
 const express = require('express');
 const request = require('supertest');
-const auctionController = require('../../controllers/auction');
+const auctionController = require('../../controller/auctionController');
 
 /**
  * These tests answer one question: is each route wired to the middleware it
@@ -34,7 +34,7 @@ function buildApp({ authenticated, role = 'user', emailVerified = true }) {
 
     // Required after the middleware above so the router picks up the fake
     // auth state rather than a real session.
-    const auctionRoutes = require('../../routes/auction');
+    const auctionRoutes = require('../../routes/auctionRoutes');
     app.use('/auction', auctionRoutes);
 
     // ensureAuctioneer renders errors/403.ejs on rejection. No view engine is

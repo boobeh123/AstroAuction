@@ -14,7 +14,7 @@
  * should.
  */
 jest.mock('../../config/mailer');
-jest.mock('../../middleware/cloudinary');
+jest.mock('../../config/cloudinary');
 
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -25,11 +25,11 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const connectDB = require('../../config/database');
 const mailer = require('../../config/mailer');
-const cloudinary = require('../../middleware/cloudinary');
-const Auction = require('../../models/Auction');
-const User = require('../../models/User');
-const auctionController = require('../../controllers/auction');
-const authController = require('../../controllers/auth');
+const cloudinary = require('../../config/cloudinary');
+const Auction = require('../../model/Auction');
+const User = require('../../model/User');
+const auctionController = require('../../controller/auctionController');
+const authController = require('../../controller/authController');
 const { closeExpiredAuctions } = require('../../services/auctionCloser');
 const { validateBid, validateListing, validateResetPassword } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');

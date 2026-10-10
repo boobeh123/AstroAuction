@@ -1,7 +1,7 @@
-jest.mock('../../models/Auction');
+jest.mock('../../model/Auction');
 jest.mock('../../config/mailer');
 
-const Auction = require('../../models/Auction');
+const Auction = require('../../model/Auction');
 const {
     sendAuctionWonEmail,
     sendAuctionEndedSellerEmail,

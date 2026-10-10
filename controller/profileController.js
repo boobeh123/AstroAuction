@@ -1,6 +1,6 @@
 const { matchedData } = require('express-validator')
-const User = require('../models/User')
-const cloudinary = require("../middleware/cloudinary");
+const User = require('../model/User')
+const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { formErrors } = require('../middleware/validators')
 

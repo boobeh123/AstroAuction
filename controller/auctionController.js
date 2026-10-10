@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 const { matchedData } = require('express-validator')
-const Auction = require('../models/Auction')
-const Comment = require('../models/Comment')
-const Bid = require('../models/Bid')
-const cloudinary = require("../middleware/cloudinary");
+const Auction = require('../model/Auction')
+const Comment = require('../model/Comment')
+const Bid = require('../model/Bid')
+const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
 const { sendOutbidEmail } = require('../config/mailer');

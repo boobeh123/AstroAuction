@@ -11,13 +11,16 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const flash = require('connect-flash');
-const mainRoutes = require('./routes/main');
+const homeRoutes = require('./routes/homeRoutes');
+const authRoutes = require('./routes/authRoutes');
+const onboardRoutes = require('./routes/onboardRoutes');
+const termRoutes = require('./routes/termRoutes');
 const errorHandler = require('./middleware/errorHandler')
-const auctionRoutes = require('./routes/auction');
-const profileRoutes = require('./routes/profile');
-const tutorialRoutes = require('./routes/tutorial');
+const auctionRoutes = require('./routes/auctionRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const tutorialRoutes = require('./routes/tutorialRoutes');
 const { startAuctionCloser } = require('./services/auctionCloser');
-const Auction = require('./models/Auction');
+const Auction = require('./model/Auction');
 const { isHighlighted } = require('./utils/highlight');
 const { formatMoney } = require('./utils/bidding');
 
@@ -160,7 +163,10 @@ app.use(async (req, res, next) => {
   next()
 })
 
-app.use('/', mainRoutes);
+app.use('/', homeRoutes);
+app.use('/', authRoutes);
+app.use('/onboard', onboardRoutes);
+app.use('/', termRoutes);
 app.use('/auction', auctionRoutes);
 app.use('/profile', profileRoutes);
 app.use('/tutorial', tutorialRoutes);

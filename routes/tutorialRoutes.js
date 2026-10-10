@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const tutorialController = require('../controllers/tutorial')
+const tutorialController = require('../controller/tutorialController')
 const { ensureAuth } = require('../middleware/auth')
 
 router.post('/dismiss', ensureAuth, tutorialController.postDismiss)

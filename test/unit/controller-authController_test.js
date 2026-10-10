@@ -1,11 +1,11 @@
-jest.mock('../../models/User');
+jest.mock('../../model/User');
 // Only the transport is faked. The real templates in config/mailer.js run,
 // so these tests see the exact HTML a user would receive.
 jest.mock('nodemailer');
 
 const nodemailer = require('nodemailer');
-const User = require('../../models/User');
-const authController = require('../../controllers/auth');
+const User = require('../../model/User');
+const authController = require('../../controller/authController');
 const {
     validateSignup,
     validateLogin,

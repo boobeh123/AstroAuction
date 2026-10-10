@@ -1,8 +1,8 @@
-jest.mock('../../models/User');
-jest.mock('../../middleware/cloudinary');
+jest.mock('../../model/User');
+jest.mock('../../config/cloudinary');
 
-const User = require('../../models/User');
-const profileController = require('../../controllers/profile');
+const User = require('../../model/User');
+const profileController = require('../../controller/profileController');
 const { validateProfileEdit } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 

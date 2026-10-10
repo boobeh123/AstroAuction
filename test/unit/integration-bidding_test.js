@@ -65,7 +65,7 @@ beforeAll(async () => {
     process.env.DB_STRING = mongod.getUri();
     jest.spyOn(console, 'log').mockImplementation(() => {});
     await connectDB();
-    Auction = require('../../models/Auction');
+    Auction = require('../../model/Auction');
     sellerId = new mongoose.Types.ObjectId();
 }, 60_000);
 

@@ -1,7 +1,7 @@
 const passport = require('passport')
 const mongoose = require('mongoose')
 const { matchedData } = require('express-validator')
-const User = require('../models/User')
+const User = require('../model/User')
 const { formErrors } = require('../middleware/validators')
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../config/mailer');
 const crypto = require('crypto');
