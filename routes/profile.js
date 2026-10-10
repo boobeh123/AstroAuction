@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const profileController = require('../controllers/profile') 
+const profileController = require('../controller/profileController') 
 const upload = require("../middleware/multer");
 const handleUploadErrors = require("../middleware/handleUploadErrors");
 const { ensureAuth } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiters');
 const { validateProfileEdit } = require('../middleware/validators');
-const authController = require('../controllers/auth');
+const authController = require('../controller/authController');
 
 router.get('/', ensureAuth, profileController.getProfile);
 router.post('/', ensureAuth, upload.single('file'), handleUploadErrors('/profile'), profileController.uploadProfilePicture);

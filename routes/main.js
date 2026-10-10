@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const homeController = require('../controllers/home');
-const authController = require('../controllers/auth');
-const onboardController = require('../controllers/onboard');
-const termController = require('../controllers/term');
+const homeController = require('../controller/homeController');
+const authController = require('../controller/authController');
+const onboardController = require('../controller/onboardController');
+const termController = require('../controller/termController');
 const { ensureAuth } = require('../middleware/auth');
 const { loginLimiter, authLimiter } = require('../middleware/rateLimiters');
 const {

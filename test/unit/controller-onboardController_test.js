@@ -1,7 +1,7 @@
 jest.mock('../../model/User');
 
 const User = require('../../model/User');
-const onboardController = require('../../controllers/onboard');
+const onboardController = require('../../controller/onboardController');
 const { validateOnboard } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 

@@ -8,7 +8,7 @@ jest.mock('../../services/auctionCloser');
 const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
-const auctionController = require('../../controllers/auction');
+const auctionController = require('../../controller/auctionController');
 const { validateBid, validateComment } = require('../../middleware/validators');
 const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
 

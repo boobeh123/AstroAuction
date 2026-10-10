@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const auctionController = require('../controllers/auction') 
+const auctionController = require('../controller/auctionController') 
 const upload = require("../middleware/multer");
 const handleUploadErrors = require("../middleware/handleUploadErrors");
 const { ensureAuth, ensureAuctioneer, ensureVerified } = require('../middleware/auth');

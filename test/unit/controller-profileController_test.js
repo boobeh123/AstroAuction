@@ -2,7 +2,7 @@ jest.mock('../../model/User');
 jest.mock('../../middleware/cloudinary');
 
 const User = require('../../model/User');
-const profileController = require('../../controllers/profile');
+const profileController = require('../../controller/profileController');
 const { validateProfileEdit } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 

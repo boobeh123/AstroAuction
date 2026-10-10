@@ -1,8 +1,8 @@
-jest.mock('../../controllers/auction');
+jest.mock('../../controller/auctionController');
 
 const express = require('express');
 const request = require('supertest');
-const auctionController = require('../../controllers/auction');
+const auctionController = require('../../controller/auctionController');
 
 /**
  * These tests answer one question: is each route wired to the middleware it

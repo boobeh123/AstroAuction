@@ -5,7 +5,7 @@ jest.mock('nodemailer');
 
 const nodemailer = require('nodemailer');
 const User = require('../../model/User');
-const authController = require('../../controllers/auth');
+const authController = require('../../controller/authController');
 const {
     validateSignup,
     validateLogin,
