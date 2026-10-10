@@ -10,6 +10,9 @@
     "format": "prettier -w .",
     "test": "cross-env NODE_ENV=test jest --runInBand"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/boobeh123/AstroAuction.git"
