@@ -8,7 +8,12 @@ const profileFileName = document.querySelector('#profile-file-name');
 const openListingModalBtn = document.querySelector('#open-create-listing-btn');
 const listingModal = document.querySelector('#create-listing-modal');
 const listingModalClose = document.querySelector('#create-listing-modal-close');
+const listingTitleInput = document.querySelector('#modal-title-input');
+const listingTitleCounter = document.querySelector('#title-counter');
+const listingDescInput = document.querySelector('#modal-desc-input');
+const listingDescCounter = document.querySelector('#desc-counter');
 const videoRadios = document.querySelectorAll('input[name="has-video"]');
+const videoYesRadio = document.querySelector('#video-yes');
 const videoUrlField = document.querySelector('#video-url-field');
 const listingFileInput = document.querySelector('#modal-file-input');
 const listingDropzone = document.querySelector('#dropzone');
@@ -24,8 +29,11 @@ const imageLightboxClose = document.querySelector('#image-lightbox-close');
 const navToggle = document.querySelector('#nav-toggle');
 const navActions = document.querySelector('#nav-actions');
 const saleTypeRadios = document.querySelectorAll('input[name="saleType"]');
+const auctionRadio = document.querySelector('#sale-auction');
 const fixedPriceFields = document.querySelector('#fixed-price-fields');
 const auctionFields = document.querySelector('#auction-fields');
+const listingPriceInput = document.querySelector('#modal-price-input');
+const listingStartingPriceInput = document.querySelector('#modal-starting-price-input');
 const countdowns = document.querySelectorAll('[data-ends-at]');
 const tutorialHighlight = document.querySelector('#tutorial-highlight');
 const tutorialBackdrop = document.querySelector('#tutorial-backdrop');
@@ -157,9 +165,7 @@ function formatTimeRemaining(ms) {
   return `${seconds}s`;
 }
 
-function wireCharCounter(inputId, counterId, max) {
-  const input = document.getElementById(inputId);
-  const counter = document.getElementById(counterId);
+function wireCharCounter(input, counter, max) {
   if (!input || !counter) return;
   input.addEventListener('input', () => {
     const len = input.value.length;
@@ -207,7 +213,7 @@ function handleModalKeydown(event) {
 }
 
 function handleVideoToggleChange() {
-  videoUrlField.classList.toggle('is-visible', document.getElementById('video-yes').checked);
+  videoUrlField.classList.toggle('is-visible', videoYesRadio.checked);
 }
 
 function addListingFiles(fileList) {
@@ -281,16 +287,13 @@ function handleNavKeydown(event) {
 // can't focus an element nobody can see — the form just silently refuses to
 // submit with no visible explanation.
 function handleSaleTypeChange() {
-  const isAuction = document.getElementById('sale-auction').checked;
+  const isAuction = auctionRadio.checked;
 
   fixedPriceFields.hidden = isAuction;
   auctionFields.hidden = !isAuction;
 
-  const priceInput = document.getElementById('modal-price-input');
-  const startingPriceInput = document.getElementById('modal-starting-price-input');
-
-  if (priceInput) priceInput.required = !isAuction;
-  if (startingPriceInput) startingPriceInput.required = isAuction;
+  if (listingPriceInput) listingPriceInput.required = !isAuction;
+  if (listingStartingPriceInput) listingStartingPriceInput.required = isAuction;
 }
 
 function tickCountdowns() {
@@ -486,7 +489,7 @@ function handleFlashDismiss(flash) {
 
 function handleFrameResize(entries) {
   for (const entry of entries) {
-    heroFrame.style.setProperty('--frame-size', `${entry.contentRect.width}px`);
+    heroFrame.style.setProperty('--frameSize', `${entry.contentRect.width}px`);
   }
 }
 
@@ -587,13 +590,13 @@ if (openListingModalBtn && listingModal && listingModalClose) {
   });
 }
 
-if (videoRadios.length && videoUrlField) {
+if (videoRadios.length && videoYesRadio && videoUrlField) {
   videoRadios.forEach((radio) => radio.addEventListener('change', handleVideoToggleChange));
 }
 
 if (listingDropzone && listingFileInput && listingGalleryGrid && listingGalleryCount && listingDropzonePrompt) {
-  wireCharCounter('modal-title-input', 'title-counter', 100);
-  wireCharCounter('modal-desc-input', 'desc-counter', 2000);
+  wireCharCounter(listingTitleInput, listingTitleCounter, 100);
+  wireCharCounter(listingDescInput, listingDescCounter, 2000);
 
   listingFileInput.addEventListener('change', () => {
     addListingFiles(listingFileInput.files);
@@ -646,7 +649,7 @@ if (navToggle && navActions) {
   });
 }
 
-if (saleTypeRadios.length && fixedPriceFields && auctionFields) {
+if (saleTypeRadios.length && auctionRadio && fixedPriceFields && auctionFields) {
   saleTypeRadios.forEach((radio) => radio.addEventListener('change', handleSaleTypeChange));
   // Runs once on load so `required` matches whichever option starts checked,
   // rather than only becoming correct after the user touches the toggle.
