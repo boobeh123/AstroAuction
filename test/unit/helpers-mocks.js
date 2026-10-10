@@ -95,4 +95,16 @@ function mockQuery(result) {
     return query;
 }
 
-module.exports = { mockResponse, mockRequest, mockQuery };
+/**
+ * Runs a route's validator chains on a mock request, one after another, the
+ * way Express runs them before the controller. Controllers read their input
+ * through formErrors() and matchedData(), which only have something to
+ * report once the chains have run.
+ */
+async function runValidators(chains, req) {
+    for (const chain of chains) {
+        await chain.run(req);
+    }
+}
+
+module.exports = { mockResponse, mockRequest, mockQuery, runValidators };

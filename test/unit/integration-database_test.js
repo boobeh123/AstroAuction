@@ -27,7 +27,8 @@ const User = require('../../models/User');
 const auctionController = require('../../controllers/auction');
 const authController = require('../../controllers/auth');
 const { closeExpiredAuctions } = require('../../services/auctionCloser');
-const { mockRequest, mockResponse } = require('./helpers-mocks');
+const { validateResetPassword } = require('../../middleware/validators');
+const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 
 const ONE_HOUR_MS = 3_600_000;
 const TOKEN = '0123456789abcdef0123456789abcdef01234567';
@@ -157,6 +158,7 @@ describe("the app's own operators still work with the guard on", () => {
         req.login = jest.fn((loggedInUser, callback) => callback());
         const res = mockResponse();
 
+        await runValidators(validateResetPassword, req);
         await authController.postResetPassword(req, res, jest.fn());
 
         expect(res.redirectedTo).toBe('/');

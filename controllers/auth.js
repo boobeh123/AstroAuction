@@ -1,7 +1,8 @@
 const passport = require('passport')
-const validator = require('validator')
 const mongoose = require('mongoose')
+const { matchedData } = require('express-validator')
 const User = require('../models/User')
+const { formErrors } = require('../middleware/validators')
 const { sendVerificationEmail, sendPasswordResetEmail } = require('../config/mailer');
 const crypto = require('crypto');
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex')
@@ -34,18 +35,15 @@ module.exports = {
     },
 
     postSignup: async (req, res, next) => {
-      const validationErrors = []
-      if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
-      if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
-      if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' })
-
-      if (validationErrors.length) {
-        req.flash('errors', validationErrors)
-        return res.redirect('../signup')
+      const errors = formErrors(req)
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array())
+        return res.redirect('/signup')
       }
-      req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
 
-      const existingUser = await User.findOne({ email: req.body.email })
+      const { email, password } = matchedData(req)
+
+      const existingUser = await User.findOne({ email })
       if (existingUser) {
         req.flash('errors', {msg: "Account with that email address or username already exists."})
         return res.redirect('/signup')
@@ -55,9 +53,10 @@ module.exports = {
 
       const user = new User({
         role: 'User',
-        email: req.body.email,
-        password: req.body.password,
-        agreeToTerms: req.body.agreeToTerms,
+        email,
+        password,
+        // validateSignup only lets the form through when the box is ticked
+        agreeToTerms: true,
         displayName: '',
         image: '',
         cloudinaryId: '',
@@ -84,17 +83,14 @@ module.exports = {
     },
 
     postLogin: async (req, res, next) => {
-      const validationErrors = []
-      if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
-      if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' })
-
-      if (validationErrors.length) {
-        req.flash('errors', validationErrors)
+      const errors = formErrors(req)
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array())
         return res.redirect('/login')
       }
 
-      req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false })
-
+      // Passport reads the email and password from req.body itself.
+      // validateLogin has already trimmed and normalized the email there.
       passport.authenticate('local', (err, user, info) => {
         if (err) { return next(err) }
         if (!user) {
@@ -194,12 +190,13 @@ module.exports = {
     },
 
     postForgetPassword: async (req, res) => {
-      if (!validator.isEmail(req.body.email)) {
-        req.flash('errors', { msg: 'Please enter a valid email address.' });
+      const errors = formErrors(req)
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array());
         return res.redirect('/recover');
       }
 
-      const email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
+      const { email } = matchedData(req);
       const user  = await User.findOne({ email });
 
       if (!user) {
@@ -237,23 +234,13 @@ module.exports = {
     },
 
     postResetPassword: async (req, res, next) => {
-      const validationErrors = [];
-
-      if (typeof req.body.password !== 'string' || typeof req.body.confirmPassword !== 'string') {
-        validationErrors.push({ msg: 'Invalid request.' });
-      } else {
-        if (!validator.isLength(req.body.password, { min: 8 })) {
-          validationErrors.push({ msg: 'Password must be at least 8 characters long.' });
-        }
-        if (req.body.password !== req.body.confirmPassword) {
-          validationErrors.push({ msg: 'Passwords do not match.' });
-        }
-      }
-
-      if (validationErrors.length) {
-        req.flash('errors', validationErrors);
+      const errors = formErrors(req)
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array());
         return res.redirect(`/recover/${req.params.token}`);
       }
+
+      const { password } = matchedData(req);
 
       const user = await User.findOne({
         passwordResetToken:   hashToken(req.params.token),
@@ -265,7 +252,7 @@ module.exports = {
         return res.redirect('/recover');
       }
 
-      user.password             = req.body.password;
+      user.password             = password;
       user.passwordResetToken   = undefined;
       user.passwordResetExpires = undefined;
       await user.save();

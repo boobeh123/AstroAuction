@@ -6,7 +6,13 @@ jest.mock('nodemailer');
 const nodemailer = require('nodemailer');
 const User = require('../../models/User');
 const authController = require('../../controllers/auth');
-const { mockRequest, mockResponse } = require('./helpers-mocks');
+const {
+    validateSignup,
+    validateLogin,
+    validateForgotPassword,
+    validateResetPassword,
+} = require('../../middleware/validators');
+const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 
 /**
  * Verification and password reset links are keys to someone's account.
@@ -55,10 +61,16 @@ describe('passwords must be at least 8 characters', () => {
 
     test('postSignup rejects a 7-character password before touching the database', async () => {
         const req = mockRequest({
-            body: { email: 'newbidder@example.com', password: SEVEN_CHARS, confirmPassword: SEVEN_CHARS },
+            body: {
+                email: 'newbidder@example.com',
+                password: SEVEN_CHARS,
+                confirmPassword: SEVEN_CHARS,
+                agreeToTerms: 'yes',
+            },
         });
         const res = mockResponse();
 
+        await runValidators(validateSignup, req);
         await authController.postSignup(req, res, jest.fn());
 
         expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long' });
@@ -73,11 +85,29 @@ describe('passwords must be at least 8 characters', () => {
         });
         const res = mockResponse();
 
+        await runValidators(validateResetPassword, req);
         await authController.postResetPassword(req, res, jest.fn());
 
         expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long.' });
         expect(User.findOne).not.toHaveBeenCalled();
         expect(res.redirectedTo).toBe('/recover/abc123');
+    });
+});
+
+describe('a non-text email gets a form error, not a crash', () => {
+    // validator.isEmail() used to throw on a list or an object, and the
+    // visitor saw the 500 page instead of the login form.
+    test('postLogin sends the visitor back to the login form', async () => {
+        const req = mockRequest({
+            body: { email: ['a@example.com', 'b@example.com'], password: 'correct-horse' },
+        });
+        const res = mockResponse();
+
+        await runValidators(validateLogin, req);
+        await authController.postLogin(req, res, jest.fn());
+
+        expect(res.redirectedTo).toBe('/login');
+        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Please enter a valid email address.' });
     });
 });
 
@@ -93,6 +123,7 @@ describe('emailed links ignore the Host header', () => {
                 email: 'newbidder@example.com',
                 password: 'correct-horse',
                 confirmPassword: 'correct-horse',
+                agreeToTerms: 'yes',
             },
         });
         req.login = jest.fn((user, callback) => {
@@ -100,6 +131,7 @@ describe('emailed links ignore the Host header', () => {
         });
         const res = mockResponse();
 
+        await runValidators(validateSignup, req);
         await authController.postSignup(req, res, jest.fn());
         await loginCallbackDone;
 
@@ -132,6 +164,7 @@ describe('emailed links ignore the Host header', () => {
         const req = forgedHostRequest({ body: { email: 'bidder@example.com' } });
         const res = mockResponse();
 
+        await runValidators(validateForgotPassword, req);
         await authController.postForgetPassword(req, res);
 
         const html = emailedHtml();
