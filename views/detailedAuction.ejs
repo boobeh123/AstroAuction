@@ -71,10 +71,10 @@
                 <ul class="comments-list">
                   <% comments.forEach((comment) => { %>
                     <li class="comment-item">
-                      <img src="<%= comment.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="" class="comment-avatar">
+                      <img src="<%= (comment.user && comment.user.image) || 'https://placeholder.pics/svg/100x100' %>" alt="" class="comment-avatar">
                       <div class="comment-body-wrap">
                         <div class="comment-meta">
-                          <span class="comment-author"><%= comment.user.displayName %></span>
+                          <span class="comment-author"><%= comment.user ? comment.user.displayName : 'Removed user' %></span>
                           <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString() %></span>
                         </div>
                         <p class="comment-text"><%= comment.body %></p>
