@@ -296,6 +296,107 @@ describe('sale type toggle', () => {
     });
 });
 
+describe('character counters', () => {
+    // main.js wires the counters inside its photo-gallery block, so the page
+    // needs the gallery's elements too, the way the real listing form has them.
+    function setupCounters() {
+        document.body.innerHTML = `
+            <input id="modal-title-input" type="text" maxlength="100">
+            <span class="char-counter" id="title-counter">0 / 100</span>
+            <textarea id="modal-desc-input" maxlength="2000"></textarea>
+            <span class="char-counter" id="desc-counter">0 / 2000</span>
+            <div class="dropzone" id="dropzone">
+                <input id="modal-file-input" type="file" multiple>
+                <span class="dropzone-prompt" id="dropzone-prompt"></span>
+            </div>
+            <div class="gallery-grid" id="gallery-grid"></div>
+            <span class="gallery-count" id="gallery-count">0 / 10 photos</span>
+        `;
+        loadMainJs();
+
+        return {
+            titleInput: document.querySelector('#modal-title-input'),
+            titleCounter: document.querySelector('#title-counter'),
+            descInput: document.querySelector('#modal-desc-input'),
+            descCounter: document.querySelector('#desc-counter'),
+        };
+    }
+
+    function typeInto(field, text) {
+        field.value = text;
+        field.dispatchEvent(new window.Event('input'));
+    }
+
+    test('counts the title as it is typed', () => {
+        const { titleInput, titleCounter } = setupCounters();
+
+        typeInto(titleInput, 'Telescope');
+
+        expect(titleCounter.textContent).toBe('9 / 100');
+    });
+
+    test('counts the description against its own limit', () => {
+        const { descInput, descCounter } = setupCounters();
+
+        typeInto(descInput, 'Barely used.');
+
+        expect(descCounter.textContent).toBe('12 / 2000');
+    });
+
+    // The warning starts at 90% of the limit, so it shows up before the field
+    // stops taking characters.
+    test('warns once the title reaches 90 characters', () => {
+        const { titleInput, titleCounter } = setupCounters();
+
+        typeInto(titleInput, 'a'.repeat(89));
+        expect(titleCounter.classList.contains('char-counter--near-limit')).toBe(false);
+
+        typeInto(titleInput, 'a'.repeat(90));
+        expect(titleCounter.classList.contains('char-counter--near-limit')).toBe(true);
+    });
+});
+
+describe('video link toggle', () => {
+    function setupVideoToggle() {
+        document.body.innerHTML = `
+            <input type="radio" name="has-video" id="video-no" value="no" checked>
+            <input type="radio" name="has-video" id="video-yes" value="yes">
+            <div class="video-url-field" id="video-url-field">
+                <input type="url" id="video-url-input" name="video">
+            </div>
+        `;
+        loadMainJs();
+
+        return {
+            noRadio: document.querySelector('#video-no'),
+            yesRadio: document.querySelector('#video-yes'),
+            urlField: document.querySelector('#video-url-field'),
+        };
+    }
+
+    function pick(radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new window.Event('change'));
+    }
+
+    test('shows the link field when Yes is picked', () => {
+        const { yesRadio, urlField } = setupVideoToggle();
+
+        pick(yesRadio);
+
+        expect(urlField.classList.contains('is-visible')).toBe(true);
+    });
+
+    test('hides it again when No is picked', () => {
+        const { noRadio, yesRadio, urlField } = setupVideoToggle();
+
+        pick(yesRadio);
+        pick(noRadio);
+
+        expect(urlField.classList.contains('is-visible')).toBe(false);
+    });
+});
+
 describe('defensive guards', () => {
     // Every page loads this one file. On a page with none of these elements —
     // the login page, say — main.js must do nothing rather than throw, or the
