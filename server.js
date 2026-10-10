@@ -105,21 +105,18 @@ app.use(flash());
 
 // Flash Available to all Views
 app.use((req, res, next) => {
-  try {
-    res.locals.success = req.flash('success') || []
-    res.locals.errors  = req.flash('errors')  || []
-    res.locals.error   = req.flash('error')   || []
-    res.locals.info    = req.flash('info')    || []
-    res.locals.currentPath = req.originalUrl
-    res.locals.user = req.user || null
-    next()
-  } catch (err) {
-    res.locals.success = []
-    res.locals.errors  = []
-    res.locals.error   = []
-    res.locals.info    = []
-    next(err)
-  }
+  // Calling req.flash() saves an empty message box into the session, which
+  // gave every visitor (bots included) a session cookie and a database row.
+  // Only read messages when the session already has some. req.session is
+  // missing when the session store can't be reached, so check for it too.
+  const readFlash = (type) => (req.session?.flash ? req.flash(type) : [])
+  res.locals.success = readFlash('success')
+  res.locals.errors  = readFlash('errors')
+  res.locals.error   = readFlash('error')
+  res.locals.info    = readFlash('info')
+  res.locals.currentPath = req.originalUrl
+  res.locals.user = req.user || null
+  next()
 })
 
 app.use(async (req, res, next) => {
