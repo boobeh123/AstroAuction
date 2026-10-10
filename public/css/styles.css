@@ -1059,6 +1059,24 @@ color: #A855F7;
   /* border: 2px solid red; */
 }
 
+/* Accounts that haven't verified their email can open the create-listing
+   modal (the tutorial walks through it) but can't submit it. The notice says
+   why, in the same muted style as the notices on the bid card. */
+.auction-form-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.listing-verify-notice {
+  color: #B8C5D6;
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+.listing-verify-notice a {
+  color: #A855F7;
+}
+
 .auction-list-header {
   display: flex;
   align-items: baseline;

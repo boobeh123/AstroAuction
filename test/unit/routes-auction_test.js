@@ -18,15 +18,16 @@ const auctionController = require('../../controllers/auction');
  */
 const LOT = '507f1f77bcf86cd799439011';
 
-function buildApp({ authenticated, role = 'user' }) {
+function buildApp({ authenticated, role = 'user', emailVerified = true }) {
     const app = express();
     app.use(express.urlencoded({ extended: true }));
 
     // Stands in for Passport. ensureAuth reads isAuthenticated(); the newer
-    // ensureAuctioneer reads req.user.role, so both have to be simulated here.
+    // ensureAuctioneer and ensureVerified read req.user.role and
+    // req.user.emailVerified, so all three have to be simulated here.
     app.use((req, res, next) => {
         req.isAuthenticated = () => authenticated;
-        req.user = authenticated ? { id: '507f1f77bcf86cd799439013', role } : null;
+        req.user = authenticated ? { id: '507f1f77bcf86cd799439013', role, emailVerified } : null;
         req.flash = () => {};
         next();
     });
@@ -120,6 +121,40 @@ describe('guarded routes admit authenticated requests', () => {
             .expect(200);
 
         expect(auctionController.deleteAuction).toHaveBeenCalled();
+    });
+});
+
+describe('creating a listing needs a verified email, not just a login', () => {
+    // Like the spotlight button, the Create button is disabled in the template
+    // for unverified accounts, but a disabled button is not access control.
+    // These tests prove the endpoint itself refuses them.
+    test('an unverified user is sent to their profile and postAuction never runs', async () => {
+        const res = await request(buildApp({ authenticated: true, emailVerified: false }))
+            .post('/auction')
+            .send({ title: 'Vintage lamp' });
+
+        expect(res.status).toBe(302);
+        expect(res.headers.location).toBe('/profile');
+        expect(auctionController.postAuction).not.toHaveBeenCalled();
+    });
+
+    test('a verified user reaches postAuction', async () => {
+        await request(buildApp({ authenticated: true }))
+            .post('/auction')
+            .send({ title: 'Vintage lamp' })
+            .expect(200);
+
+        expect(auctionController.postAuction).toHaveBeenCalled();
+    });
+
+    // ensureAuth has to run first, so a logged-out visitor is asked to log in
+    // rather than told to verify an email they haven't given us.
+    test('anonymous requests are still redirected to login', async () => {
+        const res = await request(buildApp({ authenticated: false, emailVerified: false }))
+            .post('/auction');
+
+        expect(res.status).toBe(302);
+        expect(res.headers.location).toBe('/login');
     });
 });
 

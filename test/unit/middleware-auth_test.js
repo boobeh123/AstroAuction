@@ -1,4 +1,4 @@
-const { ensureAuth, ensureAuctioneer } = require('../../middleware/auth');
+const { ensureAuth, ensureAuctioneer, ensureVerified } = require('../../middleware/auth');
 const { mockRequest, mockResponse } = require('./helpers-mocks');
 
 describe('ensureAuth', () => {
@@ -126,6 +126,53 @@ describe('ensureAuctioneer', () => {
         // different string and must not pass.
         const { next } = run({ id: 'u4', role: 'Admin' });
 
+        expect(next).not.toHaveBeenCalled();
+    });
+});
+
+describe('ensureVerified', () => {
+    function run(user) {
+        const req = mockRequest({ user, isAuthenticated: () => Boolean(user) });
+        const res = mockResponse();
+        const next = jest.fn();
+
+        ensureVerified(req, res, next);
+
+        return { req, res, next };
+    }
+
+    test('admits a user who has verified their email', () => {
+        const { res, next } = run({ id: 'v1', emailVerified: true });
+
+        expect(next).toHaveBeenCalledTimes(1);
+        expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    // A fresh signup is unverified until the emailed link is clicked. This is
+    // the case that actually protects the endpoint.
+    test('sends an unverified user to their profile with an explanation', () => {
+        const { req, res, next } = run({ id: 'v2', emailVerified: false });
+
+        expect(next).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/profile');
+        expect(req.flashed.errors[0].msg).toMatch(/verify your email/i);
+    });
+
+    // Accounts created before email verification existed may have no flag at
+    // all. They must fail closed, not slip through on a loose check.
+    test('rejects a user with no emailVerified field at all', () => {
+        const { res, next } = run({ id: 'v3' });
+
+        expect(next).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/profile');
+    });
+
+    test('rejects a request with no user rather than throwing', () => {
+        const req = mockRequest({ user: null });
+        const res = mockResponse();
+        const next = jest.fn();
+
+        expect(() => ensureVerified(req, res, next)).not.toThrow();
         expect(next).not.toHaveBeenCalled();
     });
 });

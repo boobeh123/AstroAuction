@@ -15,5 +15,17 @@ module.exports = {
       return next()
     }
     res.status(403).render('errors/403.ejs')
+  },
+  // Also chained after ensureAuth. Listings are only for accounts that have
+  // proved they own their email address, which is what the verification email
+  // is for. Like ensureAuctioneer it fails closed: a missing user or a missing
+  // flag is treated as unverified. The profile page is where the Resend
+  // verification email button lives, so that's where the user is sent.
+  ensureVerified: function (req, res, next) {
+    if (req.user && req.user.emailVerified === true) {
+      return next()
+    }
+    req.flash('errors', { msg: 'Please verify your email before creating a listing. You can resend the verification email from your profile.' })
+    res.redirect('/profile')
   }
 }
