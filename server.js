@@ -70,7 +70,9 @@ app.use(helmet({
     xFrameOptions: { action: 'sameorigin' },
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }))
-app.use(logger('dev'));
+// Locally: short colored lines. On Railway: the standard "combined" format,
+// which adds the visitor's IP, the date, the referring page and the browser.
+app.use(logger(isProduction ? 'combined' : 'dev'));
 // extended: false keeps every form field a plain string. With extended: true,
 // a field named email[$ne] arrived as the object { $ne: ... }, which is how
 // database operators get smuggled into queries.
