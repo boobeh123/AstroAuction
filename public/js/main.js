@@ -489,7 +489,7 @@ function handleFlashDismiss(flash) {
 
 function handleFrameResize(entries) {
   for (const entry of entries) {
-    heroFrame.style.setProperty('--frame-size', `${entry.contentRect.width}px`);
+    heroFrame.style.setProperty('--frameSize', `${entry.contentRect.width}px`);
   }
 }
 

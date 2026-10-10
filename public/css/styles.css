@@ -18,17 +18,17 @@
 * Base
 ***************************************************************/
 :root {
-  --header-h: 60px;
+  --headerHeight: 60px;
 
   /* Spacing scale */
-  --space-1: 0.25rem;  /* 4px  */
-  --space-2: 0.5rem;   /* 8px  */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-5: 1.5rem;   /* 24px */
-  --space-6: 2rem;     /* 32px */
-  --space-8: 3rem;     /* 48px */
-  --space-10: 4rem;    /* 64px */
+  --space1: 0.25rem;  /* 4px  */
+  --space2: 0.5rem;   /* 8px  */
+  --space3: 0.75rem;  /* 12px */
+  --space4: 1rem;     /* 16px */
+  --space5: 1.5rem;   /* 24px */
+  --space6: 2rem;     /* 32px */
+  --space8: 3rem;     /* 48px */
+  --space10: 4rem;    /* 64px */
 }
 
 *,
@@ -95,7 +95,7 @@ p {
 ***************************************************************/
 .flash-stack {
   position: fixed;
-  top: calc(var(--header-h) + 16px);
+  top: calc(var(--headerHeight) + 16px);
   right: 24px;
   width: min(92%, 420px);
   z-index: 2001;
@@ -285,14 +285,14 @@ p {
 }
 
 .navbar {
-  padding: var(--space-2) 0;
+  padding: var(--space2) 0;
   /* border: 2px solid red; */
 }
 
 .nav-container {
   display: flex;
   align-items: center;
-  padding-right: var(--space-4);
+  padding-right: var(--space4);
   /* border: 2px solid red; */
 }
 
@@ -303,10 +303,10 @@ p {
   font-size: 1.75rem;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space2);
   text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
   /* border: 2px solid red; */
-  padding-left: var(--space-4);
+  padding-left: var(--space4);
 
 }
 
@@ -316,7 +316,7 @@ p {
 }
 
 .highlight-banner {
-  margin-top: var(--header-h);
+  margin-top: var(--headerHeight);
   overflow: hidden;
   background: linear-gradient(90deg, rgba(251, 191, 36, 0.15), rgba(168, 85, 247, 0.15));
   border-bottom: 1px solid rgba(251, 191, 36, 0.3);
@@ -370,7 +370,7 @@ p {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space3);
   /* border: 2px solid red; */
 }
 
@@ -467,7 +467,7 @@ color: #A855F7;
 ***************************************************************/
 .hero {
   position: relative;
-  padding-top: calc(var(--header-h) + var(--space-6));
+  padding-top: calc(var(--headerHeight) + var(--space6));
   display: grid;
   grid-template-columns: 1fr;
   grid-template-areas: "hero-image" "hero-content";
@@ -495,7 +495,7 @@ color: #A855F7;
 
 .hero-content {
   grid-area: hero-content;
-  padding: 0 var(--space-6);
+  padding: 0 var(--space6);
   /* border: 2px solid red; */
   text-align: center;
 }
@@ -503,18 +503,18 @@ color: #A855F7;
 .hero-title {
   font-size: 3rem;
   color: #E8E9F3;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space4);
   text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
 }
 
 .hero-text h2 {
   color: #E8E9F3;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space2);
 }
 
 .hero-text h3 {
   color: #B8C5D6;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space6);
 }
 
 .hero-text .btn {
@@ -689,16 +689,16 @@ color: #A855F7;
 .orbit-particle:nth-child(4) { animation-delay: -6s; color: rgba(0, 217, 255, 0.6); font-size: 10px; }
 
 @keyframes orbit-spin {
-  from { transform: rotate(0deg) translateX(calc(var(--frame-size, 600px) * 0.58)) rotate(0deg); }
-  to   { transform: rotate(360deg) translateX(calc(var(--frame-size, 600px) * 0.58)) rotate(-360deg); }
+  from { transform: rotate(0deg) translateX(calc(var(--frameSize, 600px) * 0.58)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(calc(var(--frameSize, 600px) * 0.58)) rotate(-360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .orbit-particle { animation: none; }
-  .orbit-particle:nth-child(1) { top: calc(50% - (var(--frame-size, 600px) * 0.58)); }
-  .orbit-particle:nth-child(2) { left: calc(50% + (var(--frame-size, 600px) * 0.58)); }
-  .orbit-particle:nth-child(3) { top: calc(50% + (var(--frame-size, 600px) * 0.58)); }
-  .orbit-particle:nth-child(4) { left: calc(50% - (var(--frame-size, 600px) * 0.58)); }
+  .orbit-particle:nth-child(1) { top: calc(50% - (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(2) { left: calc(50% + (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(3) { top: calc(50% + (var(--frameSize, 600px) * 0.58)); }
+  .orbit-particle:nth-child(4) { left: calc(50% - (var(--frameSize, 600px) * 0.58)); }
 
   /* Kept visible via a static border and glow rather than removed outright —
      a highlighted listing should still read as highlighted at a glance, just
@@ -2094,7 +2094,7 @@ color: #A855F7;
 * Profile Page
 ***************************************************************/
 .profile-main {
-  padding-top: calc(var(--header-h) + 24px);
+  padding-top: calc(var(--headerHeight) + 24px);
   min-height: 100vh;
   padding-bottom: 3rem;
   /* border: 2px solid red !important; */
@@ -2357,7 +2357,7 @@ color: #A855F7;
 * Error Pages (404, 403, 500)
 ***************************************************************/
 .error-page {
-  padding-top: calc(var(--header-h) + 40px);
+  padding-top: calc(var(--headerHeight) + 40px);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -2417,7 +2417,7 @@ color: #A855F7;
 * Terms & Privacy
 ***************************************************************/
 .legal-page {
-  padding-top: calc(var(--header-h) + 24px);
+  padding-top: calc(var(--headerHeight) + 24px);
   min-height: 100vh;
   padding-bottom: 3rem;
 }
@@ -2535,7 +2535,7 @@ color: #A855F7;
 * Detailed Auction Page
 ***************************************************************/
 .detailed-auction-page {
-  padding-top: calc(var(--header-h) + 24px);
+  padding-top: calc(var(--headerHeight) + 24px);
   min-height: 100vh;
   padding-bottom: 3rem;
   /* border: 2px solid red; */
@@ -3162,7 +3162,7 @@ color: #A855F7;
   }
 
   .flash-stack {
-    top: calc(var(--header-h) + 8px);
+    top: calc(var(--headerHeight) + 8px);
     right: 12px;
     left: 12px;
     width: auto;
@@ -3289,7 +3289,7 @@ color: #A855F7;
 
   /* detailed auction */
   .detailed-auction-page {
-    padding-top: calc(var(--header-h) + 16px);
+    padding-top: calc(var(--headerHeight) + 16px);
     /* border: 2px solid red; */
   }
 
