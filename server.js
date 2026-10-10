@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const helmet = require('helmet');
 const logger = require('morgan');
-const connectDB = require('./config/db')
+const connectDB = require('./config/database')
 const methodOverride = require('method-override');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -24,6 +24,7 @@ const { formatMoney } = require('./utils/bidding');
 require('./config/passport')(passport);
 
 const isProduction = process.env.NODE_ENV === 'production';
+const PORT = process.env.PORT || 3000;
 
 // Verification, reset and auction emails build their links from APP_URL.
 // Without it in production, every link in those emails points at localhost.
@@ -31,7 +32,10 @@ if (isProduction && !process.env.APP_URL) {
   console.warn('APP_URL is not set. Links in emails will point at http://localhost:3000.')
 }
 
-connectDB();
+// Connect once. The server starts taking requests only after this succeeds
+// (see the bottom of this file), and the session store shares the connection.
+const clientPromise = connectDB();
+
 // Railway sends every request through one proxy. Trusting that hop lets
 // Express see the visitor's real IP and that the connection was HTTPS,
 // which the secure session cookie below depends on.
@@ -71,19 +75,13 @@ app.use(express.json());
 app.use(express.static('public'));
 //Use forms for put / delete
 app.use(methodOverride("_method"));
-// Sessions (mongoOptions avoids indefinite hangs if DB is unreachable)
+// Sessions, stored in MongoDB over the app's own connection
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.DB_STRING,
-      mongoOptions: {
-        serverSelectionTimeoutMS: 10_000,
-        connectTimeoutMS: 10_000,
-      },
-    }),
+    store: MongoStore.create({ clientPromise }),
     // httpOnly keeps the cookie away from page scripts. sameSite 'lax' stops
     // other sites from submitting forms (bids, deletes) as a logged-in user.
     // secure limits it to HTTPS, which only works because of 'trust proxy'.
@@ -148,12 +146,22 @@ app.use((req, res) => {
 // Central error handler — must be last -> routes -> 404 handler - > error handler
 app.use(errorHandler)
 
-app.listen(process.env.PORT, ()=>{
-    console.log('Server is running, you better catch it!')
+// Take requests only once the database is connected. Before, the server
+// started straight away, and requests that arrived during a slow or failed
+// connection hung until they timed out. If the connection fails, the process
+// exits so Railway can restart it.
+clientPromise
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log('Server is running, you better catch it!')
 
-    // Sweeps for auctions whose time is up and closes them. Runs once
-    // immediately to catch anything that expired while the app was down, then
-    // every 60s. Mongoose buffers commands until the connection is ready, so
-    // this is safe to kick off here even though connectDB() isn't awaited.
-    startAuctionCloser()
-})    
+      // Sweeps for auctions whose time is up and closes them. Runs once
+      // immediately to catch anything that expired while the app was down,
+      // then every 60s.
+      startAuctionCloser()
+    })
+  })
+  .catch((err) => {
+    console.error('Database connection failed:', err)
+    process.exit(1)
+  })
