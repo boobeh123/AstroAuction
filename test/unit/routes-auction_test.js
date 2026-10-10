@@ -41,7 +41,7 @@ function buildApp({ authenticated, role = 'user', emailVerified = true }) {
     // configured here, so that render throws — this catches it and reports
     // the status the middleware actually chose, which is what's under test.
     // Without it a legitimate 403 would surface as a confusing 500.
-    app.use((err, req, res, next) => {
+    app.use((err, req, res, _next) => {
         res.status(res.statusCode === 403 ? 403 : 500).send('render failed');
     });
 

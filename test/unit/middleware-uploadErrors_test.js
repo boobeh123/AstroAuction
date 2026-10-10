@@ -126,7 +126,7 @@ describe('handleUploadErrors — real uploads through express', () => {
 
         // Stands in for errorHandler.js. If anything reaches here, the
         // middleware failed to catch it and the user would have seen a 500.
-        app.use((err, req, res, next) => {
+        app.use((err, req, res, _next) => {
             res.status(500).send('FELL THROUGH TO 500');
         });
 

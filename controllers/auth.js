@@ -1,7 +1,6 @@
 const passport = require('passport')
 const validator = require('validator')
 const User = require('../models/User')
-const nodemailer = require('nodemailer');
 const { appUrl, createTransporter } = require('../config/mailer');
 const crypto = require('crypto');
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex')
