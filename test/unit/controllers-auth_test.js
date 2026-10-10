@@ -94,6 +94,30 @@ describe('passwords must be at least 8 characters', () => {
     });
 });
 
+describe('new accounts', () => {
+    // Signup used to save role 'User', while the model's default (and every
+    // other account) is 'user'. It now leaves the role to the model.
+    test("postSignup leaves the role to the model's default", async () => {
+        User.findOne.mockResolvedValue(null);
+        const req = mockRequest({
+            body: {
+                email: 'newbidder@example.com',
+                password: 'correct-horse',
+                confirmPassword: 'correct-horse',
+                agreeToTerms: 'yes',
+            },
+        });
+        req.login = jest.fn();
+
+        await runValidators(validateSignup, req);
+        await authController.postSignup(req, mockResponse(), jest.fn());
+
+        expect(User).toHaveBeenCalledTimes(1);
+        expect(User.mock.calls[0][0]).not.toHaveProperty('role');
+        expect(User.mock.calls[0][0]).toMatchObject({ email: 'newbidder@example.com', agreeToTerms: true });
+    });
+});
+
 describe('a non-text email gets a form error, not a crash', () => {
     // validator.isEmail() used to throw on a list or an object, and the
     // visitor saw the 500 page instead of the login form.

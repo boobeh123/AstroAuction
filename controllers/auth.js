@@ -51,8 +51,8 @@ module.exports = {
 
       const token = crypto.randomBytes(20).toString('hex');
 
+      // role isn't set here, so new accounts get the model's default, 'user'
       const user = new User({
-        role: 'User',
         email,
         password,
         // validateSignup only lets the form through when the box is ticked
