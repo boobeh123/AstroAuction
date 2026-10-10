@@ -328,14 +328,16 @@ describe('postBid — outbid notification', () => {
 });
 
 describe('postBid — failure handling', () => {
-    test('renders the 500 page if the database throws', async () => {
+    // Express 5 hands a rejected handler to middleware/errorHandler.js, which
+    // logs the error and shows the 500 page. So the handler lets it through
+    // rather than rendering anything itself.
+    test('passes a database failure on to the error handler', async () => {
         Auction.findById.mockImplementation(() => { throw new Error('connection lost'); });
 
         const res = mockResponse();
-        await auctionController.postBid(bidRequest('150'), res);
+        await expect(auctionController.postBid(bidRequest('150'), res)).rejects.toThrow('connection lost');
 
-        expect(res.statusCode).toBe(500);
-        expect(res.rendered).toBe('errors/500.ejs');
+        expect(res.render).not.toHaveBeenCalled();
     });
 });
 
@@ -559,13 +561,12 @@ describe('postToggleHighlight', () => {
         expect(res.statusCode).not.toBe(403);
     });
 
-    test('renders the 500 page if the database throws', async () => {
+    test('passes a database failure on to the error handler', async () => {
         Auction.findById.mockImplementation(() => { throw new Error('connection lost'); });
 
         const res = mockResponse();
-        await auctionController.postToggleHighlight(highlightRequest(), res);
+        await expect(auctionController.postToggleHighlight(highlightRequest(), res)).rejects.toThrow('connection lost');
 
-        expect(res.statusCode).toBe(500);
-        expect(res.rendered).toBe('errors/500.ejs');
+        expect(res.render).not.toHaveBeenCalled();
     });
 });
