@@ -47,20 +47,42 @@ app.set('view engine', 'ejs');
 // Strict-Transport-Security — forces HTTPS on browsers that have visited before
 // X-DNS-Prefetch-Control — controls DNS prefetching
 // Referrer-Policy — controls what's sent in the Referer header
-// CSP is configured explicitly to allow Google Analytics, Google Fonts, Cloudinary images, and our own assets while blocking everything else.
+// Content-Security-Policy (CSP) lists the only places pages may load things
+// from, and the browser blocks everything else. No page has inline scripts
+// or onclick-style attributes, so scripts may only come from this site's own
+// files: even if a <script> tag slipped into a listing, the browser wouldn't
+// run it.
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc:     ["'self'"],
-            scriptSrc:      ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://cdnjs.cloudflare.com", "https://kit.fontawesome.com"],
-            scriptSrcAttr:  ["'unsafe-inline'"],
-            styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
-            fontSrc:        ["'self'", "https://fonts.gstatic.com", "https://kit.fontawesome.com", "https://ka-f.fontawesome.com", "https://cdnjs.cloudflare.com"],
-            imgSrc:         ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://www.google-analytics.com", "https://placeholder.pics"],
-            connectSrc:     ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://ka-f.fontawesome.com"],
-            frameSrc:       ["'self'", "https://www.youtube-nocookie.com"],
+            scriptSrc:      ["'self'"],
+            styleSrc:       [
+                "'self'",
+                "'unsafe-inline'",
+                "https://fonts.googleapis.com",      // Roboto and Material Icons stylesheets
+                "https://cdnjs.cloudflare.com",      // Font Awesome 6.4 stylesheet
+            ],
+            fontSrc:        [
+                "'self'",
+                "https://fonts.gstatic.com",         // Google Fonts' font files
+                "https://cdnjs.cloudflare.com",      // Font Awesome's icon font files
+            ],
+            imgSrc:         [
+                "'self'",
+                "data:",                             // small images built into styles.css
+                "blob:",                             // previews of photos picked in the listing form
+                "https://res.cloudinary.com",        // uploaded listing and profile photos
+                "https://placeholder.pics",          // stand-in avatar for users without a photo
+            ],
+            connectSrc:     ["'self'"],
+            frameSrc:       [
+                "'self'",
+                "https://www.youtube-nocookie.com",  // listing videos
+            ],
             objectSrc:      ["'none'"],
-            upgradeInsecureRequests: [],
+            // Local development runs on plain HTTP, so only upgrade on the live site
+            upgradeInsecureRequests: isProduction ? [] : null,
         },
     },
     // X-Frame-Options: SAMEORIGIN — controls whether other sites can embed
