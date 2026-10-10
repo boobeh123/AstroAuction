@@ -13,6 +13,9 @@ const createTransporter = () => {
   });
 };
 
+// Every email shows the same sender name in the recipient's inbox.
+const sender = () => ({ name: 'Astro Auction', address: process.env.EMAIL_NAME });
+
 // Every link in an email starts from APP_URL, never from the request's Host
 // header, which whoever sends the request controls. A trailing slash is
 // dropped so a link can't come out as "//verify/...", which no route matches.
@@ -22,6 +25,8 @@ const appUrl = () => {
 };
 
 const listingUrl = (auctionId) => `${appUrl()}/auction/viewAuction/${auctionId}`;
+const verifyUrl = (token) => `${appUrl()}/verify/${token}`;
+const resetUrl = (token) => `${appUrl()}/recover/${token}`;
 
 const money = (value) => `$${Number(value).toFixed(2)}`;
 
@@ -46,12 +51,17 @@ const button = (href, label) => `
   </p>
 `;
 
+// The small print explaining why someone received an account email.
+const footnote = (text) => `
+  <p style="font-size: 13px; color: #666;">${text}</p>
+`;
+
 const sendOutbidEmail = async (user, listing, newAmount) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
 
   await transporter.sendMail({
-    from: process.env.EMAIL_NAME,
+    from: sender(),
     to: user.email,
     subject: `You've been outbid on "${listing.title}"`,
     html: shell("You've been outbid", `
@@ -68,7 +78,7 @@ const sendAuctionWonEmail = async (user, listing) => {
   const url = listingUrl(listing._id);
 
   await transporter.sendMail({
-    from: process.env.EMAIL_NAME,
+    from: sender(),
     to: user.email,
     subject: `You won "${listing.title}"`,
     html: shell('You won!', `
@@ -91,7 +101,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
        <p>You may want to relist it at a lower starting price.</p>`;
 
   await transporter.sendMail({
-    from: process.env.EMAIL_NAME,
+    from: sender(),
     to: user.email,
     subject: `Your auction "${listing.title}" has ended`,
     html: shell('Your auction has ended', `
@@ -102,10 +112,44 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
   });
 };
 
+// Sent at signup, and again when someone presses Resend on their profile.
+const sendVerificationEmail = async (user, token) => {
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: sender(),
+    to: user.email,
+    subject: 'Welcome to Astro Auction - Please verify your email',
+    html: shell('Welcome to Astro Auction', `
+      <p>Thanks for joining our local marketplace community!</p>
+      <p>Please confirm your email address with the button below. The link expires in 1 hour.</p>
+      ${button(verifyUrl(token), 'Verify my email')}
+      ${footnote("You're receiving this because someone signed up for Astro Auction with this email address. If that wasn't you, you can ignore this email.")}
+    `),
+  });
+};
+
+const sendPasswordResetEmail = async (user, token) => {
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: sender(),
+    to: user.email,
+    subject: 'Astro Auction — Password Reset Request',
+    html: shell('Reset your password', `
+      <p>We received a request to reset the password for your Astro Auction account.</p>
+      <p>Use the button below to choose a new password. The link expires in 1 hour.</p>
+      ${button(resetUrl(token), 'Reset my password')}
+      ${footnote("If you didn't ask to reset your password, you can ignore this email. Your password won't change.")}
+    `),
+  });
+};
+
 module.exports = {
-  appUrl,
   createTransporter,
   sendOutbidEmail,
   sendAuctionWonEmail,
   sendAuctionEndedSellerEmail,
+  sendVerificationEmail,
+  sendPasswordResetEmail,
 };

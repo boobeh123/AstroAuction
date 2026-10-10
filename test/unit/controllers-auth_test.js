@@ -1,11 +1,10 @@
 jest.mock('../../models/User');
-jest.mock('../../config/mailer', () => ({
-    ...jest.requireActual('../../config/mailer'),
-    createTransporter: jest.fn(),
-}));
+// Only the transport is faked. The real templates in config/mailer.js run,
+// so these tests see the exact HTML a user would receive.
+jest.mock('nodemailer');
 
+const nodemailer = require('nodemailer');
 const User = require('../../models/User');
-const { createTransporter } = require('../../config/mailer');
 const authController = require('../../controllers/auth');
 const { mockRequest, mockResponse } = require('./helpers-mocks');
 
@@ -27,7 +26,7 @@ beforeEach(() => {
     jest.clearAllMocks();
     process.env.APP_URL = APP_URL;
     sendMail = jest.fn().mockResolvedValue({});
-    createTransporter.mockReturnValue({ sendMail });
+    nodemailer.createTransport.mockReturnValue({ sendMail });
 });
 
 afterAll(() => {
