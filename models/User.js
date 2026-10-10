@@ -60,11 +60,16 @@ const UserSchema = new mongoose.Schema({
     { timestamps: true }
 )
 
+// Cost factor for new password hashes. Each step up doubles the work needed
+// to crack a stolen hash. Existing hashes keep working at their old cost,
+// because bcrypt stores the cost inside each hash.
+const BCRYPT_COST = 12
+
 // Password hash middleware.
  UserSchema.pre('save', function save(next) {
   const user = this
   if (!user.isModified('password')) { return next() }
-  bcrypt.genSalt(10, (err, salt) => {
+  bcrypt.genSalt(BCRYPT_COST, (err, salt) => {
     if (err) { return next(err) }
     bcrypt.hash(user.password, salt, (err, hash) => {
       if (err) { return next(err) }

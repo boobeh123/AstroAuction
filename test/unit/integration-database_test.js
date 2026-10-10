@@ -16,6 +16,7 @@
 jest.mock('../../config/mailer');
 jest.mock('../../middleware/cloudinary');
 
+const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -177,5 +178,30 @@ describe("the app's own operators still work with the guard on", () => {
         expect(res.redirectedTo).toBe('/auction');
         expect((await Auction.findById(previous._id).lean()).highlightedAt).toBeNull();
         expect((await Auction.findById(next._id).lean()).highlightedAt).toBeInstanceOf(Date);
+    });
+});
+
+describe('password hashing', () => {
+    // A bcrypt hash starts with its version and cost: $2b$12$ means cost 12
+    test('new passwords are hashed with bcrypt cost 12', async () => {
+        const user = await makeUser();
+
+        expect(user.password).toMatch(/^\$2b\$12\$/);
+    });
+
+    test('a password hashed at the old cost of 10 still logs in', async () => {
+        const oldHash = await bcrypt.hash('correct-horse-battery', 10);
+        // Write the old hash straight to the database, skipping the save hook
+        const { insertedId } = await User.collection.insertOne({
+            email: 'longtime@example.com',
+            password: oldHash,
+        });
+        const user = await User.findById(insertedId);
+
+        const isMatch = await new Promise((resolve, reject) => {
+            user.comparePassword('correct-horse-battery', (err, ok) => (err ? reject(err) : resolve(ok)));
+        });
+
+        expect(isMatch).toBe(true);
     });
 });
