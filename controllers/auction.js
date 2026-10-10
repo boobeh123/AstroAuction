@@ -14,7 +14,7 @@ const {
     formatMoney,
     DURATION_CHOICES,
 } = require('../utils/bidding');
-const { isHighlighted, HIGHLIGHT_DURATION_MS } = require('../utils/highlight');
+const { isHighlighted } = require('../utils/highlight');
 
 // Handles youtube.com/watch?v=, youtu.be/, and youtube.com/embed/ links,
 // with or without extra query params (timestamps, playlists, etc).

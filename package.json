@@ -4,19 +4,14 @@
   "description": "Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount.",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "dev": "cross-env NODE_ENV=development node --watch server.js",
     "start": "node server.js",
     "lint": "eslint .",
     "format": "prettier -w .",
     "test": "cross-env NODE_ENV=test jest --runInBand"
   },
-  "lint-staged": {
-    "*.{js,jsx,json,md,ejs}": [
-      "prettier -w"
-    ],
-    "*.{js,jsx}": [
-      "eslint --fix"
-    ]
+  "engines": {
+    "node": "24.x"
   },
   "repository": {
     "type": "git",
@@ -45,22 +40,19 @@
     "mongoose": "^8.17.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "nodemailer": "^9.0.4",
+    "nodemailer": "^10.0.16",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "validator": "^13.15.26"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "cross-env": "^10.0.0",
-    "eslint": "^9.32.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "husky": "^9.1.7",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.5.1",
-    "lint-staged": "^16.1.4",
     "mongodb-memory-server": "^11.2.0",
-    "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "supertest": "^7.2.2"
   }

@@ -8,7 +8,6 @@ const connectDB = require('./config/db')
 const methodOverride = require('method-override');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const mainRoutes = require('./routes/main');

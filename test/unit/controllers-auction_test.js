@@ -5,7 +5,6 @@ jest.mock('../../middleware/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
 
-const mongoose = require('mongoose');
 const Auction = require('../../models/Auction');
 const Bid = require('../../models/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
