@@ -9,6 +9,8 @@
  * already showed.
  **************************************************************/
 const { body, validationResult } = require('express-validator')
+const { CATEGORIES, SALE_TYPES } = require('../models/Auction')
+const { parseMoney, DURATION_CHOICES } = require('../utils/bidding')
 
 // Only the message goes into the flash. express-validator's default error
 // objects also carry what was typed, which would store passwords in the
@@ -31,6 +33,22 @@ const emailField = () =>
 const matchesPassword = (value, { req }) => value === req.body.password
 
 const TERMS_MESSAGE = 'Please agree to the Terms of Use and Privacy Policy.'
+
+// A positive amount of money, read the same way the bidding code reads it
+const isMoney = (value) => parseMoney(value) !== null
+
+// Price fields only apply to one kind of listing, so each is checked only
+// when the form chose that kind
+const forFixedPrice = body('saleType').equals('fixed')
+const forAuction = body('saleType').equals('auction')
+
+// A text field that has to be filled in, with a maximum length
+const requiredText = (field, missingMessage, maxLength, tooLongMessage) =>
+  body(field)
+    .isString().withMessage(missingMessage).bail()
+    .trim()
+    .notEmpty().withMessage(missingMessage).bail()
+    .isLength({ max: maxLength }).withMessage(tooLongMessage)
 
 module.exports = {
   formErrors,
@@ -67,5 +85,53 @@ module.exports = {
     body('confirmPassword')
       .isString().withMessage('Invalid request.').bail()
       .custom(matchesPassword).withMessage('Passwords do not match.'),
+  ],
+
+  // The create-listing form. Its route runs this after multer has read the
+  // multipart form, and the controller checks the result before uploading
+  // any photos, so a rejected listing never leaves photos in Cloudinary.
+  validateListing: [
+    requiredText('title', 'Enter a title for your listing.', 100, 'Titles can be up to 100 characters.'),
+    requiredText('description', 'Enter a description for your listing.', 2000, 'Descriptions can be up to 2000 characters.'),
+    body('category')
+      .isString().withMessage('Choose a category.').bail()
+      .isIn(CATEGORIES).withMessage('Choose a category.'),
+    body('saleType')
+      .isString().withMessage('Choose fixed price or auction.').bail()
+      .isIn(SALE_TYPES).withMessage('Choose fixed price or auction.'),
+    body('price')
+      .if(forFixedPrice)
+      .isString().withMessage('Enter a valid price for your listing.').bail()
+      .custom(isMoney).withMessage('Enter a valid price for your listing.'),
+    body('startingPrice')
+      .if(forAuction)
+      .isString().withMessage('Enter a valid starting price for your auction.').bail()
+      .custom(isMoney).withMessage('Enter a valid starting price for your auction.'),
+    // Optional: an empty increment means $1.00, as before
+    body('minIncrement')
+      .if(forAuction)
+      .optional({ values: 'falsy' })
+      .isString().withMessage('Enter a valid minimum bid increment.').bail()
+      .custom(isMoney).withMessage('Enter a valid minimum bid increment.'),
+    body('durationDays')
+      .if(forAuction)
+      .isString().withMessage('Choose a valid auction duration.').bail()
+      .isInt().withMessage('Choose a valid auction duration.').bail()
+      .custom((value) => DURATION_CHOICES.includes(Number(value))).withMessage('Choose a valid auction duration.'),
+    body('video')
+      .optional({ values: 'falsy' })
+      .isString().withMessage('Enter a valid video link.').bail()
+      .trim()
+      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Enter a valid video link.'),
+  ],
+
+  validateBid: [
+    body('amount')
+      .isString().withMessage('Enter a valid bid amount.').bail()
+      .custom(isMoney).withMessage('Enter a valid bid amount.'),
+  ],
+
+  validateComment: [
+    requiredText('body', 'Please enter a comment.', 1000, 'Comments cannot be longer than 1000 characters.'),
   ],
 }

@@ -63,9 +63,10 @@ function mockRequest(overrides = {}) {
         ...overrides,
     };
 
+    // Like connect-flash, a list of messages is stored as separate messages
     req.flash = jest.fn((key, value) => {
         if (!flashed[key]) flashed[key] = [];
-        flashed[key].push(value);
+        flashed[key].push(...(Array.isArray(value) ? value : [value]));
     });
 
     req.isAuthenticated = req.isAuthenticated || jest.fn(() => Boolean(req.user));

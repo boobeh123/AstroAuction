@@ -9,7 +9,8 @@ const Auction = require('../../models/Auction');
 const Bid = require('../../models/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
 const auctionController = require('../../controllers/auction');
-const { mockRequest, mockResponse, mockQuery } = require('./helpers-mocks');
+const { validateBid, validateComment } = require('../../middleware/validators');
+const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
 
 const LOT_ID = '507f1f77bcf86cd799439011';
 const SELLER_ID = '507f1f77bcf86cd799439012';
@@ -41,6 +42,18 @@ function bidRequest(amount, userId = BIDDER_ID) {
     });
 }
 
+// These run the route's validators first, the way Express does before the
+// controller. The controllers read their input through matchedData().
+async function postBid(req, res) {
+    await runValidators(validateBid, req);
+    return auctionController.postBid(req, res);
+}
+
+async function postComment(req, res) {
+    await runValidators(validateComment, req);
+    return auctionController.postComment(req, res);
+}
+
 beforeEach(() => {
     jest.clearAllMocks();
     sendOutbidEmail.mockResolvedValue(undefined);
@@ -52,7 +65,7 @@ describe('postBid — rejections before any write', () => {
         const req = mockRequest({ params: { id: 'not-an-objectid' }, user: { id: BIDDER_ID } });
         const res = mockResponse();
 
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(res.statusCode).toBe(404);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -62,7 +75,7 @@ describe('postBid — rejections before any write', () => {
         Auction.findById.mockReturnValue(mockQuery(null));
 
         const res = mockResponse();
-        await auctionController.postBid(bidRequest('150'), res);
+        await postBid(bidRequest('150'), res);
 
         expect(res.statusCode).toBe(404);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -73,7 +86,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('150');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toMatch(/not an auction/i);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -87,7 +100,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('150', SELLER_ID);
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toMatch(/your own listing/i);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -100,7 +113,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('150');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toMatch(/ended/i);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -111,7 +124,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('150');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toMatch(/ended/i);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -128,7 +141,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest(amount);
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toMatch(/valid bid/i);
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -139,7 +152,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('99');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         // The message has to state the actual figure — "too low" alone leaves
         // the user guessing at what would be accepted.
@@ -154,7 +167,7 @@ describe('postBid — rejections before any write', () => {
 
         const req = bidRequest('102');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.errors[0].msg).toContain('$105.00');
         expect(Auction.findOneAndUpdate).not.toHaveBeenCalled();
@@ -166,7 +179,7 @@ describe('postBid — the atomic update', () => {
         Auction.findById.mockReturnValue(mockQuery(liveAuction()));
         Auction.findOneAndUpdate.mockReturnValue(mockQuery(liveAuction()));
 
-        await auctionController.postBid(bidRequest('150'), mockResponse());
+        await postBid(bidRequest('150'), mockResponse());
 
         const [filter, update, options] = Auction.findOneAndUpdate.mock.calls[0];
 
@@ -194,7 +207,7 @@ describe('postBid — the atomic update', () => {
         Auction.findById.mockReturnValue(mockQuery(liveAuction()));
         Auction.findOneAndUpdate.mockReturnValue(mockQuery(liveAuction()));
 
-        await auctionController.postBid(bidRequest('150'), mockResponse());
+        await postBid(bidRequest('150'), mockResponse());
 
         const [filter] = Auction.findOneAndUpdate.mock.calls[0];
         const firstBidBranch = filter.$or.find((b) => b.currentBid === null);
@@ -209,7 +222,7 @@ describe('postBid — the atomic update', () => {
         );
         Auction.findOneAndUpdate.mockReturnValue(mockQuery(liveAuction({ currentBidder: null })));
 
-        await auctionController.postBid(bidRequest('120'), mockResponse());
+        await postBid(bidRequest('120'), mockResponse());
 
         const [filter] = Auction.findOneAndUpdate.mock.calls[0];
         const raiseBranch = filter.$or.find((b) => b.currentBid && b.currentBid.$ne === null);
@@ -223,7 +236,7 @@ describe('postBid — the atomic update', () => {
         Auction.findById.mockReturnValue(mockQuery(liveAuction()));
         Auction.findOneAndUpdate.mockReturnValue(mockQuery(liveAuction()));
 
-        await auctionController.postBid(bidRequest('150'), mockResponse());
+        await postBid(bidRequest('150'), mockResponse());
 
         expect(Bid.create).toHaveBeenCalledWith({
             auction: LOT_ID,
@@ -238,7 +251,7 @@ describe('postBid — the atomic update', () => {
 
         const req = bidRequest('150');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(Bid.create).not.toHaveBeenCalled();
         expect(req.flashed.errors[0].msg).toMatch(/not accepted/i);
@@ -251,7 +264,7 @@ describe('postBid — the atomic update', () => {
 
         const req = bidRequest('150');
         const res = mockResponse();
-        await auctionController.postBid(req, res);
+        await postBid(req, res);
 
         expect(req.flashed.success[0]).toContain('$150.00');
         expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
@@ -269,7 +282,7 @@ describe('postBid — outbid notification', () => {
             mockQuery(liveAuction({ currentBid: 100, currentBidder: displaced }))
         );
 
-        await auctionController.postBid(bidRequest('120'), mockResponse());
+        await postBid(bidRequest('120'), mockResponse());
 
         expect(sendOutbidEmail).toHaveBeenCalledTimes(1);
         const [recipient, listing, amount] = sendOutbidEmail.mock.calls[0];
@@ -282,7 +295,7 @@ describe('postBid — outbid notification', () => {
         Auction.findById.mockReturnValue(mockQuery(liveAuction()));
         Auction.findOneAndUpdate.mockReturnValue(mockQuery(liveAuction({ currentBidder: null })));
 
-        await auctionController.postBid(bidRequest('150'), mockResponse());
+        await postBid(bidRequest('150'), mockResponse());
 
         expect(sendOutbidEmail).not.toHaveBeenCalled();
     });
@@ -299,7 +312,7 @@ describe('postBid — outbid notification', () => {
             mockQuery(liveAuction({ currentBid: 100, currentBidder: self }))
         );
 
-        await auctionController.postBid(bidRequest('120', BIDDER_ID), mockResponse());
+        await postBid(bidRequest('120', BIDDER_ID), mockResponse());
 
         expect(sendOutbidEmail).not.toHaveBeenCalled();
     });
@@ -320,7 +333,7 @@ describe('postBid — outbid notification', () => {
         const req = bidRequest('120');
         const res = mockResponse();
 
-        await expect(auctionController.postBid(req, res)).resolves.not.toThrow();
+        await expect(postBid(req, res)).resolves.not.toThrow();
 
         expect(req.flashed.success).toBeDefined();
         expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
@@ -335,7 +348,7 @@ describe('postBid — failure handling', () => {
         Auction.findById.mockImplementation(() => { throw new Error('connection lost'); });
 
         const res = mockResponse();
-        await expect(auctionController.postBid(bidRequest('150'), res)).rejects.toThrow('connection lost');
+        await expect(postBid(bidRequest('150'), res)).rejects.toThrow('connection lost');
 
         expect(res.render).not.toHaveBeenCalled();
     });
@@ -353,7 +366,7 @@ describe('postComment', () => {
         const req = mockRequest({ params: { id: 'bad' }, body: { body: 'hi' }, user: { id: BIDDER_ID } });
         const res = mockResponse();
 
-        await auctionController.postComment(req, res);
+        await postComment(req, res);
 
         expect(res.statusCode).toBe(404);
         expect(Comment.create).not.toHaveBeenCalled();
@@ -365,7 +378,7 @@ describe('postComment', () => {
         const req = mockRequest({ params: { id: LOT_ID }, body: { body: 'hi' }, user: { id: BIDDER_ID } });
         const res = mockResponse();
 
-        await auctionController.postComment(req, res);
+        await postComment(req, res);
 
         expect(res.statusCode).toBe(404);
         expect(Comment.create).not.toHaveBeenCalled();
@@ -378,7 +391,7 @@ describe('postComment', () => {
             Auction.exists.mockResolvedValue(true);
 
             const req = mockRequest({ params: { id: LOT_ID }, body: { body }, user: { id: BIDDER_ID } });
-            await auctionController.postComment(req, mockResponse());
+            await postComment(req, mockResponse());
 
             expect(Comment.create).not.toHaveBeenCalled();
         }
@@ -391,7 +404,7 @@ describe('postComment', () => {
             user: { id: BIDDER_ID },
         });
 
-        await auctionController.postComment(req, mockResponse());
+        await postComment(req, mockResponse());
 
         expect(Comment.create).not.toHaveBeenCalled();
     });
@@ -403,7 +416,7 @@ describe('postComment', () => {
             user: { id: BIDDER_ID },
         });
 
-        await auctionController.postComment(req, mockResponse());
+        await postComment(req, mockResponse());
 
         expect(Comment.create).not.toHaveBeenCalled();
         expect(req.flashed.errors[0].msg).toMatch(/1000/);
@@ -417,7 +430,7 @@ describe('postComment', () => {
         });
         const res = mockResponse();
 
-        await auctionController.postComment(req, res);
+        await postComment(req, res);
 
         expect(Comment.create).toHaveBeenCalledWith({
             body: 'Is this still available?',

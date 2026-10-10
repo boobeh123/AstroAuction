@@ -5,6 +5,7 @@ const {
     validateLogin,
     validateForgotPassword,
     validateResetPassword,
+    validateListing,
 } = require('../../middleware/validators');
 const { mockRequest, runValidators } = require('./helpers-mocks');
 
@@ -117,5 +118,51 @@ describe('validateResetPassword', () => {
         });
 
         expect(messages).toEqual([]);
+    });
+});
+
+describe('validateListing', () => {
+    const fixedPrice = {
+        title: 'Koa wood bowl',
+        description: 'Hand-turned bowl.',
+        category: 'Art',
+        saleType: 'fixed',
+        price: '25',
+    };
+
+    test('accepts a complete fixed-price listing', async () => {
+        const { messages } = await check(validateListing, fixedPrice);
+
+        expect(messages).toEqual([]);
+    });
+
+    test("checks only the price fields for the listing's sale type", async () => {
+        // A fixed-price form still sends the hidden auction fields
+        const { messages } = await check(validateListing, { ...fixedPrice, startingPrice: '', durationDays: '' });
+
+        expect(messages).toEqual([]);
+    });
+
+    test('reports every problem at once', async () => {
+        const { messages } = await check(validateListing, {
+            title: '',
+            description: 'x'.repeat(2001),
+            category: 'Spaceships',
+            saleType: 'auction',
+            startingPrice: '-5',
+            minIncrement: 'abc',
+            durationDays: '2',
+            video: 'not a link',
+        });
+
+        expect(messages).toEqual([
+            'Enter a title for your listing.',
+            'Descriptions can be up to 2000 characters.',
+            'Choose a category.',
+            'Enter a valid starting price for your auction.',
+            'Enter a valid minimum bid increment.',
+            'Choose a valid auction duration.',
+            'Enter a valid video link.',
+        ]);
     });
 });

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { matchedData } = require('express-validator')
 const Auction = require('../models/Auction')
 const Comment = require('../models/Comment')
 const Bid = require('../models/Bid')
@@ -15,6 +16,7 @@ const {
     DURATION_CHOICES,
 } = require('../utils/bidding');
 const { isHighlighted } = require('../utils/highlight');
+const { formErrors } = require('../middleware/validators');
 
 // Handles youtube.com/watch?v=, youtu.be/, and youtube.com/embed/ links,
 // with or without extra query params (timestamps, playlists, etc).
@@ -62,44 +64,35 @@ module.exports = {
             // Uploading first and validating second means a rejected listing
             // leaves its images sitting in Cloudinary with no database row
             // pointing at them — orphaned files nothing will ever clean up.
-            const saleType = req.body.saleType === 'auction' ? 'auction' : 'fixed';
+            // The finally block below still deletes multer's temp files.
+            const errors = formErrors(req);
+            if (!errors.isEmpty()) {
+                req.flash('errors', errors.array());
+                return res.redirect('/auction');
+            }
+
+            // matchedData also returns the other sale type's price fields,
+            // unchecked (validateListing skips them), so only the fields for
+            // this listing's sale type are read below.
+            const input = matchedData(req);
             const saleFields = {};
 
-            if (saleType === 'auction') {
-                const startingPrice = parseMoney(req.body.startingPrice);
-                const minIncrement = parseMoney(req.body.minIncrement) || 1;
-                const durationDays = Number.parseInt(req.body.durationDays, 10);
-
-                if (startingPrice === null) {
-                    req.flash('errors', { msg: 'Enter a valid starting price for your auction.' });
-                    return res.redirect('/auction');
-                }
-
-                if (!DURATION_CHOICES.includes(durationDays)) {
-                    req.flash('errors', { msg: 'Choose a valid auction duration.' });
-                    return res.redirect('/auction');
-                }
-
+            if (input.saleType === 'auction') {
+                const durationDays = Number(input.durationDays);
                 const endsAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
 
                 saleFields.saleType = 'auction';
-                saleFields.startingPrice = startingPrice;
-                saleFields.minIncrement = minIncrement;
+                saleFields.startingPrice = parseMoney(input.startingPrice);
+                // An empty increment means $1.00
+                saleFields.minIncrement = parseMoney(input.minIncrement) || 1;
                 saleFields.endsAt = endsAt;
                 saleFields.status = 'open';
                 saleFields.currentBid = null;
                 saleFields.currentBidder = null;
                 saleFields.bidCount = 0;
             } else {
-                const price = parseMoney(req.body.price);
-
-                if (price === null) {
-                    req.flash('errors', { msg: 'Enter a valid price for your listing.' });
-                    return res.redirect('/auction');
-                }
-
                 saleFields.saleType = 'fixed';
-                saleFields.price = price;
+                saleFields.price = parseMoney(input.price);
             }
 
             let images = [];
@@ -121,13 +114,13 @@ module.exports = {
             }
 
             await Auction.create({
-                title: req.body.title,
-                description: req.body.description,
+                title: input.title,
+                description: input.description,
                 images: images,
-                video: req.body.video,
+                video: input.video,
                 user: req.user.id,
                 cloudinaryIds: cloudinaryIds,
-                category: req.body.category,
+                category: input.category,
                 ...saleFields,
             })
 
@@ -236,8 +229,15 @@ module.exports = {
     },
 
     postComment: async (req, res) => {
+        // A listing id that can't exist is a 404, whatever the form says
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(404).render('errors/404.ejs');
+        }
+
+        const errors = formErrors(req);
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array());
+            return res.redirect(`/auction/viewAuction/${req.params.id}`);
         }
 
         const auctionExists = await Auction.exists({ _id: req.params.id });
@@ -245,17 +245,7 @@ module.exports = {
             return res.status(404).render('errors/404.ejs');
         }
 
-        const body = typeof req.body.body === 'string' ? req.body.body.trim() : '';
-
-        if (!body) {
-            req.flash('errors', { msg: 'Please enter a comment.' });
-            return res.redirect(`/auction/viewAuction/${req.params.id}`);
-        }
-
-        if (body.length > 1000) {
-            req.flash('errors', { msg: 'Comments cannot be longer than 1000 characters.' });
-            return res.redirect(`/auction/viewAuction/${req.params.id}`);
-        }
+        const { body } = matchedData(req);
 
         await Comment.create({
             body,
@@ -270,9 +260,18 @@ module.exports = {
         const listingId = req.params.id;
         const redirectBack = `/auction/viewAuction/${listingId}`;
 
+        // A listing id that can't exist is a 404, whatever the form says
         if (!mongoose.Types.ObjectId.isValid(listingId)) {
             return res.status(404).render('errors/404.ejs');
         }
+
+        const errors = formErrors(req);
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array());
+            return res.redirect(redirectBack);
+        }
+
+        const amount = parseMoney(matchedData(req).amount);
 
         const listing = await Auction.findById(listingId).lean();
 
@@ -294,13 +293,6 @@ module.exports = {
 
         if (!isAuctionLive(listing)) {
             req.flash('errors', { msg: 'This auction has ended.' });
-            return res.redirect(redirectBack);
-        }
-
-        const amount = parseMoney(req.body.amount);
-
-        if (amount === null) {
-            req.flash('errors', { msg: 'Enter a valid bid amount.' });
             return res.redirect(redirectBack);
         }
 

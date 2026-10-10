@@ -18,16 +18,20 @@ jest.mock('../../middleware/cloudinary');
 
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const fs = require('fs/promises');
+const os = require('os');
+const path = require('path');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const connectDB = require('../../config/database');
 const mailer = require('../../config/mailer');
+const cloudinary = require('../../middleware/cloudinary');
 const Auction = require('../../models/Auction');
 const User = require('../../models/User');
 const auctionController = require('../../controllers/auction');
 const authController = require('../../controllers/auth');
 const { closeExpiredAuctions } = require('../../services/auctionCloser');
-const { validateResetPassword } = require('../../middleware/validators');
+const { validateBid, validateListing, validateResetPassword } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 
 const ONE_HOUR_MS = 3_600_000;
@@ -104,14 +108,15 @@ describe("the app's own operators still work with the guard on", () => {
 
     test('a first bid and a raise are both accepted', async () => {
         const lot = await makeAuction();
-        const placeBid = (amount) => auctionController.postBid(
-            mockRequest({
+        const placeBid = async (amount) => {
+            const req = mockRequest({
                 params: { id: lot._id.toString() },
                 body: { amount: String(amount) },
                 user: { id: new mongoose.Types.ObjectId().toString() },
-            }),
-            mockResponse()
-        );
+            });
+            await runValidators(validateBid, req);
+            await auctionController.postBid(req, mockResponse());
+        };
 
         await placeBid(150); // the first-bid branch: startingPrice $lte
         await placeBid(160); // the raise branch: currentBid $ne and $lte
@@ -180,6 +185,97 @@ describe("the app's own operators still work with the guard on", () => {
         expect(res.redirectedTo).toBe('/auction');
         expect((await Auction.findById(previous._id).lean()).highlightedAt).toBeNull();
         expect((await Auction.findById(next._id).lean()).highlightedAt).toBeInstanceOf(Date);
+    });
+});
+
+describe('creating a listing', () => {
+    let tempDir;
+
+    beforeEach(async () => {
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'astro-uploads-'));
+        cloudinary.uploader.upload.mockReset();
+        cloudinary.uploader.upload.mockImplementation(async (filePath) => ({
+            secure_url: `https://res.cloudinary.com/demo/image/upload/${path.basename(filePath)}`,
+            public_id: path.basename(filePath),
+        }));
+    });
+
+    afterEach(async () => {
+        await fs.rm(tempDir, { recursive: true, force: true });
+    });
+
+    // Stand-ins for the photos multer saves to disk before the controller runs
+    async function tempPhotos(count) {
+        const files = [];
+        for (let i = 0; i < count; i++) {
+            const filePath = path.join(tempDir, `photo${i}.jpg`);
+            await fs.writeFile(filePath, 'not really a photo');
+            files.push({ path: filePath });
+        }
+        return files;
+    }
+
+    async function postListing(body, files) {
+        const req = mockRequest({ body, files, user: { id: new mongoose.Types.ObjectId().toString() } });
+        const res = mockResponse();
+        await runValidators(validateListing, req);
+        await auctionController.postAuction(req, res);
+        return { req, res };
+    }
+
+    const fileExists = (filePath) => fs.access(filePath).then(() => true, () => false);
+
+    // The listing used to be checked only after its photos were uploaded,
+    // so a rejected listing left its photos in Cloudinary with nothing in
+    // the database pointing at them.
+    test('a rejected listing uploads no photos and still deletes the temp files', async () => {
+        const files = await tempPhotos(2);
+
+        const { req, res } = await postListing({
+            title: '',
+            description: 'Hand-turned bowl.',
+            category: 'Art',
+            saleType: 'fixed',
+            price: '25',
+        }, files);
+
+        expect(res.redirectedTo).toBe('/auction');
+        expect(req.flashed.errors).toContainEqual({ msg: 'Enter a title for your listing.' });
+        expect(cloudinary.uploader.upload).not.toHaveBeenCalled();
+        expect(await Auction.countDocuments()).toBe(0);
+        for (const file of files) {
+            expect(await fileExists(file.path)).toBe(false);
+        }
+    });
+
+    test('a valid auction is saved with its photos', async () => {
+        const files = await tempPhotos(2);
+
+        await postListing({
+            title: '  Koa wood bowl  ',
+            description: 'Hand-turned bowl.',
+            category: 'Art',
+            saleType: 'auction',
+            startingPrice: '100',
+            minIncrement: '',
+            durationDays: '7',
+            video: '',
+        }, files);
+
+        const saved = await Auction.findOne().lean();
+        expect(saved).toMatchObject({
+            title: 'Koa wood bowl',
+            saleType: 'auction',
+            startingPrice: 100,
+            minIncrement: 1, // an empty increment means $1.00
+            status: 'open',
+            cloudinaryIds: ['photo0.jpg', 'photo1.jpg'],
+        });
+        const sevenDaysMs = 7 * 24 * ONE_HOUR_MS;
+        expect(Math.abs(saved.endsAt.getTime() - Date.now() - sevenDaysMs)).toBeLessThan(60_000);
+        for (const file of files) {
+            expect(await fileExists(file.path)).toBe(false);
+        }
     });
 });
 

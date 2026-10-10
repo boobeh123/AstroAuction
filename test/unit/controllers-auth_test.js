@@ -73,7 +73,7 @@ describe('passwords must be at least 8 characters', () => {
         await runValidators(validateSignup, req);
         await authController.postSignup(req, res, jest.fn());
 
-        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long' });
+        expect(req.flashed.errors).toContainEqual({ msg: 'Password must be at least 8 characters long' });
         expect(User.findOne).not.toHaveBeenCalled();
         expect(res.redirect).toHaveBeenCalledTimes(1);
     });
@@ -88,7 +88,7 @@ describe('passwords must be at least 8 characters', () => {
         await runValidators(validateResetPassword, req);
         await authController.postResetPassword(req, res, jest.fn());
 
-        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Password must be at least 8 characters long.' });
+        expect(req.flashed.errors).toContainEqual({ msg: 'Password must be at least 8 characters long.' });
         expect(User.findOne).not.toHaveBeenCalled();
         expect(res.redirectedTo).toBe('/recover/abc123');
     });
@@ -107,7 +107,7 @@ describe('a non-text email gets a form error, not a crash', () => {
         await authController.postLogin(req, res, jest.fn());
 
         expect(res.redirectedTo).toBe('/login');
-        expect(req.flashed.errors[0]).toContainEqual({ msg: 'Please enter a valid email address.' });
+        expect(req.flashed.errors).toContainEqual({ msg: 'Please enter a valid email address.' });
     });
 });
 
