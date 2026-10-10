@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const validator = require('validator');
 
 const createTransporter = () => {
   return nodemailer.createTransport({
@@ -12,11 +13,23 @@ const createTransporter = () => {
   });
 };
 
-const appUrl = () => process.env.APP_URL || 'http://localhost:3000';
+// Every link in an email starts from APP_URL, never from the request's Host
+// header, which whoever sends the request controls. A trailing slash is
+// dropped so a link can't come out as "//verify/...", which no route matches.
+const appUrl = () => {
+  const url = process.env.APP_URL || 'http://localhost:3000';
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
 
 const listingUrl = (auctionId) => `${appUrl()}/auction/viewAuction/${auctionId}`;
 
 const money = (value) => `$${Number(value).toFixed(2)}`;
+
+// Listing titles and display names are typed by users. Escaping them keeps a
+// title like <a href="...">Claim your refund</a> from turning into a real
+// link inside an email sent from the AstroAuction address. Subject lines are
+// plain text, not HTML, so they use the raw value.
+const escapeHtml = (value) => validator.escape(String(value));
 
 const shell = (heading, bodyHtml) => `
   <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; color: #1a1a2e;">
@@ -42,7 +55,7 @@ const sendOutbidEmail = async (user, listing, newAmount) => {
     to: user.email,
     subject: `You've been outbid on "${listing.title}"`,
     html: shell("You've been outbid", `
-      <p>Someone has placed a higher bid on <strong>${listing.title}</strong>.</p>
+      <p>Someone has placed a higher bid on <strong>${escapeHtml(listing.title)}</strong>.</p>
       <p>The bid is now <strong>${money(newAmount)}</strong>.</p>
       <p>There's still time to bid again if you want it.</p>
       ${button(url, 'View listing')}
@@ -59,7 +72,7 @@ const sendAuctionWonEmail = async (user, listing) => {
     to: user.email,
     subject: `You won "${listing.title}"`,
     html: shell('You won!', `
-      <p>Congratulations — you had the winning bid on <strong>${listing.title}</strong>.</p>
+      <p>Congratulations — you had the winning bid on <strong>${escapeHtml(listing.title)}</strong>.</p>
       <p>Winning bid: <strong>${money(listing.currentBid)}</strong></p>
       <p>The seller can see your details and should be in touch to arrange payment and pickup.</p>
       ${button(url, 'View listing')}
@@ -72,7 +85,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
   const url = listingUrl(listing._id);
 
   const outcome = winnerName
-    ? `<p>Winning bid: <strong>${money(listing.currentBid)}</strong> by <strong>${winnerName}</strong>.</p>
+    ? `<p>Winning bid: <strong>${money(listing.currentBid)}</strong> by <strong>${escapeHtml(winnerName)}</strong>.</p>
        <p>Reach out to arrange payment and pickup.</p>`
     : `<p>This auction ended without any bids.</p>
        <p>You may want to relist it at a lower starting price.</p>`;
@@ -82,7 +95,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
     to: user.email,
     subject: `Your auction "${listing.title}" has ended`,
     html: shell('Your auction has ended', `
-      <p>Bidding has closed on <strong>${listing.title}</strong>.</p>
+      <p>Bidding has closed on <strong>${escapeHtml(listing.title)}</strong>.</p>
       ${outcome}
       ${button(url, 'View listing')}
     `),
@@ -90,6 +103,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
 };
 
 module.exports = {
+  appUrl,
   createTransporter,
   sendOutbidEmail,
   sendAuctionWonEmail,

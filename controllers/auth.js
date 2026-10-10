@@ -2,7 +2,7 @@ const passport = require('passport')
 const validator = require('validator')
 const User = require('../models/User')
 const nodemailer = require('nodemailer');
-const { createTransporter } = require('../config/mailer');
+const { appUrl, createTransporter } = require('../config/mailer');
 const crypto = require('crypto');
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex')
 
@@ -40,7 +40,7 @@ module.exports = {
     postSignup: async (req, res, next) => {
       const validationErrors = []
       if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' })
-      if (!validator.isLength(req.body.password, { min: 3 })) validationErrors.push({ msg: 'Password must be at least 3 characters long' })
+      if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' })
       if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' })
     
       if (validationErrors.length) {
@@ -74,7 +74,7 @@ module.exports = {
 
         await user.save()
 
-        const verificationUrl = `${req.protocol}://${req.get('host')}/verify/${token}`
+        const verificationUrl = `${appUrl()}/verify/${token}`
 
         req.login(user, async function(err) {
           if (err) { return next(err); }
@@ -307,7 +307,7 @@ module.exports = {
           verificationTokenExpires: Date.now() + TOKEN_LIFETIME_MS,
         });
 
-        const verificationUrl = `${req.protocol}://${req.get('host')}/verify/${token}`;
+        const verificationUrl = `${appUrl()}/verify/${token}`;
 
           try {
             const transporter = createTransporter();
@@ -464,7 +464,7 @@ module.exports = {
         user.passwordResetExpires = expires;
         await user.save();
 
-        const resetUrl = `${req.protocol}://${req.get('host')}/recover/${token}`;
+        const resetUrl = `${appUrl()}/recover/${token}`;
 
         const transporter = createTransporter();
 
@@ -602,8 +602,8 @@ module.exports = {
         if (typeof req.body.password !== 'string' || typeof req.body.confirmPassword !== 'string') {
           validationErrors.push({ msg: 'Invalid request.' });
         } else {
-          if (!validator.isLength(req.body.password, { min: 3 })) {
-            validationErrors.push({ msg: 'Password must be at least 3 characters long.' });
+          if (!validator.isLength(req.body.password, { min: 8 })) {
+            validationErrors.push({ msg: 'Password must be at least 8 characters long.' });
           }
           if (req.body.password !== req.body.confirmPassword) {
             validationErrors.push({ msg: 'Passwords do not match.' });
