@@ -12,7 +12,13 @@ const createTransporter = () => {
   });
 };
 
-const appUrl = () => process.env.APP_URL || 'http://localhost:3000';
+// Every link in an email starts from APP_URL, never from the request's Host
+// header, which whoever sends the request controls. A trailing slash is
+// dropped so a link can't come out as "//verify/...", which no route matches.
+const appUrl = () => {
+  const url = process.env.APP_URL || 'http://localhost:3000';
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
 
 const listingUrl = (auctionId) => `${appUrl()}/auction/viewAuction/${auctionId}`;
 
@@ -90,6 +96,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
 };
 
 module.exports = {
+  appUrl,
   createTransporter,
   sendOutbidEmail,
   sendAuctionWonEmail,

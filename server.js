@@ -26,6 +26,12 @@ require('./config/passport')(passport);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Verification, reset and auction emails build their links from APP_URL.
+// Without it in production, every link in those emails points at localhost.
+if (isProduction && !process.env.APP_URL) {
+  console.warn('APP_URL is not set. Links in emails will point at http://localhost:3000.')
+}
+
 connectDB();
 // Railway sends every request through one proxy. Trusting that hop lets
 // Express see the visitor's real IP and that the connection was HTTPS,
