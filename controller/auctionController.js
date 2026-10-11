@@ -82,6 +82,7 @@ module.exports = {
             isAuctionLive: isAuctionLive,
             isHighlighted: isHighlighted,
             durationChoices: DURATION_CHOICES,
+            categories: Auction.CATEGORIES,
             amountLimits: AMOUNT_LIMITS,
             incrementLimits: INCREMENT_LIMITS,
         });

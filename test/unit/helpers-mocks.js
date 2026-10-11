@@ -1,10 +1,10 @@
 /**
  * Test doubles shared across the unit suites.
  *
- * These deliberately avoid a real database. The one place that genuinely
- * needs MongoDB is __tests__/integration/bidding_test.js, where the whole
- * point is observing real concurrent writes. Everything else is faster and
- * more precise with the data layer mocked.
+ * These deliberately avoid a real database. The integration-*_test.js suites
+ * are the exceptions: concurrent bids, and queries that have to work with
+ * the sanitizeFilter guard on, need a real MongoDB. Everything else is
+ * faster and more precise with the data layer mocked.
  */
 
 /**

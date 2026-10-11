@@ -50,7 +50,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 
 - Forms delete and edit with `method="POST"` plus `?_method=DELETE` or `?_method=PUT` in the action URL; method-override reads the query string.
 - The locals middleware calls `req.flash()` only when `req.session.flash` exists. Calling it every time would give every visitor a session cookie and a database row.
-- `user` is `null` for visitors, so views check it before reading its fields.
+- `user` is `null` for visitors, so views check it before reading its fields. `app.locals.currentPath` defaults to `''`, so error pages still render when a request fails before the locals middleware.
 - Any outside resource (script, stylesheet, font, image host, iframe) needs the matching CSP directive in server.js. `script-src` is `'self'` only: no inline scripts and no `onclick`-style attributes.
 
 **Validation.** `middleware/validators.js` holds one express-validator chain per form.
@@ -79,7 +79,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - `deserializeUser` leaves the password and token hashes out of `req.user`. If code needs one of those fields, look the user up instead.
 
 **Uploads and email.**
-- Multer writes JPG/PNG files (10 MB each, 10 at most) to the OS temp dir.
+- Multer writes JPG/PNG files (10 MB each, 10 at most) to the OS temp dir. The file pickers' `accept` attributes and `isAllowedPhoto()` in main.js allow the same two types, so change all three together.
 - `handleUploadErrors(redirectTo)` turns multer's errors into a flash message and a redirect.
 - Controllers upload to Cloudinary and delete the temp files in `finally`. Listing validation runs before any upload, so a rejected listing leaves no orphaned images.
 - `config/mailer.js` sends through Gmail. Every link is built from `APP_URL`, never from the request's Host header, and user text in email HTML goes through `escapeHtml`.
@@ -88,6 +88,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Pages are built from `partials/head`, `navigation` (which pulls in the spotlight banner and the first-visit tutorial), `flash` and `footer`. The footer loads `/js/main.js` with `defer`.
 - Use escaped `<%= %>` for data; `<%-` is only for `include`.
 - Listing queries use `.lean()`, so results have `_id` but no `.id`.
+- The listing form's category options come from `Auction.CATEGORIES` (passed as `categories`). Users without a photo get `/images/avatarPlaceholder.svg`.
 - `public/js/main.js` serves every page: selectors at the top, then helpers, then handlers, then event listeners at the bottom. Each feature checks that its elements exist before running.
 
 ## Tests
@@ -96,7 +97,6 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 
 - The `integration-*` suites start a real MongoDB through mongodb-memory-server, which downloads a mongod binary on the first run.
 - `jest.mock('../../model/Auction')` turns `Auction.CATEGORIES` and `SALE_TYPES` into empty arrays. Run listing validators only in suites that load the real model.
-- `middleware-uploadErrors_test.js` leaves one multer temp file in the OS temp dir per run.
 
 ## Conventions
 

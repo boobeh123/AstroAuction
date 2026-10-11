@@ -71,7 +71,7 @@
                 <ul class="comments-list">
                   <% comments.forEach((comment) => { %>
                     <li class="comment-item">
-                      <img src="<%= (comment.user && comment.user.image) || 'https://placeholder.pics/svg/100x100' %>" alt="" class="comment-avatar">
+                      <img src="<%= (comment.user && comment.user.image) || '/images/avatarPlaceholder.svg' %>" alt="" class="comment-avatar">
                       <div class="comment-body-wrap">
                         <div class="comment-meta">
                           <span class="comment-author"><%= comment.user ? comment.user.displayName : 'Removed user' %></span>
@@ -177,7 +177,7 @@
               <div class="detailed-card seller-card">
                 <h2 class="section-title">Seller</h2>
                 <div class="seller-info">
-                  <img src="<%= listing.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
+                  <img src="<%= listing.user.image || '/images/avatarPlaceholder.svg' %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
                   <div class="seller-details">
                     <h3 class="seller-name"><%= listing.user.displayName %></h3>
                     <p class="seller-joined">Member since <%= new Date(listing.user.createdAt).toLocaleDateString('en-US', { 

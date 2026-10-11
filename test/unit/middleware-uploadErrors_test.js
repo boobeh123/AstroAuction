@@ -1,3 +1,4 @@
+const fs = require('fs/promises');
 const express = require('express');
 const request = require('supertest');
 const multer = require('multer');
@@ -121,7 +122,11 @@ describe('handleUploadErrors — real uploads through express', () => {
             '/auction',
             upload.array('file', 10),
             handleUploadErrors('/auction'),
-            (req, res) => res.status(200).send('uploaded')
+            // Stands in for the controller, which removes multer's temp files
+            async (req, res) => {
+                await Promise.all((req.files || []).map((file) => fs.unlink(file.path)));
+                res.status(200).send('uploaded');
+            }
         );
 
         // Stands in for errorHandler.js. If anything reaches here, the

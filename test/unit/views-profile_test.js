@@ -34,3 +34,16 @@ test('the Delete Profile confirmation warns that listings are deleted too', asyn
 
     expect(html).toMatch(/data-confirm="[^"]*listings[^"]*"/);
 });
+
+test('without a profile photo, the page shows the local placeholder avatar', async () => {
+    const html = await renderProfile();
+
+    expect(html).toMatch(/id="profile-picture" src="\/images\/avatarPlaceholder\.svg"/);
+});
+
+// The same two types the server accepts (middleware/multer.js)
+test('the photo picker only offers JPG and PNG files', async () => {
+    const html = await renderProfile();
+
+    expect(html).toMatch(/id="profile-file"[^>]*accept="image\/jpeg,image\/png"/);
+});

@@ -1404,6 +1404,25 @@ Auction
 
 .char-counter.char-counter--near-limit { color: #FBBF24; }
 
+/* The radio groups (listing type, video yes/no) are fieldsets, so screen
+   readers announce the group's name with each option. These rules remove
+   the browser's fieldset box and style the legend like the form's labels. */
+.toggle-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.toggle-fieldset legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: #B8C5D6;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
 /* Video yes/no toggle */
 .toggle-group {
   display: flex;

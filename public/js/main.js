@@ -48,6 +48,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const RISE_COLOR = '232, 233, 243'; // #E8E9F3
 const TWINKLE_COLOR = '168, 85, 247'; // #A855F7
 const MAX_LISTING_IMAGES = 10;
+const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png']; // the same two types middleware/multer.js accepts
 let selectedListingFiles = [];
 let lastFocusedStripThumb = null;
 
@@ -100,6 +101,13 @@ function drawSparkle(ctx, cx, cy, size, rotation) {
 
 function getModalFocusable() {
   return listingModal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+}
+
+// Photos dragged onto the dropzone skip the file picker's accept filter, so
+// they're checked here. Anything else would only be refused by the server
+// after the whole form was sent.
+function isAllowedPhoto(file) {
+  return ALLOWED_PHOTO_TYPES.includes(file.type);
 }
 
 // Keeps the real <input type="file"> in sync with the JS-tracked selection,
@@ -217,7 +225,7 @@ function handleVideoToggleChange() {
 }
 
 function addListingFiles(fileList) {
-  const incoming = Array.from(fileList).filter((f) => f.type.startsWith('image/'));
+  const incoming = Array.from(fileList).filter(isAllowedPhoto);
   const room = MAX_LISTING_IMAGES - selectedListingFiles.length;
   selectedListingFiles = selectedListingFiles.concat(incoming.slice(0, room));
   renderListingGallery();
@@ -694,5 +702,5 @@ if (canvas) {
 // instead of re-implementing them in the test file, where they could drift
 // out of sync with the real ones.
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { formatTimeRemaining };
+  module.exports = { formatTimeRemaining, isAllowedPhoto };
 }

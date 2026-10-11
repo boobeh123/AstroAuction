@@ -65,7 +65,7 @@ describe('comments from deleted accounts', () => {
     test('get the placeholder avatar', async () => {
         const html = await renderListingPage([comment(null, 'Does it work?')]);
 
-        expect(html).toContain('src="https://placeholder.pics/svg/100x100"');
+        expect(html).toContain('src="/images/avatarPlaceholder.svg"');
     });
 
     test('sit alongside comments from accounts that still exist', async () => {

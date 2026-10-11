@@ -67,6 +67,26 @@ describe('formatTimeRemaining', () => {
     });
 });
 
+describe('isAllowedPhoto', () => {
+    let isAllowedPhoto;
+
+    beforeAll(() => {
+        document.body.innerHTML = '';
+        ({ isAllowedPhoto } = loadMainJs());
+    });
+
+    // Photos dragged onto the listing form skip the picker's accept filter,
+    // so main.js checks them against the same two types the server takes
+    // (middleware/multer.js)
+    test.each(['image/jpeg', 'image/png'])('accepts %s', (type) => {
+        expect(isAllowedPhoto({ type })).toBe(true);
+    });
+
+    test.each(['image/gif', 'image/heic', 'image/webp', 'application/pdf', ''])('refuses "%s"', (type) => {
+        expect(isAllowedPhoto({ type })).toBe(false);
+    });
+});
+
 describe('mobile nav toggle', () => {
     function setupNav() {
         document.body.innerHTML = `

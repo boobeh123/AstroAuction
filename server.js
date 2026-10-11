@@ -44,6 +44,10 @@ const clientPromise = connectDB();
 // which the secure session cookie below depends on.
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
+// Error pages include the navigation, which reads currentPath. A request that
+// fails before the locals middleware below sets it, such as a body that can't
+// be parsed, would otherwise crash the error page itself.
+app.locals.currentPath = ''
 // X-Content-Type-Options: nosniff — prevents MIME sniffing attacks
 // X-Frame-Options: SAMEORIGIN — prevents clickjacking via iframes
 // Strict-Transport-Security — forces HTTPS on browsers that have visited before
@@ -75,7 +79,6 @@ app.use(helmet({
                 "data:",                             // small images built into styles.css
                 "blob:",                             // previews of photos picked in the listing form
                 "https://res.cloudinary.com",        // uploaded listing and profile photos
-                "https://placeholder.pics",          // stand-in avatar for users without a photo
             ],
             connectSrc:     ["'self'"],
             frameSrc:       [

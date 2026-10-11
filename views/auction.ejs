@@ -57,7 +57,7 @@
                         <% } %>
                         <% if (listing.user) { %>
                           <div class="listing-card-seller">
-                            <img src="<%= listing.user.image || 'https://placeholder.pics/svg/100x100' %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
+                            <img src="<%= listing.user.image || '/images/avatarPlaceholder.svg' %>" alt="<%= listing.user.image ? listing.user.displayName : 'No' %> profile photo" loading="lazy" class="seller-avatar" width="32" height="32">
                             <span class="seller-name">Posted by: <%= listing.user.displayName %></span>
                           </div>
                           <% } %>
@@ -120,34 +120,25 @@
         <label for="modal-category-input">Category <span class="required">*</span></label>
         <select id="modal-category-input" name="category" required aria-required="true">
           <option value="" selected>Select a category</option>
-          <option value="Art">Art</option>
-          <option value="Antiques">Antiques</option>
-          <option value="Coins & Collectibles">Coins & Collectibles</option>
-          <option value="Jewelry & Watches">Jewelry & Watches</option>
-          <option value="Fashion">Fashion</option>
-          <option value="Home Decor & Goods">Home Decor & Goods</option>
-          <option value="Lawn & Garden">Lawn & Garden</option>
-          <option value="Furniture">Furniture</option>
-          <option value="Sports Goods">Sports Goods</option>
-          <option value="Toys">Toys</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Cars">Cars</option>
-          <option value="Construction">Construction</option>
-          <option value="Services">Services</option>
+          <% categories.forEach((category) => { %>
+            <option value="<%= category %>"><%= category %></option>
+          <% }) %>
         </select>
       </div>
       <div class="form-group" id="sale-type-toggle">
-        <label id="sale-type-label">Listing type <span class="required">*</span></label>
-        <div class="toggle-group" role="group" aria-labelledby="sale-type-label">
-          <div class="toggle-option">
-            <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
-            <label for="sale-fixed">Fixed price</label>
+        <fieldset class="toggle-fieldset">
+          <legend>Listing type <span class="required">*</span></legend>
+          <div class="toggle-group">
+            <div class="toggle-option">
+              <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
+              <label for="sale-fixed">Fixed price</label>
+            </div>
+            <div class="toggle-option">
+              <input type="radio" name="saleType" id="sale-auction" value="auction">
+              <label for="sale-auction">Auction</label>
+            </div>
           </div>
-          <div class="toggle-option">
-            <input type="radio" name="saleType" id="sale-auction" value="auction">
-            <label for="sale-auction">Auction</label>
-          </div>
-        </div>
+        </fieldset>
 
         <div class="sale-fields" id="fixed-price-fields">
           <label for="modal-price-input">Price</label>
@@ -171,17 +162,19 @@
         </div>
       </div>
       <div class="form-group" id="video-type-toggle">
-        <label id="video-toggle-label">Does this listing include a video?</label>
-        <div class="toggle-group" role="group" aria-labelledby="video-toggle-label">
-          <div class="toggle-option">
-            <input type="radio" name="has-video" id="video-no" value="no" checked>
-            <label for="video-no">No</label>
+        <fieldset class="toggle-fieldset">
+          <legend>Does this listing include a video?</legend>
+          <div class="toggle-group">
+            <div class="toggle-option">
+              <input type="radio" name="has-video" id="video-no" value="no" checked>
+              <label for="video-no">No</label>
+            </div>
+            <div class="toggle-option">
+              <input type="radio" name="has-video" id="video-yes" value="yes">
+              <label for="video-yes">Yes</label>
+            </div>
           </div>
-          <div class="toggle-option">
-            <input type="radio" name="has-video" id="video-yes" value="yes">
-            <label for="video-yes">Yes</label>
-          </div>
-        </div>
+        </fieldset>
         <div class="video-url-field" id="video-url-field">
           <label for="video-url-input" class="sr-only">YouTube link</label>
           <input type="url" id="video-url-input" name="video" placeholder="https://youtube.com/watch?v=...">
@@ -191,7 +184,7 @@
       <div class="form-group">
         <label for="modal-file-input">Photos (optional, up to 10)</label>
         <div class="dropzone" id="dropzone">
-          <input id="modal-file-input" type="file" name="file" accept="image/*" multiple>
+          <input id="modal-file-input" type="file" name="file" accept="image/jpeg,image/png" multiple>
           <span class="dropzone-prompt" id="dropzone-prompt"><i class="fas fa-image" aria-hidden="true"></i>Drag photos here, or click to browse</span>
         </div>
         <div class="gallery-grid" id="gallery-grid"></div>

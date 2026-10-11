@@ -51,6 +51,30 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 1.1.3
+📅 **Release Date:** October 10th, 2026
+
+## 📢 Developer's Notes - Account deletion, security hardening & cleanup
+
+- Deleting your account deletes your listings too, with their photos, comments & bids
+  - You can't delete your account while you have an auction with bids, or while you're the highest bidder on one
+- Changing your profile picture uploads the new one first, then deletes the old one
+  - A failed upload doesn't leave a broken image anymore
+- Log out is a button now, so other sites can't log you out with a link
+- Comments & bids are rate limited per account - 10 comments & 30 bids every 15 minutes
+- Resetting your password signs you out on every other device
+- Pages no longer receive password or token hashes
+- The "only your own" message no longer shows up on the next page after a 403
+- The auction page shows 24 listings at a time, with Previous & Next links
+- The spotlight banner is looked up at most every 10 seconds instead of on every request
+- The listing form's radio buttons are grouped for screen readers
+- Avatars without a photo use a placeholder from the site itself
+- Photo pickers only offer JPG & PNG, the same types the server accepts
+- Font Awesome loads with an integrity check, & the unused Material Icons font is gone
+- Error pages show up properly even when a request can't be read
+- 371/371 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 1.1.2
 📅 **Release Date:** October 10th, 2026
 
