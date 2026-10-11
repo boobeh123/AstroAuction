@@ -20,6 +20,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * Guided tutorial for posting a listing
 * Email verification & password reset
 * Server-side validation, rate limiting & secure sessions
+* Auction winners & sellers get each other's contact details
 
 ## Optimizations
 * Edit/Delete comments
@@ -51,6 +52,28 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 1.1.4
+📅 **Release Date:** October 12th, 2026
+
+## 📢 Developer's Notes - Smaller photos, winner contact & accessibility
+
+- Listing photos load at the size they're shown
+  - The auction page went from 3.61 MB of photos to 100 KB, & a listing page from 3.61 MB to 197 KB
+- When an auction ends, the winner & the seller get each other's email address
+  - It's in the end-of-auction emails, & on the ended listing where only those two can see it
+  - The bid form tells bidders this before they bid, & the listing form tells sellers before they list
+- An open auction with bids can't be deleted until it ends
+  - The listing form tells sellers this before they list
+- The tutorial waits until you've finished setting up your account
+- The listing form & photo viewer keep keyboard focus inside them
+- Every page has its own title, like "Log in | Astro Auction"
+- The Content-Security-Policy no longer allows inline styles
+- Database indexes for comments & listings
+- Removed the unused JSON body parser
+- Shrunk this README's biggest GIF from 34 MB to 5 MB
+- 417/417 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 1.1.3
 📅 **Release Date:** October 10th, 2026
 
