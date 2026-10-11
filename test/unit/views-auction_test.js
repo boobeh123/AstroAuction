@@ -9,6 +9,9 @@ const {
 } = require('../../utils/bidding');
 const { isHighlighted } = require('../../utils/highlight');
 const { CATEGORIES } = require('../../model/Auction');
+const { photoUrl } = require('../../utils/photos');
+
+const PHOTO = 'https://res.cloudinary.com/dvzx6pt8h/image/upload/v1770578503/8e809005409b08f232583a0a935c0641.jpg';
 
 /**
  * The listings page and its Create Listing form, rendered from the real
@@ -17,7 +20,7 @@ const { CATEGORIES } = require('../../model/Auction');
 const VIEW = path.join(__dirname, '../../views/auction.ejs');
 
 const LISTINGS = [
-    { _id: '507f1f77bcf86cd799439011', title: 'Koa bowl', category: 'Art', saleType: 'fixed', price: 25, images: [], user: null },
+    { _id: '507f1f77bcf86cd799439011', title: 'Koa bowl', category: 'Art', saleType: 'fixed', price: 25, images: [PHOTO], user: null },
     { _id: '507f1f77bcf86cd799439012', title: 'Brass lamp', category: 'Antiques', saleType: 'fixed', price: 40, images: [], user: null },
     {
         _id: '507f1f77bcf86cd799439013', title: 'Rattan chair', category: 'Furniture', saleType: 'fixed', price: 60, images: [],
@@ -36,6 +39,7 @@ function renderPage(overrides = {}) {
         currentPage: 1,
         pageCount: 1,
         formatMoney,
+        photoUrl,
         isAuctionLive,
         isHighlighted,
         durationChoices: DURATION_CHOICES,
@@ -134,6 +138,14 @@ test('the photo picker only offers JPG and PNG files', async () => {
     const html = await renderPage();
 
     expect(html).toMatch(/id="modal-file-input"[^>]*accept="image\/jpeg,image\/png"/);
+});
+
+// Cards are 180px tall, so a full-size phone photo is wasted bytes
+test('listing cards load a card-sized copy of the photo', async () => {
+    const html = await renderPage();
+
+    expect(html).toContain(`class="listing-card-image" src="${photoUrl(PHOTO, 'card')}"`);
+    expect(html).not.toContain(`src="${PHOTO}"`);
 });
 
 test('a seller without a photo gets the local placeholder avatar', async () => {

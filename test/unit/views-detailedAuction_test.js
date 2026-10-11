@@ -1,6 +1,7 @@
 const path = require('path');
 const ejs = require('ejs');
 const { formatMoney, AMOUNT_LIMITS } = require('../../utils/bidding');
+const { photoUrl } = require('../../utils/photos');
 
 /**
  * Deleting an account removes the user but keeps their comments, so each of
@@ -39,6 +40,7 @@ function renderListingPage(comments, overrides = {}) {
         auctionLive: false,
         minNextBid: 0,
         formatMoney,
+        photoUrl,
         amountLimits: AMOUNT_LIMITS,
         user: null,
         currentPath: `/auction/viewAuction/${LISTING._id}`,
@@ -93,6 +95,39 @@ describe('photo thumbnails', () => {
 
         expect(html).toContain('aria-current="true"');
         expect(html).not.toContain('&#34;');
+    });
+});
+
+describe('photo sizes', () => {
+    const PHOTOS = [
+        'https://res.cloudinary.com/dvzx6pt8h/image/upload/v1770578503/8e809005409b08f232583a0a935c0641.jpg',
+        'https://res.cloudinary.com/dvzx6pt8h/image/upload/v1770163513/548f208b862745f573157d606a81e311.png',
+    ];
+    const withPhotos = { ...LISTING, images: PHOTOS };
+
+    test('the main photo and its thumbnails each load a copy sized for them', async () => {
+        const html = await renderListingPage([], { listing: withPhotos });
+
+        expect(html).toContain(`src="${photoUrl(PHOTOS[0], 'main')}"`);
+        PHOTOS.forEach((photo) => {
+            expect(html).toContain(`<img src="${photoUrl(photo, 'thumb')}" alt="">`);
+            // Clicking a thumbnail swaps it into the main photo, so that's the size it asks for
+            expect(html).toContain(`data-image-url="${photoUrl(photo, 'main')}"`);
+        });
+        expect(html).not.toMatch(/(src|data-image-url)="https:\/\/res\.cloudinary\.com\/dvzx6pt8h\/image\/upload\/v\d/);
+    });
+
+    // With a video, the photos sit in a strip and open in the photo viewer
+    test('next to a video, the strip shows thumbnails and the viewer gets the large size', async () => {
+        const html = await renderListingPage([], {
+            listing: withPhotos,
+            videoEmbedUrl: 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+        });
+
+        PHOTOS.forEach((photo) => {
+            expect(html).toContain(`data-image-url="${photoUrl(photo, 'full')}"`);
+            expect(html).toContain(`src="${photoUrl(photo, 'thumb')}"`);
+        });
     });
 });
 

@@ -20,6 +20,7 @@ const {
     INCREMENT_LIMITS,
 } = require('../utils/bidding');
 const { isHighlighted } = require('../utils/highlight');
+const { photoUrl } = require('../utils/photos');
 const { formErrors } = require('../middleware/validators');
 
 // How many listings the auction page shows at a time
@@ -79,6 +80,7 @@ module.exports = {
             currentPage: currentPage,
             pageCount: pageCount,
             formatMoney: formatMoney,
+            photoUrl: photoUrl,
             isAuctionLive: isAuctionLive,
             isHighlighted: isHighlighted,
             durationChoices: DURATION_CHOICES,
@@ -244,6 +246,7 @@ module.exports = {
             auctionLive: isAuctionLive(listing),
             minNextBid: minimumNextBid(listing),
             formatMoney: formatMoney,
+            photoUrl: photoUrl,
             amountLimits: AMOUNT_LIMITS,
         });
     },
