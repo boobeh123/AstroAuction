@@ -148,7 +148,6 @@ module.exports = {
         }
 
         if (listing.user.toString() !== req.user.id) {
-            req.flash('error', 'You can only delete your own listings');
             return res.status(403).render('errors/403.ejs');
         }
 

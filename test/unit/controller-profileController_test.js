@@ -110,13 +110,16 @@ describe('deleteProfile', () => {
         expect(filter.$or[1].currentBidder).toBe(USER_ID);
     });
 
-    test("refuses another user's account with a 403", async () => {
+    // The 403 page explains the refusal. The flash message it used to set as
+    // well only showed up later, on whatever page the user opened next.
+    test("refuses another user's account with the 403 page alone", async () => {
         const req = deleteRequest('507f1f77bcf86cd799439099');
         const res = mockResponse();
         await profileController.deleteProfile(req, res);
 
         expect(res.statusCode).toBe(403);
         expect(res.rendered).toBe('errors/403.ejs');
+        expect(req.flash).not.toHaveBeenCalled();
         expect(User.deleteOne).not.toHaveBeenCalled();
     });
 });

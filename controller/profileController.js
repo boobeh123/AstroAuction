@@ -75,7 +75,6 @@ module.exports = {
 
     deleteProfile: async (req, res) => {
         if (req.params.id !== req.user._id.toString()) {
-            req.flash('error', 'You can only delete your own account');
             return res.status(403).render('errors/403.ejs');
         }
 

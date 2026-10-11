@@ -611,7 +611,9 @@ describe('deleteAuction', () => {
         expect(res.redirectedTo).toBe('/auction');
     });
 
-    test("refuses someone else's listing with a 403", async () => {
+    // The 403 page explains the refusal. The flash message it used to set as
+    // well only showed up later, on whatever page the user opened next.
+    test("refuses someone else's listing with the 403 page alone", async () => {
         Auction.findById.mockReturnValue(mockQuery(liveAuction()));
 
         const req = deleteRequest(RIVAL_ID);
@@ -620,6 +622,7 @@ describe('deleteAuction', () => {
 
         expect(res.statusCode).toBe(403);
         expect(res.rendered).toBe('errors/403.ejs');
+        expect(req.flash).not.toHaveBeenCalled();
         expect(deleteListings).not.toHaveBeenCalled();
     });
 
