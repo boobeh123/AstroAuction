@@ -102,3 +102,13 @@ test('the video link and photo inputs have labels', async () => {
     expect(html).toContain('<label for="video-url-input"');
     expect(html).toContain('<label for="modal-file-input"');
 });
+
+// A screen reader announces a fieldset's legend along with each option in it,
+// so "Auction" is read as part of "Listing type"
+test('the two radio groups are fieldsets named by their legends', async () => {
+    const html = await renderPage();
+
+    expect(html).toMatch(/<fieldset class="toggle-fieldset">\s*<legend>Listing type <span class="required">\*<\/span><\/legend>/);
+    expect(html).toMatch(/<fieldset class="toggle-fieldset">\s*<legend>Does this listing include a video\?<\/legend>/);
+    expect(html).not.toContain('role="group"');
+});

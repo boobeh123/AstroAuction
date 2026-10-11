@@ -137,17 +137,19 @@
         </select>
       </div>
       <div class="form-group" id="sale-type-toggle">
-        <label id="sale-type-label">Listing type <span class="required">*</span></label>
-        <div class="toggle-group" role="group" aria-labelledby="sale-type-label">
-          <div class="toggle-option">
-            <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
-            <label for="sale-fixed">Fixed price</label>
+        <fieldset class="toggle-fieldset">
+          <legend>Listing type <span class="required">*</span></legend>
+          <div class="toggle-group">
+            <div class="toggle-option">
+              <input type="radio" name="saleType" id="sale-fixed" value="fixed" checked>
+              <label for="sale-fixed">Fixed price</label>
+            </div>
+            <div class="toggle-option">
+              <input type="radio" name="saleType" id="sale-auction" value="auction">
+              <label for="sale-auction">Auction</label>
+            </div>
           </div>
-          <div class="toggle-option">
-            <input type="radio" name="saleType" id="sale-auction" value="auction">
-            <label for="sale-auction">Auction</label>
-          </div>
-        </div>
+        </fieldset>
 
         <div class="sale-fields" id="fixed-price-fields">
           <label for="modal-price-input">Price</label>
@@ -171,17 +173,19 @@
         </div>
       </div>
       <div class="form-group" id="video-type-toggle">
-        <label id="video-toggle-label">Does this listing include a video?</label>
-        <div class="toggle-group" role="group" aria-labelledby="video-toggle-label">
-          <div class="toggle-option">
-            <input type="radio" name="has-video" id="video-no" value="no" checked>
-            <label for="video-no">No</label>
+        <fieldset class="toggle-fieldset">
+          <legend>Does this listing include a video?</legend>
+          <div class="toggle-group">
+            <div class="toggle-option">
+              <input type="radio" name="has-video" id="video-no" value="no" checked>
+              <label for="video-no">No</label>
+            </div>
+            <div class="toggle-option">
+              <input type="radio" name="has-video" id="video-yes" value="yes">
+              <label for="video-yes">Yes</label>
+            </div>
           </div>
-          <div class="toggle-option">
-            <input type="radio" name="has-video" id="video-yes" value="yes">
-            <label for="video-yes">Yes</label>
-          </div>
-        </div>
+        </fieldset>
         <div class="video-url-field" id="video-url-field">
           <label for="video-url-input" class="sr-only">YouTube link</label>
           <input type="url" id="video-url-input" name="video" placeholder="https://youtube.com/watch?v=...">
