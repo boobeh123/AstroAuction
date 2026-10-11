@@ -158,6 +158,31 @@ describe('creating a listing needs a verified email, not just a login', () => {
     });
 });
 
+describe('bidding needs a verified email, not just a login', () => {
+    // A bid is a promise to pay, so like a listing it needs an account that
+    // has proved it owns its email address. Throwaway signups can't bid.
+    test('an unverified user is sent to their profile and postBid never runs', async () => {
+        const res = await request(buildApp({ authenticated: true, emailVerified: false }))
+            .post(`/auction/postBid/${LOT}`)
+            .send({ amount: '150' });
+
+        expect(res.status).toBe(302);
+        expect(res.headers.location).toBe('/profile');
+        expect(auctionController.postBid).not.toHaveBeenCalled();
+    });
+
+    // Asking the seller a question doesn't commit anyone to anything, so
+    // comments stay open to every logged-in user.
+    test('an unverified user can still comment', async () => {
+        await request(buildApp({ authenticated: true, emailVerified: false }))
+            .post(`/auction/postComment/${LOT}`)
+            .send({ body: 'Is this available?' })
+            .expect(200);
+
+        expect(auctionController.postComment).toHaveBeenCalled();
+    });
+});
+
 describe('spotlight route is gated by role, not just by login', () => {
     // The button is hidden from non-auctioneers in the template, but hiding a
     // button is not access control — anyone can POST to the URL directly.

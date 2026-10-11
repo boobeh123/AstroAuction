@@ -59,6 +59,11 @@ describe('parseMoney', () => {
         expect(parseMoney('-5')).toBeNull();
     });
 
+    // 0.004 is more than zero, but it rounds to $0.00
+    test('rejects amounts that round to zero cents', () => {
+        expect(parseMoney('0.004')).toBeNull();
+    });
+
     test('rejects Infinity and NaN', () => {
         expect(parseMoney('Infinity')).toBeNull();
         expect(parseMoney('NaN')).toBeNull();

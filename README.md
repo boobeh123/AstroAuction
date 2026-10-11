@@ -15,6 +15,11 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * Server with database and authentication
 * CRUD opeartions
 * User profiles & profile pictures
+* Auctions with bidding, outbid emails & automatic closing
+* Spotlight banner for items sold during live sales
+* Guided tutorial for posting a listing
+* Email verification & password reset
+* Server-side validation, rate limiting & secure sessions
 
 ## Optimizations
 * Edit/Delete comments
@@ -46,6 +51,53 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 1.1.2
+📅 **Release Date:** October 10th, 2026
+
+## 📢 Developer's Notes - Folder names, standards & bid limits
+
+- Renamed folders & files to match the standard MVC layout
+  - `models/` is now `model/`, & controllers are `controller/<name>Controller.js`
+  - `routes/main.js` is split into one routes file per controller
+  - The Cloudinary setup moved from `middleware/` to `config/`
+- `main.js` & `styles.css` follow the code standards
+  - Elements are selected with `querySelector`
+  - CSS custom properties use camelCase, & the reduced-motion rules are in one block at the bottom
+- Added `CLAUDE.md`, which gives Claude Code sessions the project's commands, structure & rules
+- Added limits for prices & bids
+  - Prices, starting bids & bids must be between $1 & $100,000, in dollars & cents
+  - The minimum bid increment must be between $0.50 & $1,000
+  - Before, a bid of `1e300` was accepted. Nobody could outbid it & it showed as "$1e+300"
+- You must verify your email before placing a bid. Any logged-in user can still comment
+- Fixed screen reader attributes, listing card ids & two missing form labels on the listing pages
+- 291/291 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
+# 🛠️ AstroAuction Patch 1.1.1
+📅 **Release Date:** October 9th, 2026
+
+## 📢 Developer's Notes - Code review & security fixes
+
+- Did a full code review with Claude Code & fixed what it found, one pull request at a time
+- Updated dependencies - fixed 1 critical & 30 high vulnerabilities
+- Protected the login cookie (`httpOnly`, `sameSite`, `secure`) & trusted Railway's proxy
+- Email links are built from `APP_URL`, & a listing title can't add a link to an email anymore
+- Passwords must be at least 8 characters & are hashed with bcrypt cost 12
+- You must verify your email before creating a listing
+- Comments from deleted accounts show "Removed user" instead of crashing the listing page
+- Every form is validated on the server with `express-validator`
+- Login, signup & password reset are rate limited
+- Database operators sent in a request can't reach a query anymore (`sanitizeFilter`)
+- The server takes requests only after the database connects
+- Visitors don't get a session cookie until they log in
+- Errors show the matching error page with the real status code
+- Pages can only run scripts from this site's own files (Content-Security-Policy)
+- Fixed the linter, swapped `nodemon` for `node --watch`, upgraded `nodemailer` to v10 & the live site runs on Node 24
+- Added `config/.env.example`, which lists every setting
+- Account emails share one template
+- 256/256 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 1.1.0
 📅 **Release Date:** September 15th, 2026
 

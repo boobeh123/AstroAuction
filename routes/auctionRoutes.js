@@ -13,7 +13,7 @@ router.delete('/deleteAuction/:id', ensureAuth, auctionController.deleteAuction)
 
 router.get('/viewAuction/:id', auctionController.getDetailedAuction)
 router.post('/postComment/:id', ensureAuth, validateComment, auctionController.postComment);
-router.post('/postBid/:id', ensureAuth, validateBid, auctionController.postBid);
+router.post('/postBid/:id', ensureAuth, ensureVerified, validateBid, auctionController.postBid);
 router.post('/toggleSpotlight/:id', ensureAuth, ensureAuctioneer, auctionController.postToggleHighlight);
 
 module.exports = router;

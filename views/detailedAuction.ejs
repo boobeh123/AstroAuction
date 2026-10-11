@@ -29,7 +29,7 @@
               <% if (listing.images.length > 1) { %>
                 <div class="detailed-image-thumbnails" aria-label="Listing photos">
                   <% listing.images.forEach((img, index) => { %>
-                    <button type="button" class="detailed-image-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> of <%= listing.images.length %>" <%= index === 0 ? 'aria-current="true"' : '' %>>
+                    <button type="button" class="detailed-image-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> of <%= listing.images.length %>" <% if (index === 0) { %>aria-current="true"<% } %>>
                       <img src="<%= img %>" alt="">
                     </button>
                   <% }) %>
@@ -104,12 +104,14 @@
                   <% if (typeof user !== 'undefined' && user) { %>
                     <% if (listing.user && listing.user._id.toString() === user.id) { %>
                       <p class="bid-notice">This is your listing, so you can't bid on it.</p>
+                    <% } else if (!user.emailVerified) { %>
+                      <p class="bid-notice">Verify your email to bid. You can resend the verification email from your <a href="/profile">profile</a>.</p>
                     <% } else { %>
                       <form action="/auction/postBid/<%= listing._id %>" method="POST" class="bid-form">
                         <label for="bid-amount">Your bid</label>
                         <div class="bid-input-row">
                           <span class="bid-currency">$</span>
-                          <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
+                          <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" max="<%= amountLimits.max %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
                         </div>
                         <small class="bid-minimum">Minimum bid: <%= formatMoney(minNextBid) %></small>
                         <button type="submit" class="btn btn-primary bid-submit">Place Bid</button>

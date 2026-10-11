@@ -14,6 +14,8 @@ const {
     isAuctionLive,
     formatMoney,
     DURATION_CHOICES,
+    AMOUNT_LIMITS,
+    INCREMENT_LIMITS,
 } = require('../utils/bidding');
 const { isHighlighted } = require('../utils/highlight');
 const { formErrors } = require('../middleware/validators');
@@ -54,6 +56,8 @@ module.exports = {
             isAuctionLive: isAuctionLive,
             isHighlighted: isHighlighted,
             durationChoices: DURATION_CHOICES,
+            amountLimits: AMOUNT_LIMITS,
+            incrementLimits: INCREMENT_LIMITS,
         });
     },
 
@@ -225,6 +229,7 @@ module.exports = {
             auctionLive: isAuctionLive(listing),
             minNextBid: minimumNextBid(listing),
             formatMoney: formatMoney,
+            amountLimits: AMOUNT_LIMITS,
         });
     },
 
