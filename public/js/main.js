@@ -49,6 +49,11 @@ const RISE_COLOR = '232, 233, 243'; // #E8E9F3
 const TWINKLE_COLOR = '168, 85, 247'; // #A855F7
 const MAX_LISTING_IMAGES = 10;
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png']; // the same two types middleware/multer.js accepts
+// Everything on the page except the dialogs, the tutorial's overlay (its Next
+// and Skip buttons have to keep working while the listing form is open) and
+// scripts. setPageInert() marks these inert while a dialog is open.
+const PAGE_BEHIND_DIALOGS = 'body > *:not(.modal-overlay):not(.image-lightbox-overlay)'
+  + ':not(.coach-backdrop):not(.coach-highlight):not(.coach-tooltip):not(script)';
 let selectedListingFiles = [];
 let lastFocusedStripThumb = null;
 
@@ -101,6 +106,14 @@ function drawSparkle(ctx, cx, cy, size, rotation) {
 
 function getModalFocusable() {
   return listingModal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+}
+
+// While a dialog is open, the rest of the page is inert: Tab, clicks and
+// screen readers can't reach it, so keyboard focus stays in the dialog.
+function setPageInert(isInert) {
+  document.querySelectorAll(PAGE_BEHIND_DIALOGS).forEach((element) => {
+    element.toggleAttribute('inert', isInert);
+  });
 }
 
 // Photos dragged onto the dropzone skip the file picker's accept filter, so
@@ -190,6 +203,7 @@ function handleProfileFileChange(event) {
 
 function openListingModal() {
   listingModal.hidden = false;
+  setPageInert(true);
   const focusable = getModalFocusable();
   if (focusable.length) focusable[0].focus();
   document.addEventListener('keydown', handleModalKeydown);
@@ -197,27 +211,13 @@ function openListingModal() {
 
 function closeListingModal() {
   listingModal.hidden = true;
+  setPageInert(false);
   document.removeEventListener('keydown', handleModalKeydown);
   openListingModalBtn.focus();
 }
 
 function handleModalKeydown(event) {
-  if (event.key === 'Escape') {
-    closeListingModal();
-    return;
-  }
-  if (event.key === 'Tab') {
-    const focusable = Array.from(getModalFocusable());
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  }
+  if (event.key === 'Escape') closeListingModal();
 }
 
 function handleVideoToggleChange() {
@@ -242,6 +242,7 @@ function openImageLightbox(event) {
   lastFocusedStripThumb = event.currentTarget;
   imageLightboxImg.src = event.currentTarget.dataset.imageUrl;
   imageLightbox.hidden = false;
+  setPageInert(true);
   imageLightboxClose.focus();
   document.addEventListener('keydown', handleLightboxKeydown);
 }
@@ -249,6 +250,7 @@ function openImageLightbox(event) {
 function closeImageLightbox() {
   imageLightbox.hidden = true;
   imageLightboxImg.src = '';
+  setPageInert(false);
   document.removeEventListener('keydown', handleLightboxKeydown);
   if (lastFocusedStripThumb) lastFocusedStripThumb.focus();
 }
