@@ -1870,6 +1870,12 @@ Bidding
   font-size: 0.75rem;
 }
 
+/* Tells bidders that winning shares their email with the seller */
+.bid-privacy {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
 .bid-submit {
   margin-top: 0.25rem;
 }
@@ -1903,6 +1909,18 @@ Bidding
 
 .bid-ended-text strong {
   color: #E8E9F3;
+}
+
+/* After an auction ends, the seller and the winner see each other's email */
+.bid-contact {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin: var(--space2) 0 0;
+}
+
+.bid-contact a {
+  color: #A855F7;
+  overflow-wrap: anywhere;
 }
 
 /* --- Bid history --- */

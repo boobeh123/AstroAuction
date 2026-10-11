@@ -1,6 +1,7 @@
 jest.mock('../../model/Auction');
 jest.mock('../../model/Comment');
 jest.mock('../../model/Bid');
+jest.mock('../../model/User');
 jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
@@ -9,6 +10,8 @@ jest.mock('../../services/highlightCache');
 
 const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
+const Comment = require('../../model/Comment');
+const User = require('../../model/User');
 const { sendOutbidEmail } = require('../../config/mailer');
 const { deleteListings } = require('../../services/listingCleanup');
 const { clearHighlightCache } = require('../../services/highlightCache');
@@ -112,6 +115,67 @@ describe('getAuction — one page of listings at a time', () => {
 
         expect(res.redirectedTo).toBe('/auction');
         expect(Auction.find).not.toHaveBeenCalled();
+    });
+});
+
+describe('getDetailedAuction — contact details once an auction ends', () => {
+    // The seller and the winner see each other's email address so they can
+    // arrange payment and pickup. Nobody else's page gets it.
+    const WINNER_ID = BIDDER_ID;
+    const SELLER = { _id: SELLER_ID, displayName: 'Seller', image: '', createdAt: new Date('2026-01-01') };
+
+    function endedAuction(overrides = {}) {
+        return liveAuction({
+            status: 'ended',
+            endsAt: new Date(Date.now() - 3_600_000),
+            bidCount: 1,
+            currentBid: 150,
+            currentBidder: WINNER_ID,
+            user: SELLER,
+            images: [],
+            ...overrides,
+        });
+    }
+
+    async function viewAs(viewer, listing = endedAuction()) {
+        Auction.findById.mockReturnValue(mockQuery(listing));
+        Comment.find.mockReturnValue(mockQuery([]));
+        Bid.find.mockReturnValue(mockQuery([]));
+        User.findById.mockReturnValue(mockQuery({ displayName: 'Someone', email: 'someone@example.com' }));
+
+        const res = mockResponse();
+        await auctionController.getDetailedAuction(mockRequest({ params: { id: LOT_ID }, user: viewer }), res);
+        return res.renderedLocals.contact;
+    }
+
+    test("the seller gets the winner's details", async () => {
+        const contact = await viewAs({ id: SELLER_ID });
+
+        expect(User.findById).toHaveBeenCalledWith(WINNER_ID);
+        expect(contact).toEqual({ role: 'winner', person: { displayName: 'Someone', email: 'someone@example.com' } });
+    });
+
+    test("the winner gets the seller's details", async () => {
+        const contact = await viewAs({ id: WINNER_ID });
+
+        expect(User.findById).toHaveBeenCalledWith(SELLER_ID);
+        expect(contact.role).toBe('seller');
+    });
+
+    test.each([
+        ['another logged-in user', { id: RIVAL_ID }],
+        ['a visitor', null],
+    ])('%s gets nothing', async (_label, viewer) => {
+        const contact = await viewAs(viewer);
+
+        expect(contact).toBeNull();
+        expect(User.findById).not.toHaveBeenCalled();
+    });
+
+    test('an auction that is still open gives nobody contact details', async () => {
+        const contact = await viewAs({ id: SELLER_ID }, liveAuction({ user: SELLER, currentBidder: WINNER_ID, bidCount: 1, images: [] }));
+
+        expect(contact).toBeNull();
     });
 });
 
@@ -410,8 +474,6 @@ describe('postBid — failure handling', () => {
 });
 
 describe('postComment', () => {
-    const Comment = require('../../model/Comment');
-
     beforeEach(() => {
         Comment.create.mockResolvedValue({});
         Auction.exists.mockResolvedValue(true);

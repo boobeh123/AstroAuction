@@ -64,18 +64,16 @@ async function notifyAuctionClosed(closed) {
     const winner = closed.currentBidder;
     const seller = closed.user;
 
+    // Each email carries the other person, so the winner and the seller get
+    // each other's contact details to arrange payment and pickup
     if (winner && winner.email) {
-        await sendAuctionWonEmail(winner, closed).catch((err) => {
+        await sendAuctionWonEmail(winner, closed, seller).catch((err) => {
             console.error('Failed to send auction-won email:', err.message);
         });
     }
 
     if (seller && seller.email) {
-        await sendAuctionEndedSellerEmail(
-            seller,
-            closed,
-            winner ? winner.displayName : null
-        ).catch((err) => {
+        await sendAuctionEndedSellerEmail(seller, closed, winner).catch((err) => {
             console.error('Failed to send auction-ended email:', err.message);
         });
     }
