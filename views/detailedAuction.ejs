@@ -29,7 +29,7 @@
               <% if (listing.images.length > 1) { %>
                 <div class="detailed-image-thumbnails" aria-label="Listing photos">
                   <% listing.images.forEach((img, index) => { %>
-                    <button type="button" class="detailed-image-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> of <%= listing.images.length %>" <%= index === 0 ? 'aria-current="true"' : '' %>>
+                    <button type="button" class="detailed-image-thumb" data-image-url="<%= img %>" aria-label="View photo <%= index + 1 %> of <%= listing.images.length %>" <% if (index === 0) { %>aria-current="true"<% } %>>
                       <img src="<%= img %>" alt="">
                     </button>
                   <% }) %>

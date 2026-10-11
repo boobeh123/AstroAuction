@@ -80,6 +80,22 @@ describe('comments from deleted accounts', () => {
     });
 });
 
+describe('photo thumbnails', () => {
+    // The first thumbnail is marked as the photo on show. The attribute used
+    // to come out escaped, as aria-current=&#34;true&#34;, which isn't valid.
+    test('mark the first photo with a real aria-current attribute', async () => {
+        const html = await renderListingPage([], {
+            listing: {
+                ...LISTING,
+                images: ['https://res.cloudinary.com/demo/a.jpg', 'https://res.cloudinary.com/demo/b.jpg'],
+            },
+        });
+
+        expect(html).toContain('aria-current="true"');
+        expect(html).not.toContain('&#34;');
+    });
+});
+
 describe('the bid form on a live auction', () => {
     const LIVE_AUCTION = {
         ...LISTING,
