@@ -28,8 +28,11 @@ const mailer = require('../../config/mailer');
 const cloudinary = require('../../config/cloudinary');
 const Auction = require('../../model/Auction');
 const User = require('../../model/User');
+const Comment = require('../../model/Comment');
+const Bid = require('../../model/Bid');
 const auctionController = require('../../controller/auctionController');
 const authController = require('../../controller/authController');
+const profileController = require('../../controller/profileController');
 const { closeExpiredAuctions } = require('../../services/auctionCloser');
 const { validateBid, validateListing, validateResetPassword } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
@@ -81,7 +84,7 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-    await Promise.all([Auction.deleteMany({}), User.deleteMany({})]);
+    await Promise.all([Auction.deleteMany({}), User.deleteMany({}), Comment.deleteMany({}), Bid.deleteMany({})]);
 });
 
 describe('the sanitizeFilter guard', () => {
@@ -301,5 +304,65 @@ describe('password hashing', () => {
         });
 
         expect(isMatch).toBe(true);
+    });
+});
+
+describe('deleting an account', () => {
+    // The checks behind this use $gt and $in, which the sanitizeFilter guard
+    // would quietly neutralize without mongoose.trusted(). Only a real
+    // database shows whether they match.
+    async function deleteAccount(user) {
+        const req = mockRequest({ params: { id: user._id.toString() }, user });
+        req.logout = (callback) => callback();
+        const res = mockResponse();
+        await profileController.deleteProfile(req, res);
+        return res;
+    }
+
+    test("removes its listings with their comments and bids, and nobody else's", async () => {
+        const seller = await makeUser({ email: 'seller@example.com' });
+        const buyer = new mongoose.Types.ObjectId();
+        const ended = await makeAuction({ user: seller._id, status: 'ended', bidCount: 1, currentBid: 150, currentBidder: buyer });
+        const fixed = await makeAuction({ user: seller._id, saleType: 'fixed', price: 40 });
+        const someoneElses = await makeAuction();
+        await Comment.create({ body: 'Still available?', user: buyer, auction: fixed._id });
+        await Bid.create({ auction: ended._id, user: buyer, amount: 150 });
+        await Bid.create({ auction: someoneElses._id, user: buyer, amount: 150 });
+
+        const res = await deleteAccount(seller);
+
+        expect(res.redirectedTo).toBe('/');
+        expect(await User.exists({ _id: seller._id })).toBeNull();
+        expect(await Auction.countDocuments({ user: seller._id })).toBe(0);
+        expect(await Comment.countDocuments({ auction: fixed._id })).toBe(0);
+        expect(await Bid.countDocuments({ auction: ended._id })).toBe(0);
+        expect(await Auction.exists({ _id: someoneElses._id })).not.toBeNull();
+        expect(await Bid.countDocuments({ auction: someoneElses._id })).toBe(1);
+    });
+
+    test('is refused while the account has an open auction with bids', async () => {
+        const seller = await makeUser({ email: 'seller@example.com' });
+        const lot = await makeAuction({
+            user: seller._id,
+            bidCount: 1,
+            currentBid: 150,
+            currentBidder: new mongoose.Types.ObjectId(),
+        });
+
+        const res = await deleteAccount(seller);
+
+        expect(res.redirectedTo).toBe('/profile');
+        expect(await User.exists({ _id: seller._id })).not.toBeNull();
+        expect(await Auction.exists({ _id: lot._id })).not.toBeNull();
+    });
+
+    test('is refused while the account is the top bidder on an open auction', async () => {
+        const bidder = await makeUser();
+        await makeAuction({ bidCount: 1, currentBid: 150, currentBidder: bidder._id });
+
+        const res = await deleteAccount(bidder);
+
+        expect(res.redirectedTo).toBe('/profile');
+        expect(await User.exists({ _id: bidder._id })).not.toBeNull();
     });
 });

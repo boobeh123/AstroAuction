@@ -6,6 +6,7 @@ const Bid = require('../model/Bid')
 const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
+const { deleteListings } = require('../services/listingCleanup');
 const { sendOutbidEmail } = require('../config/mailer');
 const {
     round2,
@@ -140,7 +141,7 @@ module.exports = {
             return res.status(404).render('errors/404.ejs');
         }
 
-        const listing = await Auction.findById(req.params.id);
+        const listing = await Auction.findById(req.params.id).select('user cloudinaryIds').lean();
 
         if (!listing) {
             return res.status(404).render('errors/404.ejs');
@@ -151,19 +152,8 @@ module.exports = {
             return res.status(403).render('errors/403.ejs');
         }
 
-        if (listing.cloudinaryIds && listing.cloudinaryIds.length > 0) {
-            await Promise.all(
-                listing.cloudinaryIds.map((id) =>
-                    cloudinary.uploader.destroy(id).catch((destroyErr) => {
-                        console.error('Failed to remove Cloudinary asset:', destroyErr.message);
-                    })
-                )
-            );
-        }
-
-        await Auction.findByIdAndDelete(req.params.id)
-        await Comment.deleteMany({ auction: req.params.id })
-        await Bid.deleteMany({ auction: req.params.id })
+        // Its photos, comments and bid history go with it
+        await deleteListings([listing]);
         console.log('Deleted listing')
         res.redirect('/auction')
     },

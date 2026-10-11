@@ -71,6 +71,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Verification and reset tokens are random hex. The email carries the token; the database stores its SHA-256 hash, valid for 1 hour.
 - Guards in `middleware/auth.js`: `ensureAuth`, `ensureVerified` (required to create listings and to bid) and `ensureAuctioneer`.
 - Roles are set directly in the database. Older accounts have `role: 'User'`, so don't add an enum to that field.
+- Deleting an account deletes its listings, with their photos, comments and bids, through `services/listingCleanup.js`. Deleting a single listing uses the same helper. Account deletion is refused while the user has an open auction with bids, or is the top bidder on one.
 - `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes.
 
 **Uploads and email.**

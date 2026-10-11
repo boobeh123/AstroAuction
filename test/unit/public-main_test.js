@@ -397,6 +397,54 @@ describe('video link toggle', () => {
     });
 });
 
+describe('delete confirmation', () => {
+    function setupDeleteForms() {
+        document.body.innerHTML = `
+            <form class="deleteForm" id="account-delete" data-confirm="Delete your account and your listings?"></form>
+            <form class="deleteForm" id="listing-delete"></form>
+        `;
+        loadMainJs();
+    }
+
+    function submit(form) {
+        const event = new window.Event('submit', { cancelable: true });
+        form.dispatchEvent(event);
+        return event;
+    }
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    // Deleting an account also deletes its listings, so that form says so
+    test("asks with the form's own message when it has one", () => {
+        setupDeleteForms();
+        const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+        submit(document.querySelector('#account-delete'));
+
+        expect(confirmSpy).toHaveBeenCalledWith('Delete your account and your listings?');
+    });
+
+    test('falls back to the general warning', () => {
+        setupDeleteForms();
+        const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true);
+
+        submit(document.querySelector('#listing-delete'));
+
+        expect(confirmSpy.mock.calls[0][0]).toMatch(/permanently DELETE/);
+    });
+
+    test('stops the form when the answer is Cancel', () => {
+        setupDeleteForms();
+        jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+        const event = submit(document.querySelector('#listing-delete'));
+
+        expect(event.defaultPrevented).toBe(true);
+    });
+});
+
 describe('defensive guards', () => {
     // Every page loads this one file. On a page with none of these elements —
     // the login page, say — main.js must do nothing rather than throw, or the
