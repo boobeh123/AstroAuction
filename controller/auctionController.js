@@ -197,7 +197,7 @@ module.exports = {
             return res.status(404).render('errors/404.ejs');
         }
 
-        const listing = await Auction.findById(req.params.id).select('user cloudinaryIds').lean();
+        const listing = await Auction.findById(req.params.id).select('user cloudinaryIds saleType status bidCount').lean();
 
         if (!listing) {
             return res.status(404).render('errors/404.ejs');
@@ -205,6 +205,14 @@ module.exports = {
 
         if (listing.user.toString() !== req.user.id) {
             return res.status(403).render('errors/403.ejs');
+        }
+
+        // Bidders on an open auction are waiting to see who wins. Once the
+        // auction has ended, and the closer has sent the winner and the seller
+        // their emails, it can be deleted.
+        if (listing.saleType === 'auction' && listing.status === 'open' && listing.bidCount > 0) {
+            req.flash('errors', { msg: "This auction already has bids, so it can't be deleted until it ends." });
+            return res.redirect('/auction');
         }
 
         // Its photos, comments and bid history go with it

@@ -760,4 +760,31 @@ describe('deleteAuction', () => {
         expect(res.statusCode).toBe(404);
         expect(deleteListings).not.toHaveBeenCalled();
     });
+
+    // Bidders on an open auction are waiting to see who wins
+    test('refuses to delete an open auction that has bids', async () => {
+        Auction.findById.mockReturnValue(mockQuery(liveAuction({ bidCount: 1, currentBid: 120, currentBidder: RIVAL_ID })));
+
+        const req = deleteRequest();
+        const res = mockResponse();
+        await auctionController.deleteAuction(req, res);
+
+        expect(deleteListings).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/auction');
+        expect(req.flashed.errors).toContainEqual({ msg: "This auction already has bids, so it can't be deleted until it ends." });
+    });
+
+    test.each([
+        ['an auction that has ended, bids and all', { status: 'ended', bidCount: 2, currentBid: 140 }],
+        ['an open auction with no bids', { bidCount: 0 }],
+        ['a fixed-price listing', { saleType: 'fixed', price: 40 }],
+    ])('deletes %s', async (_label, overrides) => {
+        Auction.findById.mockReturnValue(mockQuery(liveAuction(overrides)));
+
+        const res = mockResponse();
+        await auctionController.deleteAuction(deleteRequest(), res);
+
+        expect(deleteListings).toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/auction');
+    });
 });
