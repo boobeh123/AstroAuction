@@ -41,7 +41,7 @@ On multipart forms, multer must come before the validators, because multer is wh
 **server.js** sets up, in order:
 1. dotenv, then `trust proxy` (Railway's proxy; secure cookies and per-IP rate limits depend on it)
 2. helmet with an explicit CSP, then morgan
-3. `urlencoded({ extended: false })`, static files, `method-override`
+3. `urlencoded({ extended: false })` (there's no JSON parser), static files, `method-override`
 4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, connect-flash
 5. a locals middleware (`user`, `currentPath` without the query string, flash messages), then one that gives GET requests the spotlighted listing for the banner, cached for 10 s in `services/highlightCache.js`
 6. routes, the 404 page, and `middleware/errorHandler.js`
@@ -51,7 +51,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Forms delete and edit with `method="POST"` plus `?_method=DELETE` or `?_method=PUT` in the action URL; method-override reads the query string.
 - The locals middleware calls `req.flash()` only when `req.session.flash` exists. Calling it every time would give every visitor a session cookie and a database row.
 - `user` is `null` for visitors, so views check it before reading its fields. `app.locals.currentPath` defaults to `''`, so error pages still render when a request fails before the locals middleware.
-- Any outside resource (script, stylesheet, font, image host, iframe) needs the matching CSP directive in server.js. `script-src` is `'self'` only: no inline scripts and no `onclick`-style attributes.
+- Any outside resource (script, stylesheet, font, image host, iframe) needs the matching CSP directive in server.js. `script-src` is `'self'` only: no inline scripts and no `onclick`-style attributes. `style-src` doesn't allow `'unsafe-inline'`: no `style=""` attributes or `<style>` tags. Setting styles from JavaScript is fine.
 
 **Validation.** `middleware/validators.js` holds one express-validator chain per form.
 - Every field starts with `.isString()`, because a form field can arrive as an object or a list.
@@ -68,6 +68,12 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - The auction page shows 24 listings per page, newest first (`?page=N`, checked by `validateListingsPage`). An invalid page number redirects to page 1, and a page past the end shows the last page.
 - When an auction ends, the winner and the seller get each other's email address so they can arrange payment and pickup. It's in the end-of-auction emails, and on the ended listing, where `findAuctionContact` in auctionController shows it to those two only. The bid form tells bidders this up front, and the listing form's auction fields tell sellers.
 - A seller can't delete an open auction that has bids. Once it has ended, deleting is allowed. The listing form's auction fields tell sellers this too, so change both together.
+- Indexes are declared in the models:
+  - listings: newest first, by seller, by top bidder, plus the closer's sweep
+  - comments: by listing
+  - bids: by auction
+
+  Add one when a new query filters or sorts on other fields.
 
 **Accounts.** Passport local strategy with the email as the username.
 - Emails are cleaned with `normalizeEmail`: lowercased, with `+tags` removed for Gmail and similar providers, but Gmail dots kept. Changing it would stop existing accounts from matching.
