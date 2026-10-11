@@ -3,6 +3,7 @@ const Auction = require('../model/Auction');
 const Comment = require('../model/Comment');
 const Bid = require('../model/Bid');
 const cloudinary = require('../config/cloudinary');
+const { clearHighlightCache } = require('./highlightCache');
 
 /**
  * Deletes listings along with everything that belongs to them: their photos
@@ -35,6 +36,9 @@ async function deleteListings(listings) {
     await Comment.deleteMany({ auction: mongoose.trusted({ $in: listingIds }) });
     await Bid.deleteMany({ auction: mongoose.trusted({ $in: listingIds }) });
     await Auction.deleteMany({ _id: mongoose.trusted({ $in: listingIds }) });
+
+    // One of them may have been in the spotlight banner
+    clearHighlightCache();
 }
 
 module.exports = { deleteListings };

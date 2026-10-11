@@ -1053,6 +1053,21 @@ Auction
   /* border: 2px solid red; */
 }
 
+/* Previous / Page X of Y / Next, under the listings */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space4);
+  margin-top: var(--space6);
+}
+
+.pagination-status {
+  color: #B8C5D6;
+  font-size: 0.95rem;
+}
+
 .listing-card {
   border: 1px solid rgba(0, 217, 255, 0.14);
   border-radius: 14px;

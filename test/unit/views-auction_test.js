@@ -24,9 +24,12 @@ const LISTINGS = [
 // onboarding
 const SELLER = { id: '507f1f77bcf86cd799439099', displayName: 'Kai', onboardingComplete: true, emailVerified: true };
 
-function renderPage() {
+function renderPage(overrides = {}) {
     return ejs.renderFile(VIEW, {
         listings: LISTINGS,
+        totalListings: LISTINGS.length,
+        currentPage: 1,
+        pageCount: 1,
         formatMoney,
         isAuctionLive,
         isHighlighted,
@@ -39,8 +42,41 @@ function renderPage() {
         error: [],
         errors: [],
         highlightedListing: null,
+        ...overrides,
     });
 }
+
+describe('pages of listings', () => {
+    test('the count shows every listing, not just this page', async () => {
+        const html = await renderPage({ totalListings: 60, currentPage: 2, pageCount: 3 });
+
+        expect(html).toMatch(/60 total\s+listings/);
+    });
+
+    test('a middle page links to the pages before and after it', async () => {
+        const html = await renderPage({ totalListings: 60, currentPage: 2, pageCount: 3 });
+
+        expect(html).toContain('href="/auction?page=1"');
+        expect(html).toContain('href="/auction?page=3"');
+        expect(html).toContain('Page 2 of 3');
+    });
+
+    test('the first page has no Previous link, and the last page no Next link', async () => {
+        const first = await renderPage({ totalListings: 60, currentPage: 1, pageCount: 3 });
+        const last = await renderPage({ totalListings: 60, currentPage: 3, pageCount: 3 });
+
+        expect(first).not.toContain('rel="prev"');
+        expect(first).toContain('href="/auction?page=2"');
+        expect(last).not.toContain('rel="next"');
+        expect(last).toContain('href="/auction?page=2"');
+    });
+
+    test('a single page has no page links at all', async () => {
+        const html = await renderPage();
+
+        expect(html).not.toContain('class="pagination"');
+    });
+});
 
 // Listings come from .lean() queries, which have _id but no id. Every card
 // used to get id="listing-", so the page repeated the same id.

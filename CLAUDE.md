@@ -43,7 +43,7 @@ On multipart forms, multer must come before the validators, because multer is wh
 2. helmet with an explicit CSP, then morgan
 3. `urlencoded({ extended: false })`, static files, `method-override`
 4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, connect-flash
-5. a locals middleware (`user`, `currentPath`, flash messages), then one that loads the spotlighted listing for the banner
+5. a locals middleware (`user`, `currentPath` without the query string, flash messages), then one that gives GET requests the spotlighted listing for the banner, cached for 10 s in `services/highlightCache.js`
 6. routes, the 404 page, and `middleware/errorHandler.js`
 
 It starts listening only after MongoDB connects, then starts the auction closer.
@@ -64,7 +64,8 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 **Auctions.** One `Auction` model holds both kinds of listing (`saleType: 'fixed' | 'auction'`). Money is a plain Number rounded through `utils/bidding.js` (`round2`, `parseMoney`, `formatMoney`, `minimumNextBid`, `isAuctionLive`). The money limits (`AMOUNT_LIMITS`, `INCREMENT_LIMITS`) live there too. The validators' `moneyField`, the schemas and the listing form's inputs all read them, so change a limit only there.
 - `auctionController.postBid` accepts a bid with a single `findOneAndUpdate`. Its filter holds every rule (open, not ended, high enough), so two simultaneous bids can't both win. `returnDocument: 'before'` gives the outbid user for the email. `Bid` documents are only history.
 - `services/auctionCloser.js` closes an auction by atomically flipping `status` from `'open'` to `'ended'`, so only one caller sends the end-of-auction emails. It runs every 60 s from server start. The detail page also closes an expired auction when someone views it.
-- Spotlight uses `highlightedAt` on the listing. It lasts 12 hours (`utils/highlight.js`), one listing at a time, and only the `auctioneer` and `admin` roles can toggle it.
+- Spotlight uses `highlightedAt` on the listing. It lasts 12 hours (`utils/highlight.js`), one listing at a time, and only the `auctioneer` and `admin` roles can toggle it. The banner caches the spotlighted listing, so anything that changes the spotlight or deletes listings must call `clearHighlightCache()` (`postToggleHighlight` and `deleteListings` already do).
+- The auction page shows 24 listings per page, newest first (`?page=N`, checked by `validateListingsPage`). An invalid page number redirects to page 1, and a page past the end shows the last page.
 
 **Accounts.** Passport local strategy with the email as the username.
 - Emails are cleaned with `normalizeEmail`: lowercased, with `+tags` removed for Gmail and similar providers, but Gmail dots kept. Changing it would stop existing accounts from matching.

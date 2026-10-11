@@ -89,6 +89,7 @@ function mockQuery(result) {
         lean: jest.fn(() => query),
         select: jest.fn(() => query),
         sort: jest.fn(() => query),
+        skip: jest.fn(() => query),
         limit: jest.fn(() => query),
         then: (resolve, reject) => Promise.resolve(result).then(resolve, reject),
         catch: (reject) => Promise.resolve(result).catch(reject),

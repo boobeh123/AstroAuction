@@ -5,13 +5,15 @@ jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
 jest.mock('../../services/listingCleanup');
+jest.mock('../../services/highlightCache');
 
 const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
 const { deleteListings } = require('../../services/listingCleanup');
+const { clearHighlightCache } = require('../../services/highlightCache');
 const auctionController = require('../../controller/auctionController');
-const { validateBid, validateComment } = require('../../middleware/validators');
+const { validateBid, validateComment, validateListingsPage } = require('../../middleware/validators');
 const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
 
 const LOT_ID = '507f1f77bcf86cd799439011';
@@ -60,6 +62,57 @@ beforeEach(() => {
     jest.clearAllMocks();
     sendOutbidEmail.mockResolvedValue(undefined);
     Bid.create.mockResolvedValue({});
+});
+
+describe('getAuction — one page of listings at a time', () => {
+    // 24 listings per page, newest first
+    async function showPage(query = {}, total = 30) {
+        const listingsQuery = mockQuery([]);
+        Auction.countDocuments.mockResolvedValue(total);
+        Auction.find.mockReturnValue(listingsQuery);
+
+        const req = mockRequest({ query });
+        const res = mockResponse();
+        await runValidators(validateListingsPage, req);
+        await auctionController.getAuction(req, res);
+
+        return { res, listingsQuery };
+    }
+
+    test('starts at the first page', async () => {
+        const { res, listingsQuery } = await showPage();
+
+        expect(listingsQuery.skip).toHaveBeenCalledWith(0);
+        expect(listingsQuery.limit).toHaveBeenCalledWith(24);
+        expect(res.renderedLocals).toMatchObject({ currentPage: 1, pageCount: 2, totalListings: 30 });
+    });
+
+    test('page 2 skips the first 24 listings', async () => {
+        const { res, listingsQuery } = await showPage({ page: '2' });
+
+        expect(listingsQuery.skip).toHaveBeenCalledWith(24);
+        expect(res.renderedLocals.currentPage).toBe(2);
+    });
+
+    test('a page past the end shows the last page', async () => {
+        const { res, listingsQuery } = await showPage({ page: '9' });
+
+        expect(listingsQuery.skip).toHaveBeenCalledWith(24);
+        expect(res.renderedLocals.currentPage).toBe(2);
+    });
+
+    test('with no listings there is still one (empty) page', async () => {
+        const { res } = await showPage({}, 0);
+
+        expect(res.renderedLocals).toMatchObject({ currentPage: 1, pageCount: 1, totalListings: 0 });
+    });
+
+    test.each(['abc', '0', '-1', '1.5'])('a page number of %s goes back to the first page', async (page) => {
+        const { res } = await showPage({ page });
+
+        expect(res.redirectedTo).toBe('/auction');
+        expect(Auction.find).not.toHaveBeenCalled();
+    });
 });
 
 describe('postBid — rejections before any write', () => {
@@ -488,6 +541,16 @@ describe('postToggleHighlight', () => {
 
         expect(res.statusCode).toBe(404);
         expect(Auction.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    // The banner caches its listing for a few seconds. The store owner should
+    // see a spotlight change straight away, not 10 seconds later.
+    test('clears the banner cache', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: null })));
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        expect(clearHighlightCache).toHaveBeenCalled();
     });
 
     test('turning a highlight ON clears every other listing first', async () => {

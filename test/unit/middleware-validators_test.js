@@ -7,6 +7,7 @@ const {
     validateResetPassword,
     validateListing,
     validateBid,
+    validateListingsPage,
 } = require('../../middleware/validators');
 const { mockRequest, runValidators } = require('./helpers-mocks');
 
@@ -165,6 +166,39 @@ describe('validateListing', () => {
             'Choose a valid auction duration.',
             'Enter a valid video link.',
         ]);
+    });
+});
+
+describe('validateListingsPage', () => {
+    // The auction page's ?page= number
+    async function checkPage(page) {
+        const req = mockRequest({ query: page === undefined ? {} : { page } });
+        await runValidators(validateListingsPage, req);
+        return req;
+    }
+
+    test('reads ?page=3 as the number 3', async () => {
+        const req = await checkPage('3');
+
+        expect(formErrors(req).isEmpty()).toBe(true);
+        expect(matchedData(req).page).toBe(3);
+    });
+
+    test('is fine without a page number', async () => {
+        const req = await checkPage(undefined);
+
+        expect(formErrors(req).isEmpty()).toBe(true);
+        expect(matchedData(req).page).toBeUndefined();
+    });
+
+    test.each([
+        ['text', 'abc'],
+        ['zero', '0'],
+        ['a list', ['1', '2']],
+    ])('refuses %s', async (_label, page) => {
+        const req = await checkPage(page);
+
+        expect(formErrors(req).isEmpty()).toBe(false);
     });
 });
 
