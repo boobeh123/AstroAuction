@@ -4,6 +4,7 @@ jest.mock('../../model/User');
 jest.mock('nodemailer');
 
 const nodemailer = require('nodemailer');
+const passport = require('passport');
 const User = require('../../model/User');
 const authController = require('../../controller/authController');
 const {
@@ -115,6 +116,63 @@ describe('new accounts', () => {
         expect(User).toHaveBeenCalledTimes(1);
         expect(User.mock.calls[0][0]).not.toHaveProperty('role');
         expect(User.mock.calls[0][0]).toMatchObject({ email: 'newbidder@example.com', agreeToTerms: true });
+    });
+});
+
+describe('logging in records when the session started', () => {
+    // endStaleSessions compares this time with the account's last password
+    // reset, so every way of logging in has to set it
+    const USER = { id: 'u1', email: 'bidder@example.com' };
+    const GOOD_PASSWORD = { password: 'correct-horse', confirmPassword: 'correct-horse' };
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test('postLogin records the login time, then goes to the home page', async () => {
+        jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => () => callback(null, USER, null));
+        const req = mockRequest({ body: { email: 'bidder@example.com', password: 'correct-horse' } });
+        req.logIn = jest.fn((user, callback) => callback());
+        const res = mockResponse();
+        const before = Date.now();
+
+        await runValidators(validateLogin, req);
+        await authController.postLogin(req, res, jest.fn());
+
+        expect(req.logIn).toHaveBeenCalledWith(USER, expect.any(Function));
+        expect(req.session.loginAt).toBeGreaterThanOrEqual(before);
+        expect(res.redirectedTo).toBe('/');
+    });
+
+    test('postSignup records the login time', async () => {
+        User.findOne.mockResolvedValue(null);
+        const req = mockRequest({
+            body: { email: 'newbidder@example.com', agreeToTerms: 'yes', ...GOOD_PASSWORD },
+        });
+        req.login = jest.fn((user, callback) => callback());
+        const before = Date.now();
+
+        await runValidators(validateSignup, req);
+        await authController.postSignup(req, mockResponse(), jest.fn());
+
+        expect(req.session.loginAt).toBeGreaterThanOrEqual(before);
+    });
+
+    test('postResetPassword records the reset, then a login time after it', async () => {
+        const user = { save: jest.fn().mockResolvedValue() };
+        User.findOne.mockResolvedValue(user);
+        const req = mockRequest({ params: { token: 'abc123' }, body: GOOD_PASSWORD });
+        req.login = jest.fn((loggedInUser, callback) => callback());
+        const res = mockResponse();
+
+        await runValidators(validateResetPassword, req);
+        await authController.postResetPassword(req, res, jest.fn());
+
+        expect(user.passwordChangedAt).toBeInstanceOf(Date);
+        expect(user.save).toHaveBeenCalled();
+        // The session doing the reset has to count as newer than the reset
+        expect(req.session.loginAt).toBeGreaterThanOrEqual(user.passwordChangedAt.getTime());
+        expect(res.redirectedTo).toBe('/');
     });
 });
 

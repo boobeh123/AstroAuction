@@ -173,6 +173,8 @@ describe("the app's own operators still work with the guard on", () => {
         const after = await User.findById(user._id);
         expect(after.password).not.toBe(user.password);
         expect(after.passwordResetToken).toBeUndefined();
+        // endStaleSessions uses this to sign the account out everywhere else
+        expect(after.passwordChangedAt).toBeInstanceOf(Date);
     });
 
     test('highlighting a listing clears the previous highlight', async () => {

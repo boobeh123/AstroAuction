@@ -16,6 +16,7 @@ const authRoutes = require('./routes/authRoutes');
 const onboardRoutes = require('./routes/onboardRoutes');
 const termRoutes = require('./routes/termRoutes');
 const errorHandler = require('./middleware/errorHandler')
+const { endStaleSessions } = require('./middleware/auth')
 const auctionRoutes = require('./routes/auctionRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const tutorialRoutes = require('./routes/tutorialRoutes');
@@ -127,6 +128,8 @@ app.use(
 // Passport middleware
 app.use(passport.initialize())
 app.use(passport.session())
+// Signs out any session that logged in before the account's last password reset
+app.use(endStaleSessions)
 
 app.use(flash());
 

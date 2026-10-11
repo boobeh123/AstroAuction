@@ -27,5 +27,17 @@ module.exports = {
     }
     req.flash('errors', { msg: 'Please verify your email first. You can resend the verification email from your profile.' })
     res.redirect('/profile')
+  },
+  // Runs on every request, right after Passport. A password reset records
+  // passwordChangedAt on the account, and every login records loginAt on its
+  // session. A session that logged in before the last reset is signed out
+  // here, so whoever knew the old password loses access on every other
+  // device. The request carries on as a visitor's.
+  endStaleSessions: function (req, res, next) {
+    const changedAt = req.user && req.user.passwordChangedAt
+    if (!changedAt || (req.session.loginAt || 0) >= changedAt.getTime()) {
+      return next()
+    }
+    req.logout((err) => next(err))
   }
 }

@@ -59,6 +59,7 @@ function mockRequest(overrides = {}) {
         user: null,
         files: undefined,
         file: undefined,
+        session: {},
         flashed,
         ...overrides,
     };
