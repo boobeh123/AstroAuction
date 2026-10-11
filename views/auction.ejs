@@ -34,7 +34,7 @@
                         <span class="listing-live-pill"><span class="listing-live-dot" aria-hidden="true"></span>Live Now</span>
                       <% } %>
                       <% if (listing.images && listing.images.length > 0) { %>
-                        <img class="listing-card-image" src="<%= listing.images[0] %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
+                        <img class="listing-card-image" src="<%= photoUrl(listing.images[0], 'card') %>" alt="<%= listing.title %>" loading="lazy" width="400" height="300">
                       <% } %>
                     </div>
                       <div class="listing-card-body">
