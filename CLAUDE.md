@@ -89,6 +89,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Use escaped `<%= %>` for data; `<%-` is only for `include`.
 - Listing queries use `.lean()`, so results have `_id` but no `.id`.
 - The listing form's category options come from `Auction.CATEGORIES` (passed as `categories`). Users without a photo get `/images/avatarPlaceholder.svg`.
+- Listing photos go through `photoUrl(url, size)` from `utils/photos.js`. It asks Cloudinary for a copy sized for where the photo is shown (`card`, `main`, `thumb`, `full`); anything new that shows a listing photo should use it too.
 - `public/js/main.js` serves every page: selectors at the top, then helpers, then handlers, then event listeners at the bottom. Each feature checks that its elements exist before running.
 
 ## Tests
