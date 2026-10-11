@@ -13,7 +13,9 @@
             <% if (typeof user !== 'undefined' && user && !user.onboardingComplete) { %>
                 <span class="onboard-text">Setting up your account</span>
                 <a href="/onboard" class="btn btn-primary">Setup</a>
-                <a href="/logout" class="btn btn-secondary" aria-label="Log out">Log out</a>
+                <form action="/logout" method="POST" class="logout-form">
+                    <button type="submit" class="btn btn-secondary logout-button">Log out</button>
+                </form>
                 <% } else if (typeof user !== 'undefined' && user) { %>
                     <span class="user-email"><span class="sr-only">Logged in as</span><%= user.displayName %></span>
                     <% if (currentPath === '/profile' || currentPath === '/profile/edit') { %>
@@ -27,7 +29,9 @@
                                     <a href="/auction" class="btn btn-primary">Auctions</a>
                                     <a href="/profile" class="btn btn-primary">Profile</a>
                                     <% } %>
-                                <a href="/logout" class="btn btn-secondary">Log out</a>
+                                <form action="/logout" method="POST" class="logout-form">
+                                    <button type="submit" class="btn btn-secondary logout-button">Log out</button>
+                                </form>
                                 <% } else { %>
                                     <a href="/login" class="btn btn-secondary">Log in</a>
                                     <a href="/signup" class="btn btn-primary">Create account</a>

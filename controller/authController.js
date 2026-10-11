@@ -12,6 +12,13 @@ const hashToken = (token) => crypto.createHash('sha256').update(token).digest('h
 // not something sent in a request. Without it, every link would look expired.
 const notExpired = () => mongoose.trusted({ $gt: Date.now() })
 
+// Records when this session logged in. After a password reset,
+// endStaleSessions in middleware/auth.js signs out every session that logged
+// in before the reset, so every way of logging in has to call this.
+const markLoginTime = (req) => {
+  req.session.loginAt = Date.now()
+}
+
 // Unexpected errors aren't caught here: Express 5 passes anything thrown in
 // these handlers to middleware/errorHandler.js, which logs it and shows the
 // 500 page. The try/catch blocks left are for failures with their own
@@ -70,6 +77,7 @@ module.exports = {
 
       req.login(user, async function(err) {
         if (err) { return next(err); }
+        markLoginTime(req)
 
         try {
           await sendVerificationEmail(user, token);
@@ -99,13 +107,16 @@ module.exports = {
         }
         req.logIn(user, (err) => {
           if (err) { return next(err) }
+          markLoginTime(req)
           req.flash('success', 'Success! You are logged in.')
-          res.redirect(req.session.returnTo || '/')
+          res.redirect('/')
       })
     })(req, res, next)
   },
 
-    getLogout: async (req, res) => {
+    // A POST from the Log out button. As a GET link, any other site could log
+    // people out by pointing an image at /logout.
+    postLogout: async (req, res) => {
       req.logout((err) => {
           if (err) {
               console.error('Logout error:', err);
@@ -255,10 +266,13 @@ module.exports = {
       user.password             = password;
       user.passwordResetToken   = undefined;
       user.passwordResetExpires = undefined;
+      // Signs the account out on every other device (see endStaleSessions)
+      user.passwordChangedAt    = new Date();
       await user.save();
 
       req.login(user, (err) => {
         if (err) return next(err);
+        markLoginTime(req);
         req.flash('success', 'Your password has been reset. Welcome back!');
         res.redirect('/');
       });

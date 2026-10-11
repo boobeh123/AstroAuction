@@ -48,6 +48,11 @@ const UserSchema = new mongoose.Schema({
     passwordResetExpires: {
       type: Date,
     },
+    // Set by a password reset. Sessions that logged in before it get signed
+    // out (see endStaleSessions in middleware/auth.js).
+    passwordChangedAt: {
+      type: Date,
+    },
     role: {
       type: String,
       default: 'user',

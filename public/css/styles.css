@@ -371,6 +371,12 @@ Header
   /* border: 2px solid red; */
 }
 
+/* Log out is a button in a small form. display: contents leaves the form out
+   of the layout, so the button sits in the nav exactly where a link would. */
+.logout-form {
+  display: contents;
+}
+
 /* Hamburger toggle — hidden on desktop, shown only below the mobile breakpoint */
 .nav-toggle {
   display: none;
@@ -3026,7 +3032,8 @@ Media queries
       text-align: center;
     }
 
-    .nav-actions a {
+    .nav-actions a,
+    .nav-actions .logout-button {
       /* border: 2px solid red; */
       font-size: .75rem;
       padding: 7.5px 12px !important;

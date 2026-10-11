@@ -173,6 +173,8 @@ describe("the app's own operators still work with the guard on", () => {
         const after = await User.findById(user._id);
         expect(after.password).not.toBe(user.password);
         expect(after.passwordResetToken).toBeUndefined();
+        // endStaleSessions uses this to sign the account out everywhere else
+        expect(after.passwordChangedAt).toBeInstanceOf(Date);
     });
 
     test('highlighting a listing clears the previous highlight', async () => {
@@ -304,6 +306,42 @@ describe('password hashing', () => {
         });
 
         expect(isMatch).toBe(true);
+    });
+});
+
+describe('the logged-in user that every page receives', () => {
+    // config/passport.js registers its deserializeUser on whatever passport
+    // object it's given, so a stand-in can capture it
+    function captureDeserializer() {
+        let deserialize;
+        require('../../config/passport')({
+            use: () => {},
+            serializeUser: () => {},
+            deserializeUser: (fn) => {
+                deserialize = fn;
+            },
+        });
+        return (id) => new Promise((resolve, reject) => {
+            deserialize(id, (err, user) => (err ? reject(err) : resolve(user)));
+        });
+    }
+
+    test('has no password or token hashes', async () => {
+        const user = await makeUser({
+            verificationToken: hashToken(TOKEN),
+            verificationTokenExpires: Date.now() + ONE_HOUR_MS,
+            passwordResetToken: hashToken(TOKEN),
+            passwordResetExpires: Date.now() + ONE_HOUR_MS,
+        });
+
+        const loaded = await captureDeserializer()(user.id);
+
+        expect(loaded.email).toBe(user.email);
+        expect(loaded.password).toBeUndefined();
+        expect(loaded.verificationToken).toBeUndefined();
+        expect(loaded.passwordResetToken).toBeUndefined();
+        // The Resend verification button's cooldown reads this one
+        expect(loaded.verificationTokenExpires).toBeInstanceOf(Date);
     });
 });
 

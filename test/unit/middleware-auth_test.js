@@ -1,4 +1,4 @@
-const { ensureAuth, ensureAuctioneer, ensureVerified } = require('../../middleware/auth');
+const { ensureAuth, ensureAuctioneer, ensureVerified, endStaleSessions } = require('../../middleware/auth');
 const { mockRequest, mockResponse } = require('./helpers-mocks');
 
 describe('ensureAuth', () => {
@@ -174,5 +174,62 @@ describe('ensureVerified', () => {
 
         expect(() => ensureVerified(req, res, next)).not.toThrow();
         expect(next).not.toHaveBeenCalled();
+    });
+});
+
+describe('endStaleSessions', () => {
+    // A password reset signs the account out everywhere else: whoever had the
+    // old password loses access. The session that did the reset logged in
+    // after the change, so it stays.
+    const CHANGED_AT = new Date('2026-10-10T12:00:00Z');
+
+    function run(user, session = {}) {
+        const req = mockRequest({ user, session });
+        req.logout = jest.fn((callback) => {
+            req.user = null;
+            callback();
+        });
+        const next = jest.fn();
+
+        endStaleSessions(req, mockResponse(), next);
+
+        return { req, next };
+    }
+
+    test('leaves visitors alone', () => {
+        const { req, next } = run(null);
+
+        expect(req.logout).not.toHaveBeenCalled();
+        expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test('leaves accounts whose password has never been reset alone', () => {
+        const { req, next } = run({ id: 'u1' });
+
+        expect(req.logout).not.toHaveBeenCalled();
+        expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test('keeps a session that logged in after the password changed', () => {
+        const { req, next } = run({ id: 'u1', passwordChangedAt: CHANGED_AT }, { loginAt: CHANGED_AT.getTime() + 1000 });
+
+        expect(req.logout).not.toHaveBeenCalled();
+        expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    test('signs out a session that logged in before the password changed', () => {
+        const { req, next } = run({ id: 'u1', passwordChangedAt: CHANGED_AT }, { loginAt: CHANGED_AT.getTime() - 1000 });
+
+        expect(req.logout).toHaveBeenCalledTimes(1);
+        expect(req.user).toBeNull();
+        expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    // Sessions from before this check existed have no login time at all
+    test('signs out an older session that has no login time', () => {
+        const { req, next } = run({ id: 'u1', passwordChangedAt: CHANGED_AT });
+
+        expect(req.logout).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalledTimes(1);
     });
 });
