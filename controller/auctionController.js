@@ -3,6 +3,7 @@ const { matchedData } = require('express-validator')
 const Auction = require('../model/Auction')
 const Comment = require('../model/Comment')
 const Bid = require('../model/Bid')
+const User = require('../model/User')
 const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
@@ -34,6 +35,33 @@ function extractYouTubeId(url) {
     if (typeof url !== 'string') return null;
     const match = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
     return match ? match[1] : null;
+}
+
+// Once an auction has ended, its seller and its winner each see the other's
+// name and email address on the listing page, so they can arrange payment
+// and pickup. Anyone else, and any auction still open, gets null.
+async function findAuctionContact(listing, viewer) {
+    if (!viewer || listing.saleType !== 'auction' || listing.status !== 'ended' || !listing.currentBidder) {
+        return null;
+    }
+
+    const sellerId = listing.user ? listing.user._id.toString() : null;
+    const winnerId = listing.currentBidder.toString();
+    let role;
+    let otherId;
+
+    if (viewer.id === sellerId) {
+        role = 'winner';
+        otherId = winnerId;
+    } else if (viewer.id === winnerId) {
+        role = 'seller';
+        otherId = sellerId;
+    } else {
+        return null;
+    }
+
+    const person = otherId ? await User.findById(otherId).select('displayName email').lean() : null;
+    return { role, person };
 }
 
 // Removes the temp files multer wrote to disk. Called from a finally block so
@@ -245,6 +273,7 @@ module.exports = {
             bids: bids,
             auctionLive: isAuctionLive(listing),
             minNextBid: minimumNextBid(listing),
+            contact: await findAuctionContact(listing, req.user),
             formatMoney: formatMoney,
             photoUrl: photoUrl,
             amountLimits: AMOUNT_LIMITS,

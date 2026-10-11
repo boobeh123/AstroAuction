@@ -19,6 +19,8 @@ const HOSTILE_TITLE = '<a href="https://phish.example">Claim your refund</a>';
 const HOSTILE_NAME = '<img src="https://phish.example/pixel.gif">Kai';
 
 const recipient = { email: 'bidder@example.com' };
+const seller = { displayName: 'Lani', email: 'lani@example.com' };
+const winner = { displayName: 'Kai', email: 'kai@example.com' };
 const hostileListing = {
     _id: '507f1f77bcf86cd799439011',
     title: HOSTILE_TITLE,
@@ -41,8 +43,8 @@ function sentMessage() {
 describe('listing titles are escaped in email HTML', () => {
     test.each([
         ['outbid', () => sendOutbidEmail(recipient, hostileListing, 130)],
-        ['auction won', () => sendAuctionWonEmail(recipient, hostileListing)],
-        ['auction ended', () => sendAuctionEndedSellerEmail(recipient, hostileListing, 'Kai')],
+        ['auction won', () => sendAuctionWonEmail(recipient, hostileListing, seller)],
+        ['auction ended', () => sendAuctionEndedSellerEmail(recipient, hostileListing, winner)],
     ])('the %s email shows the title as text, not as a link', async (_name, send) => {
         await send();
 
@@ -57,12 +59,62 @@ describe('display names are escaped in email HTML', () => {
         await sendAuctionEndedSellerEmail(
             recipient,
             { ...hostileListing, title: 'Vintage lamp' },
-            HOSTILE_NAME
+            { ...winner, displayName: HOSTILE_NAME }
         );
 
         const { html } = sentMessage();
         expect(html).not.toContain('<img');
         expect(html).toContain('&lt;img src=&quot;');
+    });
+});
+
+describe('the winner and the seller can reach each other', () => {
+    // The won email used to say "The seller can see your details", but the
+    // seller only ever got the winner's display name
+    test("the winner's email has the seller's name and a link to their address", async () => {
+        await sendAuctionWonEmail(winner, hostileListing, seller);
+
+        const { html } = sentMessage();
+        expect(html).toContain('Contact the seller, <strong>Lani</strong>,');
+        expect(html).toContain('<a href="mailto:lani@example.com">lani@example.com</a>');
+        expect(html).not.toContain('can see your details');
+    });
+
+    test("the seller's email has the winner's name and a link to their address", async () => {
+        await sendAuctionEndedSellerEmail(seller, hostileListing, winner);
+
+        const { html } = sentMessage();
+        expect(html).toContain('by <strong>Kai</strong>');
+        expect(html).toContain('Contact the winner, <strong>Kai</strong>,');
+        expect(html).toContain('<a href="mailto:kai@example.com">kai@example.com</a>');
+    });
+
+    // An account that never finished setup has no display name yet
+    test('leaves the name out when there is none', async () => {
+        await sendAuctionWonEmail(winner, hostileListing, { displayName: '', email: 'lani@example.com' });
+
+        expect(sentMessage().html).toContain('Contact the seller at <a href="mailto:lani@example.com">');
+    });
+
+    // Bidding needs a verified email but not a finished profile. The seller's
+    // email used to decide "sold" or "no bids" from the winner's name, so a
+    // winner without one left the seller thinking nobody had bid.
+    test("the seller's email still reports the sale when the winner has no name", async () => {
+        await sendAuctionEndedSellerEmail(seller, hostileListing, { displayName: '', email: 'kai@example.com' });
+
+        const { html } = sentMessage();
+        expect(html).toContain('Winning bid:');
+        expect(html).not.toContain('by <strong>');
+        expect(html).toContain('Contact the winner at <a href="mailto:kai@example.com">');
+        expect(html).not.toContain('without any bids');
+    });
+
+    test('says so when the other account no longer exists', async () => {
+        await sendAuctionWonEmail(winner, hostileListing, null);
+
+        const { html } = sentMessage();
+        expect(html).toContain("The seller's account no longer exists");
+        expect(html).not.toContain('mailto:');
     });
 });
 
@@ -139,7 +191,7 @@ describe('sender', () => {
         ['verification', () => sendVerificationEmail(recipient, 'token')],
         ['password reset', () => sendPasswordResetEmail(recipient, 'token')],
         ['outbid', () => sendOutbidEmail(recipient, hostileListing, 130)],
-        ['auction won', () => sendAuctionWonEmail(recipient, hostileListing)],
+        ['auction won', () => sendAuctionWonEmail(recipient, hostileListing, seller)],
         ['auction ended', () => sendAuctionEndedSellerEmail(recipient, hostileListing, null)],
     ])('the %s email comes from "Astro Auction"', async (_name, send) => {
         process.env.EMAIL_NAME = 'astroauction@example.com';

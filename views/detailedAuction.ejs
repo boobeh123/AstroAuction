@@ -114,6 +114,7 @@
                           <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" max="<%= amountLimits.max %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
                         </div>
                         <small class="bid-minimum">Minimum bid: <%= formatMoney(minNextBid) %></small>
+                        <small class="bid-privacy">If you win, the seller gets your email address so you can arrange payment and pickup, and you get theirs.</small>
                         <button type="submit" class="btn btn-primary bid-submit">Place Bid</button>
                       </form>
                     <% } %>
@@ -125,6 +126,15 @@
                     <span class="bid-ended-badge">Auction ended</span>
                     <% if (listing.bidCount > 0) { %>
                       <p class="bid-ended-text">Won with a bid of <strong><%= formatMoney(listing.currentBid) %></strong>.</p>
+                      <% if (contact) { %>
+                        <p class="bid-contact">
+                          <% if (contact.person) { %>
+                            Contact the <%= contact.role %><%= contact.person.displayName ? `, ${contact.person.displayName},` : '' %> at <a href="mailto:<%= contact.person.email %>"><%= contact.person.email %></a> to arrange payment and pickup.
+                          <% } else { %>
+                            The <%= contact.role %>'s account no longer exists.
+                          <% } %>
+                        </p>
+                      <% } %>
                     <% } else { %>
                       <p class="bid-ended-text">This auction closed without any bids.</p>
                     <% } %>

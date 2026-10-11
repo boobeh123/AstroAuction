@@ -81,13 +81,17 @@ describe('closeAuctionIfDue', () => {
 
         await closeAuctionIfDue('lot1');
 
+        // Each email carries the other person, so the winner and the seller
+        // get each other's contact details
         expect(sendAuctionWonEmail).toHaveBeenCalledTimes(1);
-        expect(sendAuctionWonEmail.mock.calls[0][0]).toBe(winner);
+        const [winnerArg, , sellerContact] = sendAuctionWonEmail.mock.calls[0];
+        expect(winnerArg).toBe(winner);
+        expect(sellerContact).toBe(seller);
 
         expect(sendAuctionEndedSellerEmail).toHaveBeenCalledTimes(1);
-        const [sellerArg, , winnerName] = sendAuctionEndedSellerEmail.mock.calls[0];
+        const [sellerArg, , winnerContact] = sendAuctionEndedSellerEmail.mock.calls[0];
         expect(sellerArg).toBe(seller);
-        expect(winnerName).toBe('Winner');
+        expect(winnerContact).toBe(winner);
     });
 
     test('emails only the seller when the auction ended with no bids', async () => {
@@ -100,10 +104,10 @@ describe('closeAuctionIfDue', () => {
         expect(sendAuctionWonEmail).not.toHaveBeenCalled();
         expect(sendAuctionEndedSellerEmail).toHaveBeenCalledTimes(1);
 
-        // A null winner name is what tells the template to render the
+        // A null winner is what tells the template to render the
         // "no bids, consider relisting" copy instead of a sale confirmation.
-        const [, , winnerName] = sendAuctionEndedSellerEmail.mock.calls[0];
-        expect(winnerName).toBeNull();
+        const [, , winnerContact] = sendAuctionEndedSellerEmail.mock.calls[0];
+        expect(winnerContact).toBeNull();
     });
 
     test('a failed winner email does not prevent the seller email', async () => {

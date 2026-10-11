@@ -56,6 +56,19 @@ const footnote = (text) => `
   <p style="font-size: 13px; color: #666;">${text}</p>
 `;
 
+// How the winner and the seller reach each other once an auction ends: the
+// other person's name and a link to their email address. The name is left
+// out when there isn't one, since an account that never finished setup has
+// no display name yet.
+const contactLine = (person, role) => {
+  if (!person || !person.email) {
+    return `<p>The ${role}'s account no longer exists, so we can't share their contact details.</p>`;
+  }
+  const name = person.displayName ? `, <strong>${escapeHtml(person.displayName)}</strong>,` : '';
+  const email = escapeHtml(person.email);
+  return `<p>Contact the ${role}${name} at <a href="mailto:${email}">${email}</a> to arrange payment and pickup.</p>`;
+};
+
 const sendOutbidEmail = async (user, listing, newAmount) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
@@ -73,7 +86,8 @@ const sendOutbidEmail = async (user, listing, newAmount) => {
   });
 };
 
-const sendAuctionWonEmail = async (user, listing) => {
+// Sent to the winner, with the seller's contact details
+const sendAuctionWonEmail = async (user, listing, seller) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
 
@@ -84,19 +98,21 @@ const sendAuctionWonEmail = async (user, listing) => {
     html: shell('You won!', `
       <p>Congratulations — you had the winning bid on <strong>${escapeHtml(listing.title)}</strong>.</p>
       <p>Winning bid: <strong>${money(listing.currentBid)}</strong></p>
-      <p>The seller can see your details and should be in touch to arrange payment and pickup.</p>
+      ${contactLine(seller, 'seller')}
       ${button(url, 'View listing')}
     `),
   });
 };
 
-const sendAuctionEndedSellerEmail = async (user, listing, winnerName) => {
+// Sent to the seller, with the winner's contact details when there is one
+const sendAuctionEndedSellerEmail = async (user, listing, winner) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
 
-  const outcome = winnerName
-    ? `<p>Winning bid: <strong>${money(listing.currentBid)}</strong> by <strong>${escapeHtml(winnerName)}</strong>.</p>
-       <p>Reach out to arrange payment and pickup.</p>`
+  const winnerName = winner && winner.displayName ? ` by <strong>${escapeHtml(winner.displayName)}</strong>` : '';
+  const outcome = winner
+    ? `<p>Winning bid: <strong>${money(listing.currentBid)}</strong>${winnerName}.</p>
+       ${contactLine(winner, 'winner')}`
     : `<p>This auction ended without any bids.</p>
        <p>You may want to relist it at a lower starting price.</p>`;
 

@@ -66,6 +66,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - `services/auctionCloser.js` closes an auction by atomically flipping `status` from `'open'` to `'ended'`, so only one caller sends the end-of-auction emails. It runs every 60 s from server start. The detail page also closes an expired auction when someone views it.
 - Spotlight uses `highlightedAt` on the listing. It lasts 12 hours (`utils/highlight.js`), one listing at a time, and only the `auctioneer` and `admin` roles can toggle it. The banner caches the spotlighted listing, so anything that changes the spotlight or deletes listings must call `clearHighlightCache()` (`postToggleHighlight` and `deleteListings` already do).
 - The auction page shows 24 listings per page, newest first (`?page=N`, checked by `validateListingsPage`). An invalid page number redirects to page 1, and a page past the end shows the last page.
+- When an auction ends, the winner and the seller get each other's email address so they can arrange payment and pickup. It's in the end-of-auction emails, and on the ended listing, where `findAuctionContact` in auctionController shows it to those two only. The bid form tells bidders this up front.
 
 **Accounts.** Passport local strategy with the email as the username.
 - Emails are cleaned with `normalizeEmail`: lowercased, with `+tags` removed for Gmail and similar providers, but Gmail dots kept. Changing it would stop existing accounts from matching.
