@@ -107,4 +107,12 @@ describe('the bid form on a live auction', () => {
         expect(html).toContain('class="bid-form"');
         expect(html).toContain('max="100000"');
     });
+
+    // The server refuses their bid anyway. This tells them why before they try.
+    test('an unverified user is asked to verify their email instead', async () => {
+        const html = await renderAuctionFor(false);
+
+        expect(html).not.toContain('class="bid-form"');
+        expect(html).toContain('Verify your email to bid');
+    });
 });

@@ -104,6 +104,8 @@
                   <% if (typeof user !== 'undefined' && user) { %>
                     <% if (listing.user && listing.user._id.toString() === user.id) { %>
                       <p class="bid-notice">This is your listing, so you can't bid on it.</p>
+                    <% } else if (!user.emailVerified) { %>
+                      <p class="bid-notice">Verify your email to bid. You can resend the verification email from your <a href="/profile">profile</a>.</p>
                     <% } else { %>
                       <form action="/auction/postBid/<%= listing._id %>" method="POST" class="bid-form">
                         <label for="bid-amount">Your bid</label>
