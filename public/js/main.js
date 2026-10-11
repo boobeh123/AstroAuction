@@ -569,8 +569,12 @@ function initHeroParticles() {
 }
 
 // Confirmation before delete - profileController.deleteProfile & auctionController.deleteAuction
+// A form can give its own warning in data-confirm. The account form does,
+// because deleting an account deletes its listings too.
 function handleDeleteConfirm(event) {
-  const confirmed = confirm('Are you sure you want to permanently DELETE this?\n' + 'This action cannot be UNDONE.');
+  const message = event.currentTarget.dataset.confirm
+    || 'Are you sure you want to permanently DELETE this?\n' + 'This action cannot be UNDONE.';
+  const confirmed = confirm(message);
 
   if (!confirmed) {
     event.preventDefault();

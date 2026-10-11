@@ -4,10 +4,12 @@ jest.mock('../../model/Bid');
 jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
+jest.mock('../../services/listingCleanup');
 
 const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
+const { deleteListings } = require('../../services/listingCleanup');
 const auctionController = require('../../controller/auctionController');
 const { validateBid, validateComment } = require('../../middleware/validators');
 const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
@@ -581,5 +583,56 @@ describe('postToggleHighlight', () => {
         await expect(auctionController.postToggleHighlight(highlightRequest(), res)).rejects.toThrow('connection lost');
 
         expect(res.render).not.toHaveBeenCalled();
+    });
+});
+
+describe('deleteAuction', () => {
+    function deleteRequest(userId = SELLER_ID, id = LOT_ID) {
+        return mockRequest({ params: { id }, user: { id: userId } });
+    }
+
+    beforeEach(() => {
+        deleteListings.mockResolvedValue();
+        jest.spyOn(console, 'log').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        console.log.mockRestore();
+    });
+
+    test("deletes the seller's own listing, with its photos, comments and bids", async () => {
+        const lot = liveAuction({ cloudinaryIds: ['lamp-1'] });
+        Auction.findById.mockReturnValue(mockQuery(lot));
+
+        const res = mockResponse();
+        await auctionController.deleteAuction(deleteRequest(), res);
+
+        expect(deleteListings).toHaveBeenCalledWith([lot]);
+        expect(res.redirectedTo).toBe('/auction');
+    });
+
+    // The 403 page explains the refusal. The flash message it used to set as
+    // well only showed up later, on whatever page the user opened next.
+    test("refuses someone else's listing with the 403 page alone", async () => {
+        Auction.findById.mockReturnValue(mockQuery(liveAuction()));
+
+        const req = deleteRequest(RIVAL_ID);
+        const res = mockResponse();
+        await auctionController.deleteAuction(req, res);
+
+        expect(res.statusCode).toBe(403);
+        expect(res.rendered).toBe('errors/403.ejs');
+        expect(req.flash).not.toHaveBeenCalled();
+        expect(deleteListings).not.toHaveBeenCalled();
+    });
+
+    test('answers a listing that no longer exists with a 404', async () => {
+        Auction.findById.mockReturnValue(mockQuery(null));
+
+        const res = mockResponse();
+        await auctionController.deleteAuction(deleteRequest(), res);
+
+        expect(res.statusCode).toBe(404);
+        expect(deleteListings).not.toHaveBeenCalled();
     });
 });
