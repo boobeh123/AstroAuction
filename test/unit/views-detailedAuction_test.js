@@ -83,6 +83,12 @@ describe('comments from deleted accounts', () => {
     });
 });
 
+test("the page title is the listing's title", async () => {
+    const html = await renderListingPage([]);
+
+    expect(html).toContain('<title>Vintage lamp | Astro Auction</title>');
+});
+
 describe('photo thumbnails', () => {
     // The first thumbnail is marked as the photo on show. The attribute used
     // to come out escaped, as aria-current=&#34;true&#34;, which isn't valid.
