@@ -1,7 +1,6 @@
 require('dotenv').config({ path: './config/.env' })
 
 const express = require('express');
-const mongoose = require('mongoose');
 const app = express();
 const helmet = require('helmet');
 const logger = require('morgan');
@@ -21,8 +20,7 @@ const auctionRoutes = require('./routes/auctionRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const tutorialRoutes = require('./routes/tutorialRoutes');
 const { startAuctionCloser } = require('./services/auctionCloser');
-const Auction = require('./model/Auction');
-const { isHighlighted } = require('./utils/highlight');
+const { getHighlightedListing } = require('./services/highlightCache');
 const { formatMoney } = require('./utils/bidding');
 
 // Passport config
@@ -151,19 +149,19 @@ app.use((req, res, next) => {
   next()
 })
 
+// The spotlight banner at the top of most pages. Only pages show it, and
+// pages are GET requests: form posts redirect, and the error pages they
+// sometimes render manage without it. The listing is cached for 10 seconds
+// in services/highlightCache.js instead of being looked up every request.
 app.use(async (req, res, next) => {
+  res.locals.formatMoney = formatMoney
+  if (req.method !== 'GET') return next()
+
   try {
-    // trusted(): this $ne is the app's own, so the sanitizeFilter guard in
-    // config/database.js lets it through
-    const candidate = await Auction.findOne({ highlightedAt: mongoose.trusted({ $ne: null }) })
-      .select('title saleType price startingPrice currentBid status endsAt highlightedAt')
-      .lean()
-    res.locals.highlightedListing = candidate && isHighlighted(candidate) ? candidate : null
-    res.locals.formatMoney = formatMoney
+    res.locals.highlightedListing = await getHighlightedListing()
   } catch (err) {
     console.error('Failed to load highlighted listing for banner:', err.message)
     res.locals.highlightedListing = null
-    res.locals.formatMoney = formatMoney
   }
   next()
 })

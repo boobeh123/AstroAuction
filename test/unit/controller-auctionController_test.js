@@ -5,11 +5,13 @@ jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
 jest.mock('../../services/listingCleanup');
+jest.mock('../../services/highlightCache');
 
 const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
 const { sendOutbidEmail } = require('../../config/mailer');
 const { deleteListings } = require('../../services/listingCleanup');
+const { clearHighlightCache } = require('../../services/highlightCache');
 const auctionController = require('../../controller/auctionController');
 const { validateBid, validateComment, validateListingsPage } = require('../../middleware/validators');
 const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
@@ -539,6 +541,16 @@ describe('postToggleHighlight', () => {
 
         expect(res.statusCode).toBe(404);
         expect(Auction.findByIdAndUpdate).not.toHaveBeenCalled();
+    });
+
+    // The banner caches its listing for a few seconds. The store owner should
+    // see a spotlight change straight away, not 10 seconds later.
+    test('clears the banner cache', async () => {
+        Auction.findById.mockReturnValue(mockQuery(listing({ highlightedAt: null })));
+
+        await auctionController.postToggleHighlight(highlightRequest(), mockResponse());
+
+        expect(clearHighlightCache).toHaveBeenCalled();
     });
 
     test('turning a highlight ON clears every other listing first', async () => {

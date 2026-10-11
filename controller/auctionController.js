@@ -7,6 +7,7 @@ const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
 const { deleteListings } = require('../services/listingCleanup');
+const { clearHighlightCache } = require('../services/highlightCache');
 const { sendOutbidEmail } = require('../config/mailer');
 const {
     round2,
@@ -428,6 +429,8 @@ module.exports = {
             await Auction.findByIdAndUpdate(req.params.id, { highlightedAt: new Date() });
         }
 
+        // The banner caches its listing for a few seconds; show the change now
+        clearHighlightCache();
         res.redirect('/auction');
     },
 
