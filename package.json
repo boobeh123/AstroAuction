@@ -2,7 +2,7 @@
   "name": "astroauction",
   "version": "1.0.0",
   "description": "Astro Auction is both a web application to assist with live sale tactics & a static webpage for Lost And Found, a local business in Wahiawa that reuses and repurposes items and offers them at discount.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node --watch server.js",
     "start": "node server.js",

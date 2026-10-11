@@ -15,12 +15,9 @@
  * Tests live flat in test/unit/, prefixed by the layer they cover. The client
  * suite is identified by its `public-` prefix rather than by directory.
  *
- * testMatch covers BOTH naming conventions in this repo —
- * `loginValidation.test.js` (dot) and `utils-bidding_test.js` (underscore).
- * An earlier version of this file matched only the underscore form under
- * __tests__/, which silently excluded loginValidation.test.js: it stopped
- * running without ever reporting a failure, which is the worst way for a test
- * to disappear.
+ * Every suite is named `<layer>-<name>_test.js`. testMatch also accepts the
+ * common `name.test.js` form, so a test named that way still runs instead of
+ * silently being skipped, which is the worst way for a test to disappear.
  */
 module.exports = {
     projects: [
