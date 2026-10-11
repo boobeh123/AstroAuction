@@ -6,11 +6,11 @@
  *
  * Every field starts with .isString(), so an object or a list can't
  * arrive where text belongs. The messages are the ones the forms
- * already showed.
+ * already showed, except that the money fields now name their limits.
  **************************************************************/
 const { body, validationResult } = require('express-validator')
 const { CATEGORIES, SALE_TYPES } = require('../model/Auction')
-const { parseMoney, DURATION_CHOICES } = require('../utils/bidding')
+const { DURATION_CHOICES, AMOUNT_LIMITS, INCREMENT_LIMITS } = require('../utils/bidding')
 
 // Only the message goes into the flash. express-validator's default error
 // objects also carry what was typed, which would store passwords in the
@@ -34,8 +34,23 @@ const matchesPassword = (value, { req }) => value === req.body.password
 
 const TERMS_MESSAGE = 'Please agree to the Terms of Use and Privacy Policy.'
 
-// A positive amount of money, read the same way the bidding code reads it
-const isMoney = (value) => parseMoney(value) !== null
+// "$100,000.00", for the messages below
+const dollars = (value) =>
+  `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+const AMOUNT_RANGE = `from ${dollars(AMOUNT_LIMITS.min)} to ${dollars(AMOUNT_LIMITS.max)}`
+const INCREMENT_RANGE = `from ${dollars(INCREMENT_LIMITS.min)} to ${dollars(INCREMENT_LIMITS.max)}`
+
+// An amount in dollars and cents ("25", "25.5" or "25.50") within the given
+// limits. isDecimal rules out letters, exponents like 1e300 and fractions of
+// a cent; isFloat checks the range. The chain passed in already has any
+// .if() or .optional() the field needs.
+const moneyField = (chain, { min, max }, message) =>
+  chain
+    .isString().withMessage(message).bail()
+    .trim()
+    .isDecimal({ decimal_digits: '0,2' }).withMessage(message).bail()
+    .isFloat({ min, max }).withMessage(message)
 
 // Price fields only apply to one kind of listing, so each is checked only
 // when the form chose that kind
@@ -109,20 +124,14 @@ module.exports = {
     body('saleType')
       .isString().withMessage('Choose fixed price or auction.').bail()
       .isIn(SALE_TYPES).withMessage('Choose fixed price or auction.'),
-    body('price')
-      .if(forFixedPrice)
-      .isString().withMessage('Enter a valid price for your listing.').bail()
-      .custom(isMoney).withMessage('Enter a valid price for your listing.'),
-    body('startingPrice')
-      .if(forAuction)
-      .isString().withMessage('Enter a valid starting price for your auction.').bail()
-      .custom(isMoney).withMessage('Enter a valid starting price for your auction.'),
+    moneyField(body('price').if(forFixedPrice), AMOUNT_LIMITS, `Enter a valid price ${AMOUNT_RANGE}.`),
+    moneyField(body('startingPrice').if(forAuction), AMOUNT_LIMITS, `Enter a valid starting price ${AMOUNT_RANGE}.`),
     // Optional: an empty increment means $1.00, as before
-    body('minIncrement')
-      .if(forAuction)
-      .optional({ values: 'falsy' })
-      .isString().withMessage('Enter a valid minimum bid increment.').bail()
-      .custom(isMoney).withMessage('Enter a valid minimum bid increment.'),
+    moneyField(
+      body('minIncrement').if(forAuction).optional({ values: 'falsy' }),
+      INCREMENT_LIMITS,
+      `Enter a valid minimum bid increment ${INCREMENT_RANGE}.`
+    ),
     body('durationDays')
       .if(forAuction)
       .isString().withMessage('Choose a valid auction duration.').bail()
@@ -136,9 +145,7 @@ module.exports = {
   ],
 
   validateBid: [
-    body('amount')
-      .isString().withMessage('Enter a valid bid amount.').bail()
-      .custom(isMoney).withMessage('Enter a valid bid amount.'),
+    moneyField(body('amount'), AMOUNT_LIMITS, `Enter a valid bid ${AMOUNT_RANGE}.`),
   ],
 
   validateComment: [

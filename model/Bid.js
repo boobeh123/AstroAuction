@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { AMOUNT_LIMITS } = require('../utils/bidding')
 
 // One row per accepted bid. The Auction document holds the *current* winning
 // bid (that's what has to stay atomic); this collection is the history behind
@@ -18,7 +19,8 @@ const BidSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true,
-        min: 0,
+        min: AMOUNT_LIMITS.min,
+        max: AMOUNT_LIMITS.max,
     },
 },
     { timestamps: true }

@@ -109,7 +109,7 @@
                         <label for="bid-amount">Your bid</label>
                         <div class="bid-input-row">
                           <span class="bid-currency">$</span>
-                          <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
+                          <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" max="<%= amountLimits.max %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
                         </div>
                         <small class="bid-minimum">Minimum bid: <%= formatMoney(minNextBid) %></small>
                         <button type="submit" class="btn btn-primary bid-submit">Place Bid</button>

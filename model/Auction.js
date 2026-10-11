@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { AMOUNT_LIMITS, INCREMENT_LIMITS } = require('../utils/bidding')
 
 const CATEGORIES = [
     'Art',
@@ -67,24 +68,30 @@ const AuctionSchema = new mongoose.Schema({
         required: true,
     },
 
+    // The money limits live in utils/bidding.js. The form validators check
+    // them first; these copies are a backstop for anything that skips them.
+
     // --- Fixed-price listings ---
     price: {
         type: Number,
-        min: 0,
+        min: AMOUNT_LIMITS.min,
+        max: AMOUNT_LIMITS.max,
         default: null,
     },
 
     // --- Auction listings ---
     startingPrice: {
         type: Number,
-        min: 0,
+        min: AMOUNT_LIMITS.min,
+        max: AMOUNT_LIMITS.max,
         default: null,
     },
     // Per-listing rather than global: a $5 item shouldn't require the same
     // jump between bids as a $500 one.
     minIncrement: {
         type: Number,
-        min: 0.01,
+        min: INCREMENT_LIMITS.min,
+        max: INCREMENT_LIMITS.max,
         default: 1,
     },
     // null until the first bid lands. The bid filter relies on this being

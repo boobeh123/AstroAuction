@@ -6,6 +6,7 @@ const {
     validateForgotPassword,
     validateResetPassword,
     validateListing,
+    validateBid,
 } = require('../../middleware/validators');
 const { mockRequest, runValidators } = require('./helpers-mocks');
 
@@ -159,10 +160,74 @@ describe('validateListing', () => {
             'Enter a title for your listing.',
             'Descriptions can be up to 2000 characters.',
             'Choose a category.',
-            'Enter a valid starting price for your auction.',
-            'Enter a valid minimum bid increment.',
+            'Enter a valid starting price from $1.00 to $100,000.00.',
+            'Enter a valid minimum bid increment from $0.50 to $1,000.00.',
             'Choose a valid auction duration.',
             'Enter a valid video link.',
         ]);
+    });
+});
+
+describe('money fields', () => {
+    // Prices, starting prices and bids run from $1 to $100,000, in dollars
+    // and cents. The form's number inputs stop most bad values already, but
+    // a request doesn't have to come from the form.
+    const listing = (fields) => ({
+        title: 'Koa wood bowl',
+        description: 'Hand-turned bowl.',
+        category: 'Art',
+        ...fields,
+    });
+
+    const auction = (fields) => listing({ saleType: 'auction', startingPrice: '100', durationDays: '7', ...fields });
+
+    test.each(['1', '25.5', '25.50', '100000'])('accepts %s as a price', async (price) => {
+        const { messages } = await check(validateListing, listing({ saleType: 'fixed', price }));
+
+        expect(messages).toEqual([]);
+    });
+
+    test.each([
+        ['letters after the number', '12abc'],
+        ['an exponent', '1e3'],
+        ['a fraction of a cent', '0.004'],
+        ['less than $1', '0.99'],
+        ['more than $100,000', '100000.01'],
+    ])('refuses %s as a price', async (_label, price) => {
+        const { messages } = await check(validateListing, listing({ saleType: 'fixed', price }));
+
+        expect(messages).toEqual(['Enter a valid price from $1.00 to $100,000.00.']);
+    });
+
+    test('applies the same limits to an auction starting price', async () => {
+        const { messages } = await check(validateListing, auction({ startingPrice: '0.99' }));
+
+        expect(messages).toEqual(['Enter a valid starting price from $1.00 to $100,000.00.']);
+    });
+
+    test.each(['0.50', '1000'])('accepts %s as a minimum bid increment', async (minIncrement) => {
+        const { messages } = await check(validateListing, auction({ minIncrement }));
+
+        expect(messages).toEqual([]);
+    });
+
+    test.each(['0.49', '1000.01'])('refuses %s as a minimum bid increment', async (minIncrement) => {
+        const { messages } = await check(validateListing, auction({ minIncrement }));
+
+        expect(messages).toEqual(['Enter a valid minimum bid increment from $0.50 to $1,000.00.']);
+    });
+
+    test('accepts a bid at the upper limit', async () => {
+        const { messages } = await check(validateBid, { amount: '100000' });
+
+        expect(messages).toEqual([]);
+    });
+
+    // A bid this size used to be accepted. Nobody could outbid it, and it
+    // showed on the listing as "$1e+300".
+    test.each(['1e300', '100000.01', '0.004', '12abc'])('refuses %s as a bid', async (amount) => {
+        const { messages } = await check(validateBid, { amount });
+
+        expect(messages).toEqual(['Enter a valid bid from $1.00 to $100,000.00.']);
     });
 });
