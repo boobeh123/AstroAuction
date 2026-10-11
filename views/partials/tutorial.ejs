@@ -1,4 +1,5 @@
-<% if (typeof user !== 'undefined' && user && user.tutorialStep === 0
+<%# Waits for onboarding: its steps point at the Create Listing button and form, which only exist after setup %>
+<% if (typeof user !== 'undefined' && user && user.tutorialStep === 0 && user.onboardingComplete
       && typeof currentPath !== 'undefined' && currentPath === '/auction') { %>
   <div class="coach-backdrop" id="tutorial-backdrop" aria-hidden="true" hidden></div>
   <div class="coach-highlight" id="tutorial-highlight" aria-hidden="true" hidden></div>
