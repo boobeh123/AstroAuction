@@ -144,7 +144,9 @@ app.use((req, res, next) => {
   res.locals.errors  = readFlash('errors')
   res.locals.error   = readFlash('error')
   res.locals.info    = readFlash('info')
-  res.locals.currentPath = req.originalUrl
+  // The path without the query string, so /auction?page=2 still counts as
+  // the auction page in the navigation, the banner and the tutorial
+  res.locals.currentPath = req.path
   res.locals.user = req.user || null
   next()
 })

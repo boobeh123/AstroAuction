@@ -21,6 +21,9 @@ const {
 const { isHighlighted } = require('../utils/highlight');
 const { formErrors } = require('../middleware/validators');
 
+// How many listings the auction page shows at a time
+const LISTINGS_PER_PAGE = 24;
+
 // Handles youtube.com/watch?v=, youtu.be/, and youtube.com/embed/ links,
 // with or without extra query params (timestamps, playlists, etc).
 // Returns null if the URL doesn't contain a recognizable video ID, so the
@@ -50,9 +53,30 @@ async function cleanupTempUploads(files) {
 module.exports = {
 
     getAuction: async (req, res) => {
-        const listings = await Auction.find({}).sort({ createdAt: -1 }).populate('user', 'image displayName').lean();
+        // A page number that isn't a whole number from 1 up goes back to page 1
+        if (!formErrors(req).isEmpty()) {
+            return res.redirect('/auction');
+        }
+
+        const totalListings = await Auction.countDocuments({});
+        const pageCount = Math.max(1, Math.ceil(totalListings / LISTINGS_PER_PAGE));
+        // A page past the end shows the last page
+        const currentPage = Math.min(matchedData(req).page || 1, pageCount);
+
+        // Newest first. _id breaks ties between listings created in the same
+        // millisecond, so one listing can't show up on two pages.
+        const listings = await Auction.find({})
+            .sort({ createdAt: -1, _id: -1 })
+            .skip((currentPage - 1) * LISTINGS_PER_PAGE)
+            .limit(LISTINGS_PER_PAGE)
+            .populate('user', 'image displayName')
+            .lean();
+
         res.render('auction.ejs', {
             listings: listings,
+            totalListings: totalListings,
+            currentPage: currentPage,
+            pageCount: pageCount,
             formatMoney: formatMoney,
             isAuctionLive: isAuctionLive,
             isHighlighted: isHighlighted,

@@ -8,7 +8,7 @@
  * arrive where text belongs. The messages are the ones the forms
  * already showed, except that the money fields now name their limits.
  **************************************************************/
-const { body, validationResult } = require('express-validator')
+const { body, query, validationResult } = require('express-validator')
 const { CATEGORIES, SALE_TYPES } = require('../model/Auction')
 const { DURATION_CHOICES, AMOUNT_LIMITS, INCREMENT_LIMITS } = require('../utils/bidding')
 
@@ -142,6 +142,16 @@ module.exports = {
       .isString().withMessage('Enter a valid video link.').bail()
       .trim()
       .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Enter a valid video link.'),
+  ],
+
+  // The auction page's ?page= number. getAuction sends anything that isn't a
+  // whole number from 1 up back to the first page.
+  validateListingsPage: [
+    query('page')
+      .optional()
+      .isString().bail()
+      .isInt({ min: 1 })
+      .toInt(),
   ],
 
   validateBid: [

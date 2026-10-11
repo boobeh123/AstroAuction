@@ -12,8 +12,8 @@
             <header class="auction-list-header">
               <h2 class="auction-card-title" id="latestListingsTitle">Latest Listings</h2>
               <p class="auction-list-meta" aria-live="polite" aria-atomic="true">
-                <%= (listings && listings.length) ? listings.length : 0 %> total
-                <%= (listings && listings.length === 1) ? 'listing' : 'listings' %>
+                <%= totalListings %> total
+                <%= totalListings === 1 ? 'listing' : 'listings' %>
               </p>
             </header>
 
@@ -73,6 +73,17 @@
                           </article>
               <% }) %>
               </div>
+              <% if (pageCount > 1) { %>
+                <nav class="pagination" aria-label="Listing pages">
+                  <% if (currentPage > 1) { %>
+                    <a href="/auction?page=<%= currentPage - 1 %>" class="btn btn-secondary" rel="prev">Previous</a>
+                  <% } %>
+                  <span class="pagination-status">Page <%= currentPage %> of <%= pageCount %></span>
+                  <% if (currentPage < pageCount) { %>
+                    <a href="/auction?page=<%= currentPage + 1 %>" class="btn btn-secondary" rel="next">Next</a>
+                  <% } %>
+                </nav>
+              <% } %>
           <% } else { %>
             <div class="auction-empty">
               <h3 class="auction-empty-title">No listings yet</h3>
