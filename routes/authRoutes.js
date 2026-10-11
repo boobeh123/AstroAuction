@@ -15,7 +15,7 @@ router.get('/login', authController.getLogin);
 router.get('/signup', authController.getSignup);
 router.post('/signup', authLimiter, validateSignup, authController.postSignup);
 router.post('/login', loginLimiter, validateLogin, authController.postLogin);
-router.get('/logout', authController.getLogout);
+router.post('/logout', authController.postLogout);
 router.get('/verify/:token', authController.getVerified);
 router.get('/recover', authController.getForgetPassword);
 router.post('/recover', authLimiter, validateForgotPassword, authController.postForgetPassword);

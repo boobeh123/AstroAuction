@@ -105,7 +105,9 @@ module.exports = {
     })(req, res, next)
   },
 
-    getLogout: async (req, res) => {
+    // A POST from the Log out button. As a GET link, any other site could log
+    // people out by pointing an image at /logout.
+    postLogout: async (req, res) => {
       req.logout((err) => {
           if (err) {
               console.error('Logout error:', err);
