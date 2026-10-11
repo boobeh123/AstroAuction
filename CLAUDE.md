@@ -42,7 +42,7 @@ On multipart forms, multer must come before the validators, because multer is wh
 1. dotenv, then `trust proxy` (Railway's proxy; secure cookies and per-IP rate limits depend on it)
 2. helmet with an explicit CSP, then morgan
 3. `urlencoded({ extended: false })`, static files, `method-override`
-4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, connect-flash
+4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, connect-flash
 5. a locals middleware (`user`, `currentPath`, flash messages), then one that loads the spotlighted listing for the banner
 6. routes, the 404 page, and `middleware/errorHandler.js`
 
@@ -72,7 +72,10 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Guards in `middleware/auth.js`: `ensureAuth`, `ensureVerified` (required to create listings and to bid) and `ensureAuctioneer`.
 - Roles are set directly in the database. Older accounts have `role: 'User'`, so don't add an enum to that field.
 - Deleting an account deletes its listings, with their photos, comments and bids, through `services/listingCleanup.js`. Deleting a single listing uses the same helper. Account deletion is refused while the user has an open auction with bids, or is the top bidder on one.
-- `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes.
+- `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes. It also limits per account: 10 comments and 30 bids per 15 minutes.
+- Log out is a POST: a button in a small form in `navigation.ejs`, so other sites can't log users out with a link.
+- A password reset sets `passwordChangedAt` on the account. `endStaleSessions` then signs out any session whose `req.session.loginAt` is older. Anything new that logs a user in must call `markLoginTime(req)` from authController.
+- `deserializeUser` leaves the password and token hashes out of `req.user`. If code needs one of those fields, look the user up instead.
 
 **Uploads and email.**
 - Multer writes JPG/PNG files (10 MB each, 10 at most) to the OS temp dir.
