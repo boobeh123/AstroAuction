@@ -75,7 +75,6 @@ app.use(helmet({
                 "data:",                             // small images built into styles.css
                 "blob:",                             // previews of photos picked in the listing form
                 "https://res.cloudinary.com",        // uploaded listing and profile photos
-                "https://placeholder.pics",          // stand-in avatar for users without a photo
             ],
             connectSrc:     ["'self'"],
             frameSrc:       [

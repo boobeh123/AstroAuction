@@ -8,6 +8,7 @@ const {
     DURATION_CHOICES,
 } = require('../../utils/bidding');
 const { isHighlighted } = require('../../utils/highlight');
+const { CATEGORIES } = require('../../model/Auction');
 
 /**
  * The listings page and its Create Listing form, rendered from the real
@@ -18,6 +19,10 @@ const VIEW = path.join(__dirname, '../../views/auction.ejs');
 const LISTINGS = [
     { _id: '507f1f77bcf86cd799439011', title: 'Koa bowl', category: 'Art', saleType: 'fixed', price: 25, images: [], user: null },
     { _id: '507f1f77bcf86cd799439012', title: 'Brass lamp', category: 'Antiques', saleType: 'fixed', price: 40, images: [], user: null },
+    {
+        _id: '507f1f77bcf86cd799439013', title: 'Rattan chair', category: 'Furniture', saleType: 'fixed', price: 60, images: [],
+        user: { _id: '507f1f77bcf86cd799439098', displayName: 'Lani', image: '' },
+    },
 ];
 
 // The Create Listing form is only on the page for accounts that finished
@@ -34,6 +39,7 @@ function renderPage(overrides = {}) {
         isAuctionLive,
         isHighlighted,
         durationChoices: DURATION_CHOICES,
+        categories: CATEGORIES,
         amountLimits: AMOUNT_LIMITS,
         incrementLimits: INCREMENT_LIMITS,
         user: SELLER,
@@ -111,4 +117,28 @@ test('the two radio groups are fieldsets named by their legends', async () => {
     expect(html).toMatch(/<fieldset class="toggle-fieldset">\s*<legend>Listing type <span class="required">\*<\/span><\/legend>/);
     expect(html).toMatch(/<fieldset class="toggle-fieldset">\s*<legend>Does this listing include a video\?<\/legend>/);
     expect(html).not.toContain('role="group"');
+});
+
+// One list, kept in model/Auction.js, so the form can't offer a category the
+// server refuses
+test('the category options come from the model', async () => {
+    const html = await renderPage();
+
+    const select = html.match(/<select id="modal-category-input"[\s\S]*?<\/select>/)[0];
+    const values = [...select.matchAll(/<option value="([^"]+)"/g)].map(([, value]) => value.replace(/&amp;/g, '&'));
+    expect(values).toEqual(CATEGORIES);
+});
+
+// The same two types the server accepts (middleware/multer.js)
+test('the photo picker only offers JPG and PNG files', async () => {
+    const html = await renderPage();
+
+    expect(html).toMatch(/id="modal-file-input"[^>]*accept="image\/jpeg,image\/png"/);
+});
+
+test('a seller without a photo gets the local placeholder avatar', async () => {
+    const html = await renderPage();
+
+    expect(html).toContain('src="/images/avatarPlaceholder.svg"');
+    expect(html).not.toContain('placeholder.pics');
 });
