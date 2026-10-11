@@ -61,7 +61,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 
 **MongoDB guard.** `config/database.js` turns on Mongoose's `sanitizeFilter`, which neutralizes `$` operators in queries. Every operator the app writes itself must be wrapped, as in `endsAt: mongoose.trusted({ $gt: new Date() })`. A missing wrapper either silently matches nothing or throws a CastError, depending on the field type. Silent failures look like refused bids, auctions that never close, and links that always look expired. `test/unit/integration-database_test.js` runs the real queries against MongoDB to catch this.
 
-**Auctions.** One `Auction` model holds both kinds of listing (`saleType: 'fixed' | 'auction'`). Money is a plain Number rounded through `utils/bidding.js` (`round2`, `parseMoney`, `formatMoney`, `minimumNextBid`, `isAuctionLive`).
+**Auctions.** One `Auction` model holds both kinds of listing (`saleType: 'fixed' | 'auction'`). Money is a plain Number rounded through `utils/bidding.js` (`round2`, `parseMoney`, `formatMoney`, `minimumNextBid`, `isAuctionLive`). The money limits (`AMOUNT_LIMITS`, `INCREMENT_LIMITS`) live there too. The validators' `moneyField`, the schemas and the listing form's inputs all read them, so change a limit only there.
 - `auctionController.postBid` accepts a bid with a single `findOneAndUpdate`. Its filter holds every rule (open, not ended, high enough), so two simultaneous bids can't both win. `returnDocument: 'before'` gives the outbid user for the email. `Bid` documents are only history.
 - `services/auctionCloser.js` closes an auction by atomically flipping `status` from `'open'` to `'ended'`, so only one caller sends the end-of-auction emails. It runs every 60 s from server start. The detail page also closes an expired auction when someone views it.
 - Spotlight uses `highlightedAt` on the listing. It lasts 12 hours (`utils/highlight.js`), one listing at a time, and only the `auctioneer` and `admin` roles can toggle it.
@@ -69,7 +69,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 **Accounts.** Passport local strategy with the email as the username.
 - Emails are cleaned with `normalizeEmail`: lowercased, with `+tags` removed for Gmail and similar providers, but Gmail dots kept. Changing it would stop existing accounts from matching.
 - Verification and reset tokens are random hex. The email carries the token; the database stores its SHA-256 hash, valid for 1 hour.
-- Guards in `middleware/auth.js`: `ensureAuth`, `ensureVerified` (required to create listings) and `ensureAuctioneer`.
+- Guards in `middleware/auth.js`: `ensureAuth`, `ensureVerified` (required to create listings and to bid) and `ensureAuctioneer`.
 - Roles are set directly in the database. Older accounts have `role: 'User'`, so don't add an enum to that field.
 - `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes.
 
