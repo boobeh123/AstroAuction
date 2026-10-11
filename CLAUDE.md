@@ -11,7 +11,7 @@ Two sites for The Lost And Found LLC, a reuse store in Wahiawa, HI:
 
 Both sites redeploy on every merge to `master`. Changes go through a branch and a pull request to `master`, one at a time: start the next branch from `master` after the previous PR has merged, never on top of an open PR.
 
-README.md is mostly Bobby's first-person patch log (newest first); leave it alone unless asked.
+README.md is mostly Bobby's patch log, newest first. It doesn't need updating on every push. After a batch of changes merges, add a Version History entry in the same format as the earlier ones (heading, release date, developer's notes, the 123-dash separator), and update any other section the changes affect.
 
 ## Commands
 
