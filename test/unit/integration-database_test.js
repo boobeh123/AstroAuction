@@ -345,6 +345,27 @@ describe('the logged-in user that every page receives', () => {
     });
 });
 
+describe('indexes', () => {
+    // Mongoose creates these when the app starts. They keep the listing page,
+    // a listing's comments and the account-deletion checks fast as data grows.
+    async function indexKeys(Model) {
+        await Model.syncIndexes();
+        return (await Model.listIndexes()).map((index) => index.key);
+    }
+
+    test("a listing's comments are indexed, oldest first", async () => {
+        expect(await indexKeys(Comment)).toContainEqual({ auction: 1, createdAt: 1 });
+    });
+
+    test('listings are indexed for the newest-first page, and by seller and top bidder', async () => {
+        const keys = await indexKeys(Auction);
+
+        expect(keys).toContainEqual({ createdAt: -1, _id: -1 });
+        expect(keys).toContainEqual({ user: 1 });
+        expect(keys).toContainEqual({ currentBidder: 1 });
+    });
+});
+
 describe('deleting an account', () => {
     // The checks behind this use $gt and $in, which the sanitizeFilter guard
     // would quietly neutralize without mongoose.trusted(). Only a real

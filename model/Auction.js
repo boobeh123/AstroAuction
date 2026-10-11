@@ -130,6 +130,13 @@ const AuctionSchema = new mongoose.Schema({
 // index scan instead of a collection scan as listings accumulate.
 AuctionSchema.index({ saleType: 1, status: 1, endsAt: 1 })
 
+// The auction page lists newest first, with _id breaking ties, one page at a time.
+AuctionSchema.index({ createdAt: -1, _id: -1 })
+
+// Deleting an account looks up its listings, and the auctions it's winning.
+AuctionSchema.index({ user: 1 })
+AuctionSchema.index({ currentBidder: 1 })
+
 const Auction = mongoose.model('Auction', AuctionSchema)
 
 Auction.CATEGORIES = CATEGORIES
