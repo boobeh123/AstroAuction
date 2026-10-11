@@ -309,6 +309,42 @@ describe('password hashing', () => {
     });
 });
 
+describe('the logged-in user that every page receives', () => {
+    // config/passport.js registers its deserializeUser on whatever passport
+    // object it's given, so a stand-in can capture it
+    function captureDeserializer() {
+        let deserialize;
+        require('../../config/passport')({
+            use: () => {},
+            serializeUser: () => {},
+            deserializeUser: (fn) => {
+                deserialize = fn;
+            },
+        });
+        return (id) => new Promise((resolve, reject) => {
+            deserialize(id, (err, user) => (err ? reject(err) : resolve(user)));
+        });
+    }
+
+    test('has no password or token hashes', async () => {
+        const user = await makeUser({
+            verificationToken: hashToken(TOKEN),
+            verificationTokenExpires: Date.now() + ONE_HOUR_MS,
+            passwordResetToken: hashToken(TOKEN),
+            passwordResetExpires: Date.now() + ONE_HOUR_MS,
+        });
+
+        const loaded = await captureDeserializer()(user.id);
+
+        expect(loaded.email).toBe(user.email);
+        expect(loaded.password).toBeUndefined();
+        expect(loaded.verificationToken).toBeUndefined();
+        expect(loaded.passwordResetToken).toBeUndefined();
+        // The Resend verification button's cooldown reads this one
+        expect(loaded.verificationTokenExpires).toBeInstanceOf(Date);
+    });
+});
+
 describe('deleting an account', () => {
     // The checks behind this use $gt and $in, which the sanitizeFilter guard
     // would quietly neutralize without mongoose.trusted(). Only a real

@@ -26,9 +26,12 @@ module.exports = function (passport) {
     done(null, user.id)
   })
 
+  // req.user, which every page also gets as `user`, leaves out the password
+  // and token hashes. verificationTokenExpires stays because the Resend
+  // verification button's cooldown reads it.
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await User.findById(id)
+      const user = await User.findById(id).select('-password -verificationToken -passwordResetToken -passwordResetExpires')
       done(null, user)
     } catch (err) {
       done(err)
