@@ -3,6 +3,9 @@ jest.mock('../../model/Auction');
 jest.mock('../../config/cloudinary');
 jest.mock('../../services/listingCleanup');
 
+const fs = require('fs/promises');
+const os = require('os');
+const path = require('path');
 const User = require('../../model/User');
 const Auction = require('../../model/Auction');
 const cloudinary = require('../../config/cloudinary');
@@ -51,6 +54,92 @@ describe('updateProfile', () => {
         expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
         expect(res.redirectedTo).toBe('/profile/edit');
         expect(req.flashed.errors).toContainEqual({ msg: message });
+    });
+});
+
+describe('uploadProfilePicture', () => {
+    const NEW_PHOTO = { secure_url: 'https://res.cloudinary.com/demo/new.jpg', public_id: 'new-photo' };
+    let tempFile;
+
+    // A real temp file, like the one multer writes, so the tests can check
+    // that it's removed afterwards
+    beforeEach(async () => {
+        tempFile = path.join(os.tmpdir(), `profile-photo-test-${process.pid}-${Date.now()}`);
+        await fs.writeFile(tempFile, 'not really a photo');
+        User.findById.mockReturnValue(mockQuery({ _id: USER_ID, cloudinaryId: 'old-photo' }));
+        cloudinary.uploader.upload.mockResolvedValue(NEW_PHOTO);
+        cloudinary.uploader.destroy.mockResolvedValue({ result: 'ok' });
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(async () => {
+        await fs.rm(tempFile, { force: true });
+    });
+
+    function uploadRequest(file = { path: tempFile }) {
+        return mockRequest({ user: { id: USER_ID }, file });
+    }
+
+    const exists = (file) => fs.access(file).then(() => true, () => false);
+
+    test('saves the new photo, then deletes the old one', async () => {
+        const res = mockResponse();
+        await profileController.uploadProfilePicture(uploadRequest(), res);
+
+        expect(User.findByIdAndUpdate).toHaveBeenCalledWith(USER_ID, {
+            image: NEW_PHOTO.secure_url,
+            cloudinaryId: 'new-photo',
+        });
+        expect(cloudinary.uploader.destroy).toHaveBeenCalledWith('old-photo');
+        // The old photo is deleted only once the new one is saved
+        expect(cloudinary.uploader.destroy.mock.invocationCallOrder[0])
+            .toBeGreaterThan(User.findByIdAndUpdate.mock.invocationCallOrder[0]);
+        expect(res.redirectedTo).toBe('/profile');
+        expect(await exists(tempFile)).toBe(false);
+    });
+
+    // The form requires a file, but a request doesn't have to come from the
+    // form. This used to delete the current photo, then crash with a 500.
+    test('without a file, keeps the current photo and asks for one', async () => {
+        const req = uploadRequest(null);
+        const res = mockResponse();
+        await profileController.uploadProfilePicture(req, res);
+
+        expect(cloudinary.uploader.destroy).not.toHaveBeenCalled();
+        expect(cloudinary.uploader.upload).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe('/profile');
+        expect(req.flashed.errors[0].msg).toMatch(/choose a photo/i);
+    });
+
+    test('when the upload fails, keeps the current photo', async () => {
+        cloudinary.uploader.upload.mockRejectedValue(new Error('Cloudinary is down'));
+
+        await expect(profileController.uploadProfilePicture(uploadRequest(), mockResponse()))
+            .rejects.toThrow('Cloudinary is down');
+
+        expect(cloudinary.uploader.destroy).not.toHaveBeenCalled();
+        expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
+        expect(await exists(tempFile)).toBe(false);
+    });
+
+    // The new photo is already saved by then, so this isn't worth an error page
+    test('logs an old photo that fails to delete, and carries on', async () => {
+        cloudinary.uploader.destroy.mockRejectedValue(new Error('Cloudinary is down'));
+
+        const res = mockResponse();
+        await profileController.uploadProfilePicture(uploadRequest(), res);
+
+        expect(res.redirectedTo).toBe('/profile');
+        expect(console.error).toHaveBeenCalled();
+    });
+
+    test('a first photo has no old one to delete', async () => {
+        User.findById.mockReturnValue(mockQuery({ _id: USER_ID, cloudinaryId: '' }));
+
+        await profileController.uploadProfilePicture(uploadRequest(), mockResponse());
+
+        expect(cloudinary.uploader.destroy).not.toHaveBeenCalled();
+        expect(User.findByIdAndUpdate).toHaveBeenCalled();
     });
 });
 
