@@ -17,14 +17,18 @@ module.exports = {
     },
 
     uploadProfilePicture: async (req, res) => {
+        // The form requires a file, but a request doesn't have to come from the form
+        if (!req.file) {
+            req.flash('errors', { msg: 'Choose a photo to upload first.' })
+            return res.redirect('/profile')
+        }
 
         try {
             const currentUser = await User.findById(req.user.id).lean()
 
-            if (currentUser.cloudinaryId) {
-                await cloudinary.uploader.destroy(currentUser.cloudinaryId)
-            }
-
+            // Replacing a photo deletes the old one, but only after the new one
+            // is uploaded and saved. A failed upload leaves the current photo in
+            // place instead of a broken image.
             const result = await cloudinary.uploader.upload(req.file.path, {
                 use_filename: true,
                 unique_filename: false,
@@ -40,14 +44,19 @@ module.exports = {
                 cloudinaryId: result.public_id
             })
 
+            // The new photo is saved by now, so a failure here is only logged
+            if (currentUser.cloudinaryId && currentUser.cloudinaryId !== result.public_id) {
+                await cloudinary.uploader.destroy(currentUser.cloudinaryId).catch((destroyErr) => {
+                    console.error('Failed to remove old profile picture:', destroyErr.message);
+                });
+            }
+
             console.log('Profile picture added')
             res.redirect('/profile')
         } finally {
-            if (req.file) {
-                await fs.unlink(req.file.path).catch((unlinkErr) => {
-                    console.error('Failed to remove temp upload:', unlinkErr.message);
-                });
-            }
+            await fs.unlink(req.file.path).catch((unlinkErr) => {
+                console.error('Failed to remove temp upload:', unlinkErr.message);
+            });
         }
     },
 
