@@ -20,7 +20,7 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * Guided tutorial for posting a listing
 * Email verification & password reset
 * Server-side validation, rate limiting & secure sessions
-* Auction winners & sellers get each other's contact details
+* Auction winners & sellers can message each other
 
 ## Optimizations
 * Edit/Delete comments
@@ -52,6 +52,23 @@ AstroAuction web app - https://astroauction.up.railway.app/
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 1.1.5
+📅 **Release Date:** October 12th, 2026
+
+## 📢 Developer's Notes - Messages between winners & sellers
+
+- When an auction ends, the winner & the seller message each other on the listing page instead of getting each other's email address
+  - Only those two can see the conversation or post in it
+  - The end-of-auction emails link to the conversation, & no email shares anyone's address
+- An email lets you know when you have a new message
+  - It's sent once until you open the conversation, so a few quick messages don't flood your inbox
+  - Replies to the email don't reach the other person, so it points you back to the listing
+- The bid form & the listing form say how the winner & the seller get in touch
+- Messages are limited to 20 per 15 minutes per account
+- Deleting a listing deletes its messages, & deleting an account deletes every message it sent or received
+- 452/452 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 1.1.4
 📅 **Release Date:** October 12th, 2026
 
