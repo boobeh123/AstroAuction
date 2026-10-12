@@ -10,7 +10,7 @@ const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
 const { deleteListings } = require('../services/listingCleanup');
 const { clearHighlightCache } = require('../services/highlightCache');
-const { sendOutbidEmail } = require('../config/mailer');
+const { sendOutbidEmail, sendNewMessageEmail } = require('../config/mailer');
 const {
     round2,
     parseMoney,
@@ -370,7 +370,7 @@ module.exports = {
             return res.redirect(listingPage);
         }
 
-        const listing = await Auction.findById(req.params.id).select('user saleType status currentBidder').lean();
+        const listing = await Auction.findById(req.params.id).select('title user saleType status currentBidder').lean();
         if (!listing) {
             return res.status(404).render('errors/404.ejs');
         }
@@ -384,10 +384,16 @@ module.exports = {
             return res.status(403).render('errors/403.ejs');
         }
 
-        if (!side.otherId || !(await User.exists({ _id: side.otherId }))) {
+        const recipient = side.otherId ? await User.findById(side.otherId).select('email').lean() : null;
+        if (!recipient) {
             req.flash('errors', { msg: `The ${side.otherRole}'s account no longer exists, so you can't message them.` });
             return res.redirect(listingPage);
         }
+
+        // One alert email per batch of messages: if the recipient still has
+        // an unread one here, they've already been told and will see this
+        // one too when they open the listing
+        const hadUnread = await Message.exists({ auction: req.params.id, recipient: side.otherId, readAt: null });
 
         const { body } = matchedData(req);
 
@@ -397,6 +403,14 @@ module.exports = {
             recipient: side.otherId,
             auction: req.params.id,
         });
+
+        if (!hadUnread) {
+            const senderName = req.user.displayName || `The ${side.otherRole === 'seller' ? 'winner' : 'seller'}`;
+            // A failed email shouldn't lose the message, which is already saved
+            await sendNewMessageEmail(recipient, listing, senderName).catch((mailErr) => {
+                console.error('Failed to send new message email:', mailErr.message);
+            });
+        }
 
         res.redirect(`${listingPage}#messages`);
     },

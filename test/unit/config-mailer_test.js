@@ -5,6 +5,7 @@ const {
     sendOutbidEmail,
     sendAuctionWonEmail,
     sendAuctionEndedSellerEmail,
+    sendNewMessageEmail,
     sendVerificationEmail,
     sendPasswordResetEmail,
 } = require('../../config/mailer');
@@ -115,6 +116,32 @@ describe('the winner and the seller can reach each other', () => {
         const { html } = sentMessage();
         expect(html).toContain("The seller's account no longer exists");
         expect(html).not.toContain('mailto:');
+    });
+});
+
+describe('the new message alert', () => {
+    // Sent when the winner or the seller gets a message on the listing page.
+    // It only says who wrote and where: the message stays on the site, and
+    // nobody's address is in it.
+    test('names the sender and the listing as text, and links to the conversation', async () => {
+        await sendNewMessageEmail(recipient, hostileListing, HOSTILE_NAME);
+
+        const { to, html } = sentMessage();
+        expect(to).toBe('bidder@example.com');
+        expect(html).not.toContain('<img');
+        expect(html).not.toContain('<a href="https://phish.example"');
+        expect(html).toContain('&lt;img src=&quot;');
+        expect(html).toContain(`/auction/viewAuction/${hostileListing._id}#messages`);
+    });
+
+    // A reply would go to the store's inbox, not to the other person
+    test("says replies to the email won't reach the sender, and shares no address", async () => {
+        await sendNewMessageEmail(recipient, hostileListing, 'Kai');
+
+        const { html } = sentMessage();
+        expect(html).toContain("Replies to this email won't reach Kai");
+        expect(html).not.toContain('mailto:');
+        expect(html).not.toContain('@example.com');
     });
 });
 

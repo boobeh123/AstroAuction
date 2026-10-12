@@ -76,6 +76,7 @@ beforeAll(async () => {
     mailer.sendOutbidEmail.mockResolvedValue();
     mailer.sendAuctionWonEmail.mockResolvedValue();
     mailer.sendAuctionEndedSellerEmail.mockResolvedValue();
+    mailer.sendNewMessageEmail.mockResolvedValue();
 }, 60_000);
 
 afterAll(async () => {
@@ -418,6 +419,20 @@ describe('messages between the winner and the seller', () => {
         const saved = await Message.findOne({ auction: lot._id }).lean();
         expect(saved.recipient.toString()).toBe(seller._id.toString());
         expect(saved.readAt).toBeInstanceOf(Date);
+    });
+
+    // The unread check runs on the real database
+    test('a second message before the first is read sends no second email', async () => {
+        const { seller, winner, lot } = await endedSale();
+        mailer.sendNewMessageEmail.mockClear();
+
+        await sendMessage(lot, winner, 'Pickup Saturday?');
+        await sendMessage(lot, winner, 'Cash is fine?');
+        expect(mailer.sendNewMessageEmail).toHaveBeenCalledTimes(1);
+
+        await openListing(lot, seller);
+        await sendMessage(lot, winner, 'See you then.');
+        expect(mailer.sendNewMessageEmail).toHaveBeenCalledTimes(2);
     });
 
     test("opening the listing doesn't mark your own messages as read", async () => {

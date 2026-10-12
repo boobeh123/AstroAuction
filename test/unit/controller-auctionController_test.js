@@ -14,7 +14,7 @@ const Bid = require('../../model/Bid');
 const Comment = require('../../model/Comment');
 const User = require('../../model/User');
 const Message = require('../../model/Message');
-const { sendOutbidEmail } = require('../../config/mailer');
+const { sendOutbidEmail, sendNewMessageEmail } = require('../../config/mailer');
 const { deleteListings } = require('../../services/listingCleanup');
 const { clearHighlightCache } = require('../../services/highlightCache');
 const auctionController = require('../../controller/auctionController');
@@ -684,8 +684,10 @@ describe('postMessage', () => {
 
     beforeEach(() => {
         Auction.findById.mockReturnValue(mockQuery(endedLot()));
-        User.exists.mockResolvedValue({ _id: SELLER_ID });
+        User.findById.mockReturnValue(mockQuery({ _id: SELLER_ID, email: 'seller@example.com' }));
+        Message.exists.mockResolvedValue(null);
         Message.create.mockResolvedValue({});
+        sendNewMessageEmail.mockResolvedValue(undefined);
     });
 
     test('the winner can message the seller', async () => {
@@ -729,7 +731,7 @@ describe('postMessage', () => {
     });
 
     test("refuses when the other person's account is gone", async () => {
-        User.exists.mockResolvedValue(null);
+        User.findById.mockReturnValue(mockQuery(null));
 
         const req = messageRequest('hi');
         const res = mockResponse();
@@ -776,6 +778,48 @@ describe('postMessage', () => {
 
         expect(Message.create).not.toHaveBeenCalled();
         expect(req.flashed.errors[0].msg).toMatch(/1000/);
+    });
+
+    // One email per batch of messages: another only goes out once the
+    // recipient has opened the listing and read the earlier ones
+    test('emails the other person when they had nothing unread', async () => {
+        const req = messageRequest('Pickup Saturday?');
+        req.user.displayName = 'Kai';
+        await postMessage(req, mockResponse());
+
+        expect(Message.exists).toHaveBeenCalledWith({ auction: LOT_ID, recipient: SELLER_ID, readAt: null });
+        expect(sendNewMessageEmail).toHaveBeenCalledTimes(1);
+        const [to, listing, senderName] = sendNewMessageEmail.mock.calls[0];
+        expect(to.email).toBe('seller@example.com');
+        expect(listing._id).toBe(LOT_ID);
+        expect(senderName).toBe('Kai');
+    });
+
+    test('sends no email while an earlier message is still unread', async () => {
+        Message.exists.mockResolvedValue({ _id: 'earlier' });
+
+        await postMessage(messageRequest('Also, cash is fine?'), mockResponse());
+
+        expect(Message.create).toHaveBeenCalled();
+        expect(sendNewMessageEmail).not.toHaveBeenCalled();
+    });
+
+    test('a sender without a display name is named by their role', async () => {
+        await postMessage(messageRequest('Pickup Saturday?'), mockResponse());
+
+        expect(sendNewMessageEmail.mock.calls[0][2]).toBe('The winner');
+    });
+
+    test('a failing email still saves the message', async () => {
+        sendNewMessageEmail.mockRejectedValue(new Error('SMTP unavailable'));
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        const res = mockResponse();
+        await postMessage(messageRequest('Pickup Saturday?'), res);
+
+        expect(Message.create).toHaveBeenCalled();
+        expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}#messages`);
+        console.error.mockRestore();
     });
 });
 

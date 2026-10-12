@@ -128,6 +128,27 @@ const sendAuctionEndedSellerEmail = async (user, listing, winner) => {
   });
 };
 
+// Sent when the winner or the seller of an ended auction gets a message on
+// the listing page, unless an earlier one is still unread. It only says who
+// wrote and where: the message itself stays on the site, and a reply to this
+// email would go to the store's inbox, not to the sender.
+const sendNewMessageEmail = async (user, listing, senderName) => {
+  const transporter = createTransporter();
+  const url = `${listingUrl(listing._id)}#messages`;
+  const name = escapeHtml(senderName);
+
+  await transporter.sendMail({
+    from: sender(),
+    to: user.email,
+    subject: `New message about "${listing.title}"`,
+    html: shell('You have a new message', `
+      <p><strong>${name}</strong> sent you a message about <strong>${escapeHtml(listing.title)}</strong>.</p>
+      ${button(url, 'Read and reply')}
+      ${footnote(`Replies to this email won't reach ${name}. Reply on the listing page instead. We'll email you about their next message once you've read this one.`)}
+    `),
+  });
+};
+
 // Sent at signup, and again when someone presses Resend on their profile.
 const sendVerificationEmail = async (user, token) => {
   const transporter = createTransporter();
@@ -166,6 +187,7 @@ module.exports = {
   sendOutbidEmail,
   sendAuctionWonEmail,
   sendAuctionEndedSellerEmail,
+  sendNewMessageEmail,
   sendVerificationEmail,
   sendPasswordResetEmail,
 };
