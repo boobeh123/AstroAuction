@@ -88,11 +88,14 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 
 **Views and client JS.**
 - Pages are built from `partials/head`, `navigation` (which pulls in the spotlight banner and the first-visit tutorial), `flash` and `footer`. The footer loads `/js/main.js` with `defer`.
+- Each page passes its own title to the head, as in `include('./partials/head.ejs', { pageTitle: 'Log in' })`. Only the home page passes none.
+- The tutorial shows only after onboarding, because its steps point at the Create Listing button and form.
 - Use escaped `<%= %>` for data; `<%-` is only for `include`.
 - Listing queries use `.lean()`, so results have `_id` but no `.id`.
 - The listing form's category options come from `Auction.CATEGORIES` (passed as `categories`). Users without a photo get `/images/avatarPlaceholder.svg`.
 - Listing photos go through `photoUrl(url, size)` from `utils/photos.js`. It asks Cloudinary for a copy sized for where the photo is shown (`card`, `main`, `thumb`, `full`); anything new that shows a listing photo should use it too.
 - `public/js/main.js` serves every page: selectors at the top, then helpers, then handlers, then event listeners at the bottom. Each feature checks that its elements exist before running.
+- While a dialog is open (the Create Listing form, the photo viewer), `setPageInert()` marks the rest of the page `inert`, so keyboard focus stays in the dialog. A new dialog should sit directly inside `<body>` and do the same.
 
 ## Tests
 

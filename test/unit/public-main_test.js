@@ -465,6 +465,84 @@ describe('delete confirmation', () => {
     });
 });
 
+describe('dialogs keep keyboard focus inside them', () => {
+    // While a dialog is open, everything else on the page is inert, so Tab,
+    // clicks and screen readers can't reach what's behind it. The tutorial's
+    // tooltip stays usable: its Next and Skip buttons work while the listing
+    // form is open.
+    function setupPage() {
+        document.body.innerHTML = `
+            <a href="#main-content" class="skip-link">Skip to main content</a>
+            <header><button type="button" id="open-create-listing-btn">+ Create Listing</button></header>
+            <main id="main-content">
+                <button type="button" class="detailed-strip-thumb" data-image-url="/photo.jpg">Photo</button>
+            </main>
+            <div class="coach-tooltip" id="tutorial-tooltip" hidden></div>
+            <div class="modal-overlay" id="create-listing-modal" hidden>
+                <div class="modal-panel">
+                    <button type="button" id="create-listing-modal-close">Close</button>
+                    <input id="modal-title-input">
+                </div>
+            </div>
+            <div class="image-lightbox-overlay" id="image-lightbox" hidden>
+                <button type="button" id="image-lightbox-close">Close</button>
+                <img id="image-lightbox-img" alt="">
+            </div>
+        `;
+        loadMainJs();
+    }
+
+    const inert = (selector) => document.querySelector(selector).hasAttribute('inert');
+    const pressEscape = () => document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+
+    test('opening the listing form makes the page behind it inert', () => {
+        setupPage();
+
+        document.querySelector('#open-create-listing-btn').click();
+
+        expect(inert('.skip-link')).toBe(true);
+        expect(inert('header')).toBe(true);
+        expect(inert('main')).toBe(true);
+        expect(inert('#create-listing-modal')).toBe(false);
+        expect(inert('#tutorial-tooltip')).toBe(false);
+    });
+
+    test('closing the form brings the page back and returns focus to the button', () => {
+        setupPage();
+        const openButton = document.querySelector('#open-create-listing-btn');
+
+        openButton.click();
+        document.querySelector('#create-listing-modal-close').click();
+
+        expect(inert('header')).toBe(false);
+        expect(inert('main')).toBe(false);
+        expect(document.activeElement).toBe(openButton);
+    });
+
+    test('Escape closes the form and brings the page back', () => {
+        setupPage();
+
+        document.querySelector('#open-create-listing-btn').click();
+        pressEscape();
+
+        expect(document.querySelector('#create-listing-modal').hidden).toBe(true);
+        expect(inert('main')).toBe(false);
+    });
+
+    test('the photo viewer works the same way', () => {
+        setupPage();
+        const thumb = document.querySelector('.detailed-strip-thumb');
+
+        thumb.click();
+        expect(inert('main')).toBe(true);
+        expect(inert('#image-lightbox')).toBe(false);
+
+        pressEscape();
+        expect(inert('main')).toBe(false);
+        expect(document.activeElement).toBe(thumb);
+    });
+});
+
 describe('defensive guards', () => {
     // Every page loads this one file. On a page with none of these elements —
     // the login page, say — main.js must do nothing rather than throw, or the
