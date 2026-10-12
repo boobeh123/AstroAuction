@@ -38,33 +38,6 @@ function extractYouTubeId(url) {
     return match ? match[1] : null;
 }
 
-// Once an auction has ended, its seller and its winner each see the other's
-// name and email address on the listing page, so they can arrange payment
-// and pickup. Anyone else, and any auction still open, gets null.
-async function findAuctionContact(listing, viewer) {
-    if (!viewer || listing.saleType !== 'auction' || listing.status !== 'ended' || !listing.currentBidder) {
-        return null;
-    }
-
-    const sellerId = listing.user ? listing.user._id.toString() : null;
-    const winnerId = listing.currentBidder.toString();
-    let role;
-    let otherId;
-
-    if (viewer.id === sellerId) {
-        role = 'winner';
-        otherId = winnerId;
-    } else if (viewer.id === winnerId) {
-        role = 'seller';
-        otherId = sellerId;
-    } else {
-        return null;
-    }
-
-    const person = otherId ? await User.findById(otherId).select('displayName email').lean() : null;
-    return { role, person };
-}
-
 // Which side of a conversation the viewer is on. Only an auction that ended
 // with a winner has one, between its seller and that winner. Returns the
 // other person's id and role, or null for everyone else. Takes the seller's
@@ -321,7 +294,6 @@ module.exports = {
             bids: bids,
             auctionLive: isAuctionLive(listing),
             minNextBid: minimumNextBid(listing),
-            contact: await findAuctionContact(listing, req.user),
             conversation: await openConversation(listing, req.user),
             formatMoney: formatMoney,
             photoUrl: photoUrl,

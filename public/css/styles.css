@@ -1934,8 +1934,8 @@ Bidding
   font-size: 0.75rem;
 }
 
-/* Tells bidders that winning shares their email with the seller */
-.bid-privacy {
+/* Tells bidders how they'll reach the seller if they win */
+.bid-note {
   color: #6B6AAF;
   font-size: 0.75rem;
 }
@@ -1975,7 +1975,7 @@ Bidding
   color: #E8E9F3;
 }
 
-/* After an auction ends, the seller and the winner see each other's email */
+/* After an auction ends, links the seller and the winner to their messages */
 .bid-contact {
   color: #B8C5D6;
   font-size: 0.9rem;

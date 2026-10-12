@@ -56,18 +56,21 @@ const footnote = (text) => `
   <p style="font-size: 13px; color: #666;">${text}</p>
 `;
 
-// How the winner and the seller reach each other once an auction ends: the
-// other person's name and a link to their email address. The name is left
+// How the winner and the seller reach each other once an auction ends: by
+// messaging on the listing page, so no addresses are shared. The name is left
 // out when there isn't one, since an account that never finished setup has
 // no display name yet.
-const contactLine = (person, role) => {
-  if (!person || !person.email) {
-    return `<p>The ${role}'s account no longer exists, so we can't share their contact details.</p>`;
+const messageLine = (person, role) => {
+  if (!person) {
+    return `<p>The ${role}'s account no longer exists, so you can't message them.</p>`;
   }
   const name = person.displayName ? `, <strong>${escapeHtml(person.displayName)}</strong>,` : '';
-  const email = escapeHtml(person.email);
-  return `<p>Contact the ${role}${name} at <a href="mailto:${email}">${email}</a> to arrange payment and pickup.</p>`;
+  return `<p>Message the ${role}${name} on the listing page to arrange payment and pickup.</p>`;
 };
+
+// The conversation when there's someone to message, otherwise the listing
+const messageButton = (person, role, url) =>
+  person ? button(`${url}#messages`, `Message the ${role}`) : button(url, 'View listing');
 
 const sendOutbidEmail = async (user, listing, newAmount) => {
   const transporter = createTransporter();
@@ -86,7 +89,7 @@ const sendOutbidEmail = async (user, listing, newAmount) => {
   });
 };
 
-// Sent to the winner, with the seller's contact details
+// Sent to the winner, pointing them to the conversation with the seller
 const sendAuctionWonEmail = async (user, listing, seller) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
@@ -98,13 +101,14 @@ const sendAuctionWonEmail = async (user, listing, seller) => {
     html: shell('You won!', `
       <p>Congratulations — you had the winning bid on <strong>${escapeHtml(listing.title)}</strong>.</p>
       <p>Winning bid: <strong>${money(listing.currentBid)}</strong></p>
-      ${contactLine(seller, 'seller')}
-      ${button(url, 'View listing')}
+      ${messageLine(seller, 'seller')}
+      ${messageButton(seller, 'seller', url)}
     `),
   });
 };
 
-// Sent to the seller, with the winner's contact details when there is one
+// Sent to the seller, pointing them to the conversation with the winner when
+// there is one
 const sendAuctionEndedSellerEmail = async (user, listing, winner) => {
   const transporter = createTransporter();
   const url = listingUrl(listing._id);
@@ -112,7 +116,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winner) => {
   const winnerName = winner && winner.displayName ? ` by <strong>${escapeHtml(winner.displayName)}</strong>` : '';
   const outcome = winner
     ? `<p>Winning bid: <strong>${money(listing.currentBid)}</strong>${winnerName}.</p>
-       ${contactLine(winner, 'winner')}`
+       ${messageLine(winner, 'winner')}`
     : `<p>This auction ended without any bids.</p>
        <p>You may want to relist it at a lower starting price.</p>`;
 
@@ -123,7 +127,7 @@ const sendAuctionEndedSellerEmail = async (user, listing, winner) => {
     html: shell('Your auction has ended', `
       <p>Bidding has closed on <strong>${escapeHtml(listing.title)}</strong>.</p>
       ${outcome}
-      ${button(url, 'View listing')}
+      ${messageButton(winner, 'winner', url)}
     `),
   });
 };

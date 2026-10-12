@@ -69,32 +69,38 @@ describe('display names are escaped in email HTML', () => {
     });
 });
 
-describe('the winner and the seller can reach each other', () => {
-    // The won email used to say "The seller can see your details", but the
-    // seller only ever got the winner's display name
-    test("the winner's email has the seller's name and a link to their address", async () => {
+describe('the winner and the seller are sent to their conversation', () => {
+    // They message each other on the listing page, so neither email shares
+    // an address. The won email used to say "The seller can see your
+    // details", which was never true.
+    const CONVERSATION = `/auction/viewAuction/${hostileListing._id}#messages`;
+
+    test("the winner's email names the seller and links to the conversation", async () => {
         await sendAuctionWonEmail(winner, hostileListing, seller);
 
         const { html } = sentMessage();
-        expect(html).toContain('Contact the seller, <strong>Lani</strong>,');
-        expect(html).toContain('<a href="mailto:lani@example.com">lani@example.com</a>');
+        expect(html).toContain('Message the seller, <strong>Lani</strong>, on the listing page to arrange payment and pickup.');
+        expect(html).toContain(CONVERSATION);
+        expect(html).not.toContain('lani@example.com');
+        expect(html).not.toContain('mailto:');
         expect(html).not.toContain('can see your details');
     });
 
-    test("the seller's email has the winner's name and a link to their address", async () => {
+    test("the seller's email names the winner and links to the conversation", async () => {
         await sendAuctionEndedSellerEmail(seller, hostileListing, winner);
 
         const { html } = sentMessage();
         expect(html).toContain('by <strong>Kai</strong>');
-        expect(html).toContain('Contact the winner, <strong>Kai</strong>,');
-        expect(html).toContain('<a href="mailto:kai@example.com">kai@example.com</a>');
+        expect(html).toContain('Message the winner, <strong>Kai</strong>, on the listing page');
+        expect(html).toContain(CONVERSATION);
+        expect(html).not.toContain('kai@example.com');
     });
 
     // An account that never finished setup has no display name yet
     test('leaves the name out when there is none', async () => {
         await sendAuctionWonEmail(winner, hostileListing, { displayName: '', email: 'lani@example.com' });
 
-        expect(sentMessage().html).toContain('Contact the seller at <a href="mailto:lani@example.com">');
+        expect(sentMessage().html).toContain('Message the seller on the listing page');
     });
 
     // Bidding needs a verified email but not a finished profile. The seller's
@@ -106,7 +112,7 @@ describe('the winner and the seller can reach each other', () => {
         const { html } = sentMessage();
         expect(html).toContain('Winning bid:');
         expect(html).not.toContain('by <strong>');
-        expect(html).toContain('Contact the winner at <a href="mailto:kai@example.com">');
+        expect(html).toContain('Message the winner on the listing page');
         expect(html).not.toContain('without any bids');
     });
 
@@ -114,10 +120,19 @@ describe('the winner and the seller can reach each other', () => {
         await sendAuctionWonEmail(winner, hostileListing, null);
 
         const { html } = sentMessage();
-        expect(html).toContain("The seller's account no longer exists");
-        expect(html).not.toContain('mailto:');
+        expect(html).toContain("The seller's account no longer exists, so you can't message them.");
+        expect(html).not.toContain('#messages');
+    });
+
+    test('an auction without bids links to the listing, not a conversation', async () => {
+        await sendAuctionEndedSellerEmail(seller, hostileListing, null);
+
+        const { html } = sentMessage();
+        expect(html).toContain('without any bids');
+        expect(html).not.toContain('#messages');
     });
 });
+
 
 describe('the new message alert', () => {
     // Sent when the winner or the seller gets a message on the listing page.
