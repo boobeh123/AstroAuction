@@ -8,10 +8,12 @@ const WINDOW_MS = 15 * 60 * 1000 // 15 minutes
 const FAILED_LOGINS_PER_WINDOW = 10
 const ACCOUNT_REQUESTS_PER_WINDOW = 20
 
-// Comments and bids are counted per account instead, so one person flooding
-// a listing doesn't block everyone else on the store's Wi-Fi. A bidding war
-// near the end of an auction needs room, hence the higher bid limit.
+// Comments, messages and bids are counted per account instead, so one person
+// flooding a listing doesn't block everyone else on the store's Wi-Fi.
+// Arranging a pickup can take some back and forth, and a bidding war near
+// the end of an auction needs room, hence the higher limits.
 const COMMENTS_PER_WINDOW = 10
+const MESSAGES_PER_WINDOW = 20
 const BIDS_PER_WINDOW = 30
 
 // These limiters run after ensureAuth, so there's always a req.user
@@ -45,6 +47,13 @@ module.exports = {
   commentLimiter: rateLimit({
     windowMs: WINDOW_MS,
     limit: COMMENTS_PER_WINDOW,
+    keyGenerator: byAccount,
+    handler: tooManyAttempts,
+  }),
+
+  messageLimiter: rateLimit({
+    windowMs: WINDOW_MS,
+    limit: MESSAGES_PER_WINDOW,
     keyGenerator: byAccount,
     handler: tooManyAttempts,
   }),

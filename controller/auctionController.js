@@ -4,6 +4,7 @@ const Auction = require('../model/Auction')
 const Comment = require('../model/Comment')
 const Bid = require('../model/Bid')
 const User = require('../model/User')
+const Message = require('../model/Message')
 const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { closeAuctionIfDue } = require('../services/auctionCloser');
@@ -62,6 +63,45 @@ async function findAuctionContact(listing, viewer) {
 
     const person = otherId ? await User.findById(otherId).select('displayName email').lean() : null;
     return { role, person };
+}
+
+// Which side of a conversation the viewer is on. Only an auction that ended
+// with a winner has one, between its seller and that winner. Returns the
+// other person's id and role, or null for everyone else. Takes the seller's
+// id as a string, since the listing's user may or may not be populated.
+function findConversationSide(listing, sellerId, viewerId) {
+    if (!viewerId || listing.saleType !== 'auction' || listing.status !== 'ended' || !listing.currentBidder) {
+        return null;
+    }
+
+    const winnerId = listing.currentBidder.toString();
+    if (viewerId === sellerId) return { otherId: winnerId, otherRole: 'winner' };
+    if (viewerId === winnerId) return { otherId: sellerId, otherRole: 'seller' };
+    return null;
+}
+
+// The conversation the listing page shows its seller or its winner: the
+// other person's name (never their email) and the messages, oldest first.
+// Opening it marks the messages sent to the viewer as read, which lets the
+// next message send an alert email again. Anyone else gets null.
+async function openConversation(listing, viewer) {
+    const sellerId = listing.user ? listing.user._id.toString() : null;
+    const side = findConversationSide(listing, sellerId, viewer && viewer.id);
+    if (!side) return null;
+
+    const other = side.otherId ? await User.findById(side.otherId).select('displayName').lean() : null;
+    const messages = await Message.find({ auction: listing._id }).sort({ createdAt: 1 }).lean();
+
+    await Message.updateMany(
+        { auction: listing._id, recipient: viewer.id, readAt: null },
+        { $set: { readAt: new Date() } }
+    );
+
+    return {
+        otherRole: side.otherRole,
+        other: other ? { displayName: other.displayName } : null,
+        messages,
+    };
 }
 
 // Removes the temp files multer wrote to disk. Called from a finally block so
@@ -282,6 +322,7 @@ module.exports = {
             auctionLive: isAuctionLive(listing),
             minNextBid: minimumNextBid(listing),
             contact: await findAuctionContact(listing, req.user),
+            conversation: await openConversation(listing, req.user),
             formatMoney: formatMoney,
             photoUrl: photoUrl,
             amountLimits: AMOUNT_LIMITS,
@@ -314,6 +355,50 @@ module.exports = {
         });
 
         res.redirect(`/auction/viewAuction/${req.params.id}`);
+    },
+
+    postMessage: async (req, res) => {
+        // A listing id that can't exist is a 404, whatever the form says
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).render('errors/404.ejs');
+        }
+
+        const listingPage = `/auction/viewAuction/${req.params.id}`;
+        const errors = formErrors(req);
+        if (!errors.isEmpty()) {
+            req.flash('errors', errors.array());
+            return res.redirect(listingPage);
+        }
+
+        const listing = await Auction.findById(req.params.id).select('user saleType status currentBidder').lean();
+        if (!listing) {
+            return res.status(404).render('errors/404.ejs');
+        }
+
+        // Only the seller and the winner of an ended auction have a
+        // conversation. The form is only on their page, so anyone else
+        // posting here gets the 403 page.
+        const sellerId = listing.user ? listing.user.toString() : null;
+        const side = findConversationSide(listing, sellerId, req.user.id);
+        if (!side) {
+            return res.status(403).render('errors/403.ejs');
+        }
+
+        if (!side.otherId || !(await User.exists({ _id: side.otherId }))) {
+            req.flash('errors', { msg: `The ${side.otherRole}'s account no longer exists, so you can't message them.` });
+            return res.redirect(listingPage);
+        }
+
+        const { body } = matchedData(req);
+
+        await Message.create({
+            body,
+            sender: req.user.id,
+            recipient: side.otherId,
+            auction: req.params.id,
+        });
+
+        res.redirect(`${listingPage}#messages`);
     },
 
     postBid: async (req, res) => {

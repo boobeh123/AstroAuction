@@ -2,6 +2,7 @@ jest.mock('../../model/Auction');
 jest.mock('../../model/Comment');
 jest.mock('../../model/Bid');
 jest.mock('../../model/User');
+jest.mock('../../model/Message');
 jest.mock('../../config/cloudinary');
 jest.mock('../../config/mailer');
 jest.mock('../../services/auctionCloser');
@@ -12,11 +13,12 @@ const Auction = require('../../model/Auction');
 const Bid = require('../../model/Bid');
 const Comment = require('../../model/Comment');
 const User = require('../../model/User');
+const Message = require('../../model/Message');
 const { sendOutbidEmail } = require('../../config/mailer');
 const { deleteListings } = require('../../services/listingCleanup');
 const { clearHighlightCache } = require('../../services/highlightCache');
 const auctionController = require('../../controller/auctionController');
-const { validateBid, validateComment, validateListingsPage } = require('../../middleware/validators');
+const { validateBid, validateComment, validateMessage, validateListingsPage } = require('../../middleware/validators');
 const { mockRequest, mockResponse, mockQuery, runValidators } = require('./helpers-mocks');
 
 const LOT_ID = '507f1f77bcf86cd799439011';
@@ -61,10 +63,17 @@ async function postComment(req, res) {
     return auctionController.postComment(req, res);
 }
 
+async function postMessage(req, res) {
+    await runValidators(validateMessage, req);
+    return auctionController.postMessage(req, res);
+}
+
 beforeEach(() => {
     jest.clearAllMocks();
     sendOutbidEmail.mockResolvedValue(undefined);
     Bid.create.mockResolvedValue({});
+    Message.find.mockReturnValue(mockQuery([]));
+    Message.updateMany.mockResolvedValue({});
 });
 
 describe('getAuction — one page of listings at a time', () => {
@@ -176,6 +185,100 @@ describe('getDetailedAuction — contact details once an auction ends', () => {
         const contact = await viewAs({ id: SELLER_ID }, liveAuction({ user: SELLER, currentBidder: WINNER_ID, bidCount: 1, images: [] }));
 
         expect(contact).toBeNull();
+    });
+});
+
+describe('getDetailedAuction — messages between the winner and the seller', () => {
+    // Once an auction ends, its seller and its winner can message each other
+    // on the listing page. Nobody else's page gets the conversation.
+    const WINNER_ID = BIDDER_ID;
+    const SELLER = { _id: SELLER_ID, displayName: 'Seller', image: '', createdAt: new Date('2026-01-01') };
+    const MESSAGES = [{ body: 'Pickup Saturday?', sender: WINNER_ID, recipient: SELLER_ID, createdAt: new Date() }];
+
+    function endedAuction(overrides = {}) {
+        return liveAuction({
+            status: 'ended',
+            endsAt: new Date(Date.now() - 3_600_000),
+            bidCount: 1,
+            currentBid: 150,
+            currentBidder: WINNER_ID,
+            user: SELLER,
+            images: [],
+            ...overrides,
+        });
+    }
+
+    async function viewAs(viewer, { listing = endedAuction(), other = { displayName: 'Someone', email: 'someone@example.com' } } = {}) {
+        Auction.findById.mockReturnValue(mockQuery(listing));
+        Comment.find.mockReturnValue(mockQuery([]));
+        Bid.find.mockReturnValue(mockQuery([]));
+        User.findById.mockReturnValue(mockQuery(other));
+        Message.find.mockReturnValue(mockQuery(MESSAGES));
+
+        const res = mockResponse();
+        await auctionController.getDetailedAuction(mockRequest({ params: { id: LOT_ID }, user: viewer }), res);
+        return res.renderedLocals.conversation;
+    }
+
+    test('the seller gets the conversation with the winner', async () => {
+        const conversation = await viewAs({ id: SELLER_ID });
+
+        expect(Message.find).toHaveBeenCalledWith({ auction: LOT_ID });
+        expect(conversation).toEqual({ otherRole: 'winner', other: { displayName: 'Someone' }, messages: MESSAGES });
+    });
+
+    test('the winner gets the conversation with the seller', async () => {
+        const conversation = await viewAs({ id: WINNER_ID });
+
+        expect(User.findById).toHaveBeenCalledWith(SELLER_ID);
+        expect(conversation.otherRole).toBe('seller');
+    });
+
+    // Only the name: the conversation never needs the other person's address
+    test("leaves the other person's email address out", async () => {
+        const conversation = await viewAs({ id: WINNER_ID });
+
+        expect(conversation.other).not.toHaveProperty('email');
+    });
+
+    // Reading the conversation is what lets the next message send an alert
+    // email again (see postMessage)
+    test('marks the messages sent to the viewer as read', async () => {
+        await viewAs({ id: WINNER_ID });
+
+        const [filter, update] = Message.updateMany.mock.calls[0];
+        expect(filter).toEqual({ auction: LOT_ID, recipient: WINNER_ID, readAt: null });
+        expect(update.$set.readAt).toBeInstanceOf(Date);
+    });
+
+    test.each([
+        ['another logged-in user', { id: RIVAL_ID }],
+        ['a visitor', null],
+    ])('%s gets no conversation, and nothing is marked read', async (_label, viewer) => {
+        const conversation = await viewAs(viewer);
+
+        expect(conversation).toBeNull();
+        expect(Message.find).not.toHaveBeenCalled();
+        expect(Message.updateMany).not.toHaveBeenCalled();
+    });
+
+    test('an auction that is still open has no conversation yet', async () => {
+        const open = liveAuction({ user: SELLER, currentBidder: WINNER_ID, bidCount: 1, images: [] });
+
+        expect(await viewAs({ id: SELLER_ID }, { listing: open })).toBeNull();
+    });
+
+    test('an auction that ended without bids has no conversation', async () => {
+        const unsold = endedAuction({ bidCount: 0, currentBid: null, currentBidder: null });
+
+        expect(await viewAs({ id: SELLER_ID }, { listing: unsold })).toBeNull();
+    });
+
+    test("says when the other person's account is gone", async () => {
+        const conversation = await viewAs({ id: SELLER_ID }, { other: null });
+
+        expect(conversation.other).toBeNull();
+        expect(conversation.otherRole).toBe('winner');
     });
 });
 
@@ -555,6 +658,124 @@ describe('postComment', () => {
             auction: LOT_ID,
         });
         expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
+    });
+});
+
+describe('postMessage', () => {
+    // The winner and the seller of an ended auction message each other from
+    // the listing page. The form is only on their page, so anyone else
+    // posting here is refused.
+    const WINNER_ID = BIDDER_ID;
+
+    function endedLot(overrides = {}) {
+        return liveAuction({
+            status: 'ended',
+            endsAt: new Date(Date.now() - 3_600_000),
+            bidCount: 1,
+            currentBid: 150,
+            currentBidder: WINNER_ID,
+            ...overrides,
+        });
+    }
+
+    function messageRequest(body, userId = WINNER_ID, id = LOT_ID) {
+        return mockRequest({ params: { id }, body: { body }, user: { id: userId } });
+    }
+
+    beforeEach(() => {
+        Auction.findById.mockReturnValue(mockQuery(endedLot()));
+        User.exists.mockResolvedValue({ _id: SELLER_ID });
+        Message.create.mockResolvedValue({});
+    });
+
+    test('the winner can message the seller', async () => {
+        const res = mockResponse();
+        await postMessage(messageRequest('Pickup Saturday?'), res);
+
+        expect(Message.create).toHaveBeenCalledWith({
+            body: 'Pickup Saturday?',
+            sender: WINNER_ID,
+            recipient: SELLER_ID,
+            auction: LOT_ID,
+        });
+        expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}#messages`);
+    });
+
+    test('the seller can message the winner', async () => {
+        await postMessage(messageRequest('Saturday works.', SELLER_ID), mockResponse());
+
+        expect(Message.create.mock.calls[0][0]).toMatchObject({ sender: SELLER_ID, recipient: WINNER_ID });
+    });
+
+    test('stores the message trimmed', async () => {
+        await postMessage(messageRequest('  Pickup Saturday?  '), mockResponse());
+
+        expect(Message.create.mock.calls[0][0].body).toBe('Pickup Saturday?');
+    });
+
+    test.each([
+        ['another logged-in user', endedLot(), RIVAL_ID],
+        ['the seller of an auction that is still open', liveAuction({ bidCount: 1, currentBid: 120, currentBidder: BIDDER_ID }), SELLER_ID],
+        ['the seller of a fixed-price listing', liveAuction({ saleType: 'fixed', price: 40 }), SELLER_ID],
+    ])('%s gets the 403 page and nothing is saved', async (_label, lot, userId) => {
+        Auction.findById.mockReturnValue(mockQuery(lot));
+
+        const res = mockResponse();
+        await postMessage(messageRequest('hi', userId), res);
+
+        expect(res.statusCode).toBe(403);
+        expect(res.rendered).toBe('errors/403.ejs');
+        expect(Message.create).not.toHaveBeenCalled();
+    });
+
+    test("refuses when the other person's account is gone", async () => {
+        User.exists.mockResolvedValue(null);
+
+        const req = messageRequest('hi');
+        const res = mockResponse();
+        await postMessage(req, res);
+
+        expect(Message.create).not.toHaveBeenCalled();
+        expect(req.flashed.errors).toContainEqual({ msg: "The seller's account no longer exists, so you can't message them." });
+        expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
+    });
+
+    test('404s on a malformed listing id', async () => {
+        const res = mockResponse();
+        await postMessage(messageRequest('hi', WINNER_ID, 'bad'), res);
+
+        expect(res.statusCode).toBe(404);
+        expect(Message.create).not.toHaveBeenCalled();
+    });
+
+    test('404s when the listing does not exist', async () => {
+        Auction.findById.mockReturnValue(mockQuery(null));
+
+        const res = mockResponse();
+        await postMessage(messageRequest('hi'), res);
+
+        expect(res.statusCode).toBe(404);
+        expect(Message.create).not.toHaveBeenCalled();
+    });
+
+    test.each([
+        ['an empty message', ''],
+        ['a whitespace-only message', '  \n '],
+        ['a message that is not text', { $ne: null }],
+    ])('rejects %s', async (_label, body) => {
+        const res = mockResponse();
+        await postMessage(messageRequest(body), res);
+
+        expect(Message.create).not.toHaveBeenCalled();
+        expect(res.redirectedTo).toBe(`/auction/viewAuction/${LOT_ID}`);
+    });
+
+    test('rejects a message over 1000 characters', async () => {
+        const req = messageRequest('x'.repeat(1001));
+        await postMessage(req, mockResponse());
+
+        expect(Message.create).not.toHaveBeenCalled();
+        expect(req.flashed.errors[0].msg).toMatch(/1000/);
     });
 });
 

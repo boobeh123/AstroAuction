@@ -162,6 +162,10 @@ module.exports = {
     requiredText('body', 'Please enter a comment.', 1000, 'Comments cannot be longer than 1000 characters.'),
   ],
 
+  validateMessage: [
+    requiredText('body', 'Please enter a message.', 1000, 'Messages cannot be longer than 1000 characters.'),
+  ],
+
   validateOnboard: [
     displayNameField('displayName'),
   ],
