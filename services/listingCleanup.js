@@ -2,12 +2,13 @@ const mongoose = require('mongoose');
 const Auction = require('../model/Auction');
 const Comment = require('../model/Comment');
 const Bid = require('../model/Bid');
+const Message = require('../model/Message');
 const cloudinary = require('../config/cloudinary');
 const { clearHighlightCache } = require('./highlightCache');
 
 /**
  * Deletes listings along with everything that belongs to them: their photos
- * in Cloudinary, their comments and their bid history.
+ * in Cloudinary, their comments, their messages and their bid history.
  *
  * Takes the listings themselves (each needs _id and cloudinaryIds), so the
  * caller decides which ones: deleting a listing passes one, deleting an
@@ -34,6 +35,7 @@ async function deleteListings(listings) {
     // config/database.js lets it through
     const listingIds = listings.map((listing) => listing._id);
     await Comment.deleteMany({ auction: mongoose.trusted({ $in: listingIds }) });
+    await Message.deleteMany({ auction: mongoose.trusted({ $in: listingIds }) });
     await Bid.deleteMany({ auction: mongoose.trusted({ $in: listingIds }) });
     await Auction.deleteMany({ _id: mongoose.trusted({ $in: listingIds }) });
 

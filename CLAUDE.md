@@ -66,11 +66,15 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - `services/auctionCloser.js` closes an auction by atomically flipping `status` from `'open'` to `'ended'`, so only one caller sends the end-of-auction emails. It runs every 60 s from server start. The detail page also closes an expired auction when someone views it.
 - Spotlight uses `highlightedAt` on the listing. It lasts 12 hours (`utils/highlight.js`), one listing at a time, and only the `auctioneer` and `admin` roles can toggle it. The banner caches the spotlighted listing, so anything that changes the spotlight or deletes listings must call `clearHighlightCache()` (`postToggleHighlight` and `deleteListings` already do).
 - The auction page shows 24 listings per page, newest first (`?page=N`, checked by `validateListingsPage`). An invalid page number redirects to page 1, and a page past the end shows the last page.
-- When an auction ends, the winner and the seller get each other's email address so they can arrange payment and pickup. It's in the end-of-auction emails, and on the ended listing, where `findAuctionContact` in auctionController shows it to those two only. The bid form tells bidders this up front, and the listing form's auction fields tell sellers.
+- When an auction ends with a winner, its seller and winner message each other on the listing page (`model/Message.js`) to arrange payment and pickup. Nobody's email address is shared.
+  - `findConversationSide` in auctionController decides who's in the conversation. `openConversation` gives the listing page the other person's name and the messages, and marks the viewer's as read. `postMessage` refuses anyone else with the 403 page.
+  - A new message emails the recipient (`sendNewMessageEmail`) only if they had nothing unread there, so a burst of messages sends one email. The email holds no message text and no address.
+  - The end-of-auction emails link to the conversation. The bid form tells bidders about messaging up front, and the listing form's auction fields tell sellers.
 - A seller can't delete an open auction that has bids. Once it has ended, deleting is allowed. The listing form's auction fields tell sellers this too, so change both together.
 - Indexes are declared in the models:
   - listings: newest first, by seller, by top bidder, plus the closer's sweep
   - comments: by listing
+  - messages: by listing, by sender, by recipient
   - bids: by auction
 
   Add one when a new query filters or sorts on other fields.
@@ -80,8 +84,8 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Verification and reset tokens are random hex. The email carries the token; the database stores its SHA-256 hash, valid for 1 hour.
 - Guards in `middleware/auth.js`: `ensureAuth`, `ensureVerified` (required to create listings and to bid) and `ensureAuctioneer`.
 - Roles are set directly in the database. Older accounts have `role: 'User'`, so don't add an enum to that field.
-- Deleting an account deletes its listings, with their photos, comments and bids, through `services/listingCleanup.js`. Deleting a single listing uses the same helper. Account deletion is refused while the user has an open auction with bids, or is the top bidder on one.
-- `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes. It also limits per account: 10 comments and 30 bids per 15 minutes.
+- Deleting an account deletes its listings, with their photos, comments, messages and bids, through `services/listingCleanup.js`. Deleting a single listing uses the same helper. It also deletes every message the account sent or received. Account deletion is refused while the user has an open auction with bids, or is the top bidder on one.
+- `middleware/rateLimiters.js` limits per IP: 10 failed logins and 20 account-form requests (the forms that send email) per 15 minutes. It also limits per account: 10 comments, 20 messages and 30 bids per 15 minutes.
 - Log out is a POST: a button in a small form in `navigation.ejs`, so other sites can't log users out with a link.
 - A password reset sets `passwordChangedAt` on the account. `endStaleSessions` then signs out any session whose `req.session.loginAt` is older. Anything new that logs a user in must call `markLoginTime(req)` from authController.
 - `deserializeUser` leaves the password and token hashes out of `req.user`. If code needs one of those fields, look the user up instead.

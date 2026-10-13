@@ -14,11 +14,12 @@ const request = require('supertest');
 let loginLimiter;
 let authLimiter;
 let commentLimiter;
+let messageLimiter;
 let bidLimiter;
 
 beforeEach(() => {
     jest.resetModules();
-    ({ loginLimiter, authLimiter, commentLimiter, bidLimiter } = require('../../middleware/rateLimiters'));
+    ({ loginLimiter, authLimiter, commentLimiter, messageLimiter, bidLimiter } = require('../../middleware/rateLimiters'));
 });
 
 // A one-route app with stand-ins for what Passport and the view engine
@@ -86,7 +87,7 @@ describe('authLimiter', () => {
     });
 });
 
-describe('comments and bids are limited per account', () => {
+describe('comments, messages and bids are limited per account', () => {
     // Everyone at the store shares one IP address, so these count each
     // logged-in account instead. The X-Test-User header picks the account.
     function buildAccountApp(limiter) {
@@ -118,6 +119,17 @@ describe('comments and bids are limited per account', () => {
         expect(allowed.every((response) => response.status === 302)).toBe(true);
         expect(blocked.status).toBe(429);
         expect(blocked.text).toBe('rendered errors/429.ejs');
+    });
+
+    // Arranging a pickup can take some back and forth
+    test('allows 20 messages, then shows the "too many attempts" page', async () => {
+        const app = buildAccountApp(messageLimiter);
+
+        const allowed = await postAs(app, 'lani', 20);
+        const [blocked] = await postAs(app, 'lani', 1);
+
+        expect(allowed.every((response) => response.status === 302)).toBe(true);
+        expect(blocked.status).toBe(429);
     });
 
     // A bidding war near the end of an auction needs room

@@ -114,7 +114,7 @@
                           <input type="number" id="bid-amount" name="amount" min="<%= minNextBid %>" max="<%= amountLimits.max %>" step="0.01" value="<%= minNextBid.toFixed(2) %>" inputmode="decimal" required>
                         </div>
                         <small class="bid-minimum">Minimum bid: <%= formatMoney(minNextBid) %></small>
-                        <small class="bid-privacy">If you win, the seller gets your email address so you can arrange payment and pickup, and you get theirs.</small>
+                        <small class="bid-note">If you win, you and the seller can message each other on this page to arrange payment and pickup.</small>
                         <button type="submit" class="btn btn-primary bid-submit">Place Bid</button>
                       </form>
                     <% } %>
@@ -126,14 +126,8 @@
                     <span class="bid-ended-badge">Auction ended</span>
                     <% if (listing.bidCount > 0) { %>
                       <p class="bid-ended-text">Won with a bid of <strong><%= formatMoney(listing.currentBid) %></strong>.</p>
-                      <% if (contact) { %>
-                        <p class="bid-contact">
-                          <% if (contact.person) { %>
-                            Contact the <%= contact.role %><%= contact.person.displayName ? `, ${contact.person.displayName},` : '' %> at <a href="mailto:<%= contact.person.email %>"><%= contact.person.email %></a> to arrange payment and pickup.
-                          <% } else { %>
-                            The <%= contact.role %>'s account no longer exists.
-                          <% } %>
-                        </p>
+                      <% if (conversation) { %>
+                        <p class="bid-contact"><a href="#messages">Message the <%= conversation.otherRole %></a> to arrange payment and pickup.</p>
                       <% } %>
                     <% } else { %>
                       <p class="bid-ended-text">This auction closed without any bids.</p>
@@ -141,6 +135,41 @@
                   </div>
                 <% } %>
               </div>
+
+              <%# Only the seller and the winner of an ended auction get a conversation %>
+              <% if (conversation) { %>
+                <div class="detailed-card messages-card" id="messages" aria-labelledby="messages-heading">
+                  <h2 class="section-title" id="messages-heading">Messages with the <%= conversation.otherRole %></h2>
+
+                  <% if (conversation.messages.length > 0) { %>
+                    <ul class="messages-list">
+                      <% conversation.messages.forEach((message) => { %>
+                        <% const mine = message.sender.toString() === user.id %>
+                        <li class="message-item<%= mine ? ' message-item--mine' : '' %>">
+                          <div class="message-meta">
+                            <span class="message-author"><%= mine ? 'You' : ((conversation.other && conversation.other.displayName) || `The ${conversation.otherRole}`) %></span>
+                            <span class="message-date"><%= new Date(message.createdAt).toLocaleDateString() %></span>
+                          </div>
+                          <p class="message-text"><%= message.body %></p>
+                        </li>
+                      <% }) %>
+                    </ul>
+                  <% } %>
+
+                  <% if (conversation.other) { %>
+                    <% if (conversation.messages.length === 0) { %>
+                      <p class="messages-note">No messages yet. Use this to arrange payment and pickup.</p>
+                    <% } %>
+                    <form action="/auction/postMessage/<%= listing._id %>" method="POST" class="message-form">
+                      <label for="message-body" class="sr-only">Message the <%= conversation.otherRole %></label>
+                      <textarea id="message-body" name="body" rows="3" placeholder="Write a message..." maxlength="1000" required></textarea>
+                      <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                  <% } else { %>
+                    <p class="messages-note">The <%= conversation.otherRole %>'s account no longer exists, so you can't message them.</p>
+                  <% } %>
+                </div>
+              <% } %>
 
               <% if (bids && bids.length > 0) { %>
                 <div class="detailed-card bid-history-card">

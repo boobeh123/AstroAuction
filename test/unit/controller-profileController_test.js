@@ -1,5 +1,6 @@
 jest.mock('../../model/User');
 jest.mock('../../model/Auction');
+jest.mock('../../model/Message');
 jest.mock('../../config/cloudinary');
 jest.mock('../../services/listingCleanup');
 
@@ -8,6 +9,7 @@ const os = require('os');
 const path = require('path');
 const User = require('../../model/User');
 const Auction = require('../../model/Auction');
+const Message = require('../../model/Message');
 const cloudinary = require('../../config/cloudinary');
 const { deleteListings } = require('../../services/listingCleanup');
 const profileController = require('../../controller/profileController');
@@ -158,15 +160,17 @@ describe('deleteProfile', () => {
         Auction.exists.mockResolvedValue(null);
         Auction.find.mockReturnValue(mockQuery(LISTINGS));
         deleteListings.mockResolvedValue();
+        Message.deleteMany.mockResolvedValue({});
         cloudinary.uploader.destroy.mockResolvedValue({ result: 'ok' });
     });
 
-    test("deletes the user's listings, profile photo and account, then logs them out", async () => {
+    test("deletes the user's listings, messages, profile photo and account, then logs them out", async () => {
         const req = deleteRequest();
         const res = mockResponse();
         await profileController.deleteProfile(req, res);
 
         expect(deleteListings).toHaveBeenCalledWith(LISTINGS);
+        expect(Message.deleteMany).toHaveBeenCalledWith({ $or: [{ sender: USER_ID }, { recipient: USER_ID }] });
         expect(cloudinary.uploader.destroy).toHaveBeenCalledWith('avatar-1');
         expect(User.deleteOne).toHaveBeenCalledWith({ _id: USER_ID });
         expect(req.logout).toHaveBeenCalled();
@@ -185,6 +189,7 @@ describe('deleteProfile', () => {
         expect(res.redirectedTo).toBe('/profile');
         expect(req.flashed.errors[0].msg).toMatch(/can't delete your account/i);
         expect(deleteListings).not.toHaveBeenCalled();
+        expect(Message.deleteMany).not.toHaveBeenCalled();
         expect(User.deleteOne).not.toHaveBeenCalled();
     });
 

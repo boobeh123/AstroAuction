@@ -2,11 +2,13 @@ jest.mock('../../config/cloudinary');
 jest.mock('../../model/Auction');
 jest.mock('../../model/Comment');
 jest.mock('../../model/Bid');
+jest.mock('../../model/Message');
 
 const cloudinary = require('../../config/cloudinary');
 const Auction = require('../../model/Auction');
 const Comment = require('../../model/Comment');
 const Bid = require('../../model/Bid');
+const Message = require('../../model/Message');
 const { deleteListings } = require('../../services/listingCleanup');
 
 /**
@@ -25,6 +27,7 @@ beforeEach(() => {
     Auction.deleteMany.mockResolvedValue({});
     Comment.deleteMany.mockResolvedValue({});
     Bid.deleteMany.mockResolvedValue({});
+    Message.deleteMany.mockResolvedValue({});
     jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -38,10 +41,11 @@ test('removes every photo of every listing from Cloudinary', async () => {
     expect(cloudinary.uploader.destroy.mock.calls.map(([id]) => id)).toEqual(['lamp-1', 'lamp-2', 'bowl-1']);
 });
 
-test('deletes the listings along with their comments and bids', async () => {
+test('deletes the listings along with their comments, messages and bids', async () => {
     await deleteListings([LAMP, BOWL]);
 
     expect(Comment.deleteMany.mock.calls[0][0].auction.$in).toEqual(['lamp', 'bowl']);
+    expect(Message.deleteMany.mock.calls[0][0].auction.$in).toEqual(['lamp', 'bowl']);
     expect(Bid.deleteMany.mock.calls[0][0].auction.$in).toEqual(['lamp', 'bowl']);
     expect(Auction.deleteMany.mock.calls[0][0]._id.$in).toEqual(['lamp', 'bowl']);
 });

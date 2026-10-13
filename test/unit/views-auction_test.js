@@ -106,15 +106,15 @@ test('the money inputs use the same limits as the server', async () => {
     expect(html).toMatch(/id="modal-increment-input"[^>]*min="0.5" max="1000"/);
 });
 
-// The bid form tells bidders that the winner and the seller get each other's
-// email address. Sellers get the same notice before they list, along with
-// the rule that an auction with bids can't be deleted until it ends.
+// The bid form tells bidders that the winner and the seller can message each
+// other. Sellers get the same notice before they list, along with the rule
+// that an auction with bids can't be deleted until it ends.
 test('the auction fields tell sellers what happens once someone bids', async () => {
     const html = await renderPage();
 
     const auctionFields = html.match(/<div class="sale-fields" id="auction-fields"[\s\S]*?<\/div>/)[0];
     expect(auctionFields).toContain("Once someone bids, you can't delete the auction until it ends.");
-    expect(auctionFields).toContain("you and the winner get each other's email address");
+    expect(auctionFields).toContain('you and the winner can message each other on the listing page to arrange payment and pickup.');
 });
 
 test('the video link and photo inputs have labels', async () => {

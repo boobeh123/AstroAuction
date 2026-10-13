@@ -1603,15 +1603,17 @@ Auction
   outline-offset: 2px;
 }
 
-/* Comments section on the detail page */
-.comment-form {
+/* Comments section on the detail page. The messages form shares its look. */
+.comment-form,
+.message-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
-.comment-form textarea {
+.comment-form textarea,
+.message-form textarea {
   width: 100%;
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(184, 197, 214, 0.25);
@@ -1623,12 +1625,14 @@ Auction
   resize: vertical;
 }
 
-.comment-form textarea:focus {
+.comment-form textarea:focus,
+.message-form textarea:focus {
   outline: none;
   border-color: #A855F7;
 }
 
-.comment-form .btn {
+.comment-form .btn,
+.message-form .btn {
   align-self: flex-start;
 }
 
@@ -1695,6 +1699,66 @@ Auction
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Messages between an ended auction's seller and winner */
+.messages-card {
+  margin: 1rem 0;
+  padding: 1.5rem;
+}
+
+.messages-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.message-item {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(184, 197, 214, 0.15);
+}
+
+/* The viewer's own messages */
+.message-item--mine {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.message-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.message-author {
+  color: #E8E9F3;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.message-date {
+  color: #6B6AAF;
+  font-size: 0.75rem;
+}
+
+.message-text {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.messages-note {
+  color: #B8C5D6;
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
 }
 
 /**************************************************************
@@ -1870,8 +1934,8 @@ Bidding
   font-size: 0.75rem;
 }
 
-/* Tells bidders that winning shares their email with the seller */
-.bid-privacy {
+/* Tells bidders how they'll reach the seller if they win */
+.bid-note {
   color: #6B6AAF;
   font-size: 0.75rem;
 }
@@ -1911,7 +1975,7 @@ Bidding
   color: #E8E9F3;
 }
 
-/* After an auction ends, the seller and the winner see each other's email */
+/* After an auction ends, links the seller and the winner to their messages */
 .bid-contact {
   color: #B8C5D6;
   font-size: 0.9rem;

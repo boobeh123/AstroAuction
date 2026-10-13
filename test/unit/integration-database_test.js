@@ -30,11 +30,12 @@ const Auction = require('../../model/Auction');
 const User = require('../../model/User');
 const Comment = require('../../model/Comment');
 const Bid = require('../../model/Bid');
+const Message = require('../../model/Message');
 const auctionController = require('../../controller/auctionController');
 const authController = require('../../controller/authController');
 const profileController = require('../../controller/profileController');
 const { closeExpiredAuctions } = require('../../services/auctionCloser');
-const { validateBid, validateListing, validateResetPassword } = require('../../middleware/validators');
+const { validateBid, validateListing, validateMessage, validateResetPassword } = require('../../middleware/validators');
 const { mockRequest, mockResponse, runValidators } = require('./helpers-mocks');
 
 const ONE_HOUR_MS = 3_600_000;
@@ -75,6 +76,7 @@ beforeAll(async () => {
     mailer.sendOutbidEmail.mockResolvedValue();
     mailer.sendAuctionWonEmail.mockResolvedValue();
     mailer.sendAuctionEndedSellerEmail.mockResolvedValue();
+    mailer.sendNewMessageEmail.mockResolvedValue();
 }, 60_000);
 
 afterAll(async () => {
@@ -84,7 +86,7 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-    await Promise.all([Auction.deleteMany({}), User.deleteMany({}), Comment.deleteMany({}), Bid.deleteMany({})]);
+    await Promise.all([Auction.deleteMany({}), User.deleteMany({}), Comment.deleteMany({}), Bid.deleteMany({}), Message.deleteMany({})]);
 });
 
 describe('the sanitizeFilter guard', () => {
@@ -364,6 +366,83 @@ describe('indexes', () => {
         expect(keys).toContainEqual({ user: 1 });
         expect(keys).toContainEqual({ currentBidder: 1 });
     });
+
+    test("a listing's messages are indexed oldest first, and by sender and recipient", async () => {
+        const keys = await indexKeys(Message);
+
+        expect(keys).toContainEqual({ auction: 1, createdAt: 1 });
+        expect(keys).toContainEqual({ sender: 1 });
+        expect(keys).toContainEqual({ recipient: 1 });
+    });
+});
+
+describe('messages between the winner and the seller', () => {
+    async function endedSale() {
+        const seller = await makeUser({ email: 'seller@example.com', displayName: 'Lani' });
+        const winner = await makeUser({ email: 'winner@example.com', displayName: 'Kai' });
+        const lot = await makeAuction({
+            user: seller._id,
+            status: 'ended',
+            endsAt: new Date(Date.now() - ONE_HOUR_MS),
+            bidCount: 1,
+            currentBid: 150,
+            currentBidder: winner._id,
+        });
+        return { seller, winner, lot };
+    }
+
+    async function sendMessage(lot, sender, body) {
+        const req = mockRequest({ params: { id: lot._id.toString() }, body: { body }, user: { id: sender._id.toString() } });
+        const res = mockResponse();
+        await runValidators(validateMessage, req);
+        await auctionController.postMessage(req, res);
+        return res;
+    }
+
+    async function openListing(lot, viewer) {
+        const req = mockRequest({ params: { id: lot._id.toString() }, user: { id: viewer._id.toString() } });
+        const res = mockResponse();
+        await auctionController.getDetailedAuction(req, res);
+        return res.renderedLocals.conversation;
+    }
+
+    test("the winner's message reaches the seller, and opening it marks it read", async () => {
+        const { seller, winner, lot } = await endedSale();
+
+        const res = await sendMessage(lot, winner, 'Pickup Saturday?');
+        expect(res.redirectedTo).toBe(`/auction/viewAuction/${lot._id}#messages`);
+
+        const conversation = await openListing(lot, seller);
+        expect(conversation.other).toEqual({ displayName: 'Kai' });
+        expect(conversation.messages.map((message) => message.body)).toEqual(['Pickup Saturday?']);
+
+        const saved = await Message.findOne({ auction: lot._id }).lean();
+        expect(saved.recipient.toString()).toBe(seller._id.toString());
+        expect(saved.readAt).toBeInstanceOf(Date);
+    });
+
+    // The unread check runs on the real database
+    test('a second message before the first is read sends no second email', async () => {
+        const { seller, winner, lot } = await endedSale();
+        mailer.sendNewMessageEmail.mockClear();
+
+        await sendMessage(lot, winner, 'Pickup Saturday?');
+        await sendMessage(lot, winner, 'Cash is fine?');
+        expect(mailer.sendNewMessageEmail).toHaveBeenCalledTimes(1);
+
+        await openListing(lot, seller);
+        await sendMessage(lot, winner, 'See you then.');
+        expect(mailer.sendNewMessageEmail).toHaveBeenCalledTimes(2);
+    });
+
+    test("opening the listing doesn't mark your own messages as read", async () => {
+        const { winner, lot } = await endedSale();
+        await sendMessage(lot, winner, 'Pickup Saturday?');
+
+        await openListing(lot, winner);
+
+        expect((await Message.findOne({ auction: lot._id }).lean()).readAt).toBeNull();
+    });
 });
 
 describe('deleting an account', () => {
@@ -378,13 +457,14 @@ describe('deleting an account', () => {
         return res;
     }
 
-    test("removes its listings with their comments and bids, and nobody else's", async () => {
+    test("removes its listings with their comments, messages and bids, and nobody else's", async () => {
         const seller = await makeUser({ email: 'seller@example.com' });
         const buyer = new mongoose.Types.ObjectId();
         const ended = await makeAuction({ user: seller._id, status: 'ended', bidCount: 1, currentBid: 150, currentBidder: buyer });
         const fixed = await makeAuction({ user: seller._id, saleType: 'fixed', price: 40 });
         const someoneElses = await makeAuction();
         await Comment.create({ body: 'Still available?', user: buyer, auction: fixed._id });
+        await Message.create({ body: 'Pickup Saturday?', sender: buyer, recipient: seller._id, auction: ended._id });
         await Bid.create({ auction: ended._id, user: buyer, amount: 150 });
         await Bid.create({ auction: someoneElses._id, user: buyer, amount: 150 });
 
@@ -394,9 +474,27 @@ describe('deleting an account', () => {
         expect(await User.exists({ _id: seller._id })).toBeNull();
         expect(await Auction.countDocuments({ user: seller._id })).toBe(0);
         expect(await Comment.countDocuments({ auction: fixed._id })).toBe(0);
+        expect(await Message.countDocuments({ auction: ended._id })).toBe(0);
         expect(await Bid.countDocuments({ auction: ended._id })).toBe(0);
         expect(await Auction.exists({ _id: someoneElses._id })).not.toBeNull();
         expect(await Bid.countDocuments({ auction: someoneElses._id })).toBe(1);
+    });
+
+    // A winner's conversations are on other people's listings, which stay
+    test("removes the messages it sent and received on other people's listings, and nobody else's", async () => {
+        const winner = await makeUser({ email: 'winner@example.com' });
+        const seller = new mongoose.Types.ObjectId();
+        const lot = await makeAuction({ user: seller, status: 'ended', bidCount: 1, currentBid: 150, currentBidder: winner._id });
+        const otherLot = await makeAuction({ status: 'ended', bidCount: 1, currentBid: 90, currentBidder: new mongoose.Types.ObjectId() });
+        await Message.create({ body: 'Pickup Saturday?', sender: winner._id, recipient: seller, auction: lot._id });
+        await Message.create({ body: 'Saturday works.', sender: seller, recipient: winner._id, auction: lot._id });
+        await Message.create({ body: 'Unrelated', sender: new mongoose.Types.ObjectId(), recipient: new mongoose.Types.ObjectId(), auction: otherLot._id });
+
+        await deleteAccount(winner);
+
+        expect(await Message.countDocuments({ auction: lot._id })).toBe(0);
+        expect(await Message.countDocuments({ auction: otherLot._id })).toBe(1);
+        expect(await Auction.exists({ _id: lot._id })).not.toBeNull();
     });
 
     test('is refused while the account has an open auction with bids', async () => {

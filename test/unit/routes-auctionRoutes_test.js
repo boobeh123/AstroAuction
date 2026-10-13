@@ -81,6 +81,7 @@ describe('guarded routes reject anonymous requests', () => {
     test.each([
         ['POST', '/auction', 'postAuction'],
         ['POST', `/auction/postComment/${LOT}`, 'postComment'],
+        ['POST', `/auction/postMessage/${LOT}`, 'postMessage'],
         ['POST', `/auction/postBid/${LOT}`, 'postBid'],
         ['POST', `/auction/toggleSpotlight/${LOT}`, 'postToggleHighlight'],
         ['DELETE', `/auction/deleteAuction/${LOT}`, 'deleteAuction'],
@@ -113,6 +114,15 @@ describe('guarded routes admit authenticated requests', () => {
             .expect(200);
 
         expect(auctionController.postComment).toHaveBeenCalled();
+    });
+
+    test('POST /auction/postMessage/:id reaches postMessage when logged in', async () => {
+        await request(buildApp({ authenticated: true }))
+            .post(`/auction/postMessage/${LOT}`)
+            .send({ body: 'Pickup Saturday?' })
+            .expect(200);
+
+        expect(auctionController.postMessage).toHaveBeenCalled();
     });
 
     test('DELETE /auction/deleteAuction/:id reaches deleteAuction when logged in', async () => {

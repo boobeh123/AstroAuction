@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { matchedData } = require('express-validator')
 const User = require('../model/User')
 const Auction = require('../model/Auction')
+const Message = require('../model/Message')
 const cloudinary = require("../config/cloudinary");
 const fs = require('fs/promises');
 const { formErrors } = require('../middleware/validators')
@@ -116,6 +117,11 @@ module.exports = {
         // shown as "Removed user".
         const listings = await Auction.find({ user: req.user._id }).select('cloudinaryIds').lean();
         await deleteListings(listings);
+
+        // Messages are private between two people, and the conversation can't
+        // go on without this account, so every message it sent or received
+        // goes too, including those on other people's listings
+        await Message.deleteMany({ $or: [{ sender: req.user._id }, { recipient: req.user._id }] });
 
         if (currentUser.cloudinaryId) {
             await cloudinary.uploader.destroy(currentUser.cloudinaryId)

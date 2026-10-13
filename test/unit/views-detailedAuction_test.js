@@ -41,7 +41,7 @@ function renderListingPage(comments, overrides = {}) {
         minNextBid: 0,
         formatMoney,
         photoUrl,
-        contact: null,
+        conversation: null,
         amountLimits: AMOUNT_LIMITS,
         user: null,
         currentPath: `/auction/viewAuction/${LISTING._id}`,
@@ -174,15 +174,20 @@ describe('the bid form on a live auction', () => {
         expect(html).toContain('Verify your email to bid');
     });
 
-    // Bidders are told up front that winning shares their email with the seller
-    test('the form says the winner and the seller get each other\'s email address', async () => {
+    // Bidders are told up front how they'll reach the seller if they win
+    test('the form says the winner and the seller can message each other', async () => {
         const html = await renderAuctionFor(true);
 
-        expect(html).toContain('If you win, the seller gets your email address so you can arrange payment and pickup, and you get theirs.');
+        expect(html).toContain('If you win, you and the seller can message each other on this page to arrange payment and pickup.');
+        expect(html).not.toContain('email address');
     });
 });
 
-describe('contact details once an auction ends', () => {
+describe('messages once an auction ends', () => {
+    // Only the winner and the seller get a conversation from the controller,
+    // so only their page has the Messages card
+    const WINNER = { id: '507f1f77bcf86cd799439099' };
+    const SELLER_ID = LISTING.user._id;
     const ENDED = {
         ...LISTING,
         saleType: 'auction',
@@ -194,26 +199,62 @@ describe('contact details once an auction ends', () => {
         endsAt: new Date(Date.now() - 60 * 60 * 1000),
     };
 
-    function renderEnded(contact) {
-        return renderListingPage([], { listing: ENDED, user: { id: '507f1f77bcf86cd799439099' }, contact });
+    function renderFor(user, conversation) {
+        return renderListingPage([], { listing: ENDED, user, conversation });
     }
 
-    test("the winner sees the seller's address", async () => {
-        const html = await renderEnded({ role: 'seller', person: { displayName: 'Lani', email: 'lani@example.com' } });
+    function conversationWith(messages, other = { displayName: 'Lani' }) {
+        return { otherRole: 'seller', other, messages };
+    }
 
-        expect(html).toContain('Contact the seller, Lani, at <a href="mailto:lani@example.com">lani@example.com</a> to arrange payment and pickup.');
+    test('the winner sees the conversation, with their own messages marked "You"', async () => {
+        const html = await renderFor(WINNER, conversationWith([
+            { body: 'Pickup Saturday?', sender: WINNER.id, createdAt: new Date('2026-10-12') },
+            { body: 'Saturday works.', sender: SELLER_ID, createdAt: new Date('2026-10-12') },
+        ]));
+
+        expect(html).toContain('id="messages"');
+        expect(html).toMatch(/You<\/span>[\s\S]*?Pickup Saturday\?/);
+        expect(html).toMatch(/Lani<\/span>[\s\S]*?Saturday works\./);
     });
 
-    test("the seller sees the winner's address", async () => {
-        const html = await renderEnded({ role: 'winner', person: { displayName: 'Kai', email: 'kai@example.com' } });
+    test("the form sends the message to this listing's conversation", async () => {
+        const html = await renderFor(WINNER, conversationWith([]));
 
-        expect(html).toContain('Contact the winner, Kai, at <a href="mailto:kai@example.com">kai@example.com</a> to arrange payment and pickup.');
+        expect(html).toContain(`action="/auction/postMessage/${LISTING._id}"`);
+        expect(html).toContain('<label for="message-body"');
+        expect(html).toContain('No messages yet.');
     });
 
-    test('everyone else sees the result but no address', async () => {
-        const html = await renderEnded(null);
+    test('a message is shown as text, not run as HTML', async () => {
+        const html = await renderFor(WINNER, conversationWith([
+            { body: '<img src=x onerror=alert(1)>', sender: SELLER_ID, createdAt: new Date() },
+        ]));
+
+        expect(html).not.toContain('<img src=x');
+        expect(html).toContain('&lt;img src=x');
+    });
+
+    test('the "Auction ended" box links to the conversation, with no address', async () => {
+        const html = await renderFor(WINNER, conversationWith([]));
+
+        expect(html).toContain('<a href="#messages">Message the seller</a> to arrange payment and pickup.');
+        expect(html).not.toContain('mailto:');
+    });
+
+    test('everyone else sees the result, but no link and no Messages card', async () => {
+        const html = await renderFor({ id: '507f1f77bcf86cd799439098' }, null);
 
         expect(html).toContain('Won with a bid of');
-        expect(html).not.toContain('mailto:');
+        expect(html).not.toContain('#messages');
+        expect(html).not.toContain('id="messages"');
+        expect(html).not.toContain('postMessage');
+    });
+
+    test("when the other account is gone, there's a note and no form", async () => {
+        const html = await renderFor(WINNER, conversationWith([], null));
+
+        expect(html).toContain("The seller's account no longer exists, so you can't message them.");
+        expect(html).not.toContain('postMessage');
     });
 });
