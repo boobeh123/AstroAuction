@@ -63,10 +63,11 @@ app.use(helmet({
         directives: {
             defaultSrc:     ["'self'"],
             scriptSrc:      ["'self'"],
+            // No inline styles: no page has a style="" or <style>. main.js
+            // sets styles through JavaScript, which this doesn't block.
             styleSrc:       [
                 "'self'",
-                "'unsafe-inline'",
-                "https://fonts.googleapis.com",      // Roboto and Material Icons stylesheets
+                "https://fonts.googleapis.com",      // the Roboto stylesheet
                 "https://cdnjs.cloudflare.com",      // Font Awesome 6.4 stylesheet
             ],
             fontSrc:        [
@@ -103,8 +104,9 @@ app.use(logger(isProduction ? 'combined' : 'dev'));
 // extended: false keeps every form field a plain string. With extended: true,
 // a field named email[$ne] arrived as the object { $ne: ... }, which is how
 // database operators get smuggled into queries.
+// There's no JSON parser: every form posts urlencoded data, and the one
+// fetch() in main.js sends no body.
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 app.use(express.static('public'));
 //Use forms for put / delete
 app.use(methodOverride("_method"));

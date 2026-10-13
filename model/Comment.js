@@ -21,4 +21,8 @@ const CommentSchema = new mongoose.Schema({
     { timestamps: true }
 )
 
+// A listing's comments are always read as "this listing's comments, oldest
+// first", and deleted together with the listing.
+CommentSchema.index({ auction: 1, createdAt: 1 })
+
 module.exports = mongoose.model('Comment', CommentSchema)
