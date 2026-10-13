@@ -22,6 +22,7 @@ const tutorialRoutes = require('./routes/tutorialRoutes');
 const { startAuctionCloser } = require('./services/auctionCloser');
 const { getHighlightedListing } = require('./services/highlightCache');
 const { formatMoney } = require('./utils/bidding');
+const { formatDate } = require('./utils/dates');
 
 // Passport config
 require('./config/passport')(passport);
@@ -48,6 +49,10 @@ app.set('view engine', 'ejs');
 // fails before the locals middleware below sets it, such as a body that can't
 // be parsed, would otherwise crash the error page itself.
 app.locals.currentPath = ''
+// Every view shows dates in Hawaii time through formatDate (utils/dates.js).
+// The server runs in UTC, so toLocaleDateString() would show tomorrow's date
+// for anything after 2 PM there.
+app.locals.formatDate = formatDate
 // X-Content-Type-Options: nosniff — prevents MIME sniffing attacks
 // X-Frame-Options: SAMEORIGIN — prevents clickjacking via iframes
 // Strict-Transport-Security — forces HTTPS on browsers that have visited before

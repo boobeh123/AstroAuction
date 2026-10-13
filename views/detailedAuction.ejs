@@ -75,7 +75,7 @@
                       <div class="comment-body-wrap">
                         <div class="comment-meta">
                           <span class="comment-author"><%= comment.user ? comment.user.displayName : 'Removed user' %></span>
-                          <span class="comment-date"><%= new Date(comment.createdAt).toLocaleDateString() %></span>
+                          <span class="comment-date"><%= formatDate(comment.createdAt) %></span>
                         </div>
                         <p class="comment-text"><%= comment.body %></p>
                       </div>
@@ -148,7 +148,7 @@
                         <li class="message-item<%= mine ? ' message-item--mine' : '' %>">
                           <div class="message-meta">
                             <span class="message-author"><%= mine ? 'You' : ((conversation.other && conversation.other.displayName) || `The ${conversation.otherRole}`) %></span>
-                            <span class="message-date"><%= new Date(message.createdAt).toLocaleDateString() %></span>
+                            <span class="message-date"><%= formatDate(message.createdAt) %></span>
                           </div>
                           <p class="message-text"><%= message.body %></p>
                         </li>
@@ -179,7 +179,7 @@
                       <li class="bid-history-item">
                         <span class="bid-history-user"><%= bid.user ? bid.user.displayName : 'Removed user' %></span>
                         <span class="bid-history-amount"><%= formatMoney(bid.amount) %></span>
-                        <span class="bid-history-date"><%= new Date(bid.createdAt).toLocaleDateString() %></span>
+                        <span class="bid-history-date"><%= formatDate(bid.createdAt) %></span>
                       </li>
                     <% }) %>
                   </ul>
@@ -208,7 +208,7 @@
                 </div>
                 <div class="info-item">
                   <span class="info-label">Posted:</span>
-                  <span class="info-value"><%= new Date(listing.createdAt).toLocaleDateString() %></span>
+                  <span class="info-value"><%= formatDate(listing.createdAt) %></span>
                 </div>
               </div>
             </div>
@@ -219,10 +219,7 @@
                   <img src="<%= listing.user.image || '/images/avatarPlaceholder.svg' %>" alt="<%= listing.user.displayName %>" class="seller-avatar-large">
                   <div class="seller-details">
                     <h3 class="seller-name"><%= listing.user.displayName %></h3>
-                    <p class="seller-joined">Member since <%= new Date(listing.user.createdAt).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      year: 'numeric' 
-                    }) %></p>
+                    <p class="seller-joined">Member since <%= formatDate(listing.user.createdAt, { month: 'short', year: 'numeric' }) %></p>
                   </div>
                 </div>
               </div>
