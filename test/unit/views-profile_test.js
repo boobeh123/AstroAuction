@@ -1,5 +1,6 @@
 const path = require('path');
 const ejs = require('ejs');
+const { formatDate } = require('../../utils/dates');
 
 /**
  * The profile page, rendered from the real template.
@@ -16,9 +17,10 @@ const USER = {
     createdAt: new Date('2026-01-01'),
 };
 
-function renderProfile() {
+function renderProfile(user = USER) {
     return ejs.renderFile(VIEW, {
-        user: USER,
+        user,
+        formatDate,
         currentPath: '/profile',
         success: [],
         error: [],
@@ -46,4 +48,12 @@ test('the photo picker only offers JPG and PNG files', async () => {
     const html = await renderProfile();
 
     expect(html).toMatch(/id="profile-file"[^>]*accept="image\/jpeg,image\/png"/);
+});
+
+// Railway runs the server in UTC, where 3 AM on Jan 1 would already be 2026.
+// In Hawaii it's still the evening of Dec 31.
+test('"Member since" shows the Hawaii date', async () => {
+    const html = await renderProfile({ ...USER, createdAt: new Date('2026-01-01T03:00:00Z') });
+
+    expect(html).toContain('December 31, 2025');
 });

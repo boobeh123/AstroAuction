@@ -101,6 +101,7 @@ It starts listening only after MongoDB connects, then starts the auction closer.
 - Each page passes its own title to the head, as in `include('./partials/head.ejs', { pageTitle: 'Log in' })`. Only the home page passes none.
 - The tutorial shows only after onboarding, because its steps point at the Create Listing button and form.
 - Use escaped `<%= %>` for data; `<%-` is only for `include`.
+- Show dates with `formatDate(date, options)` from `utils/dates.js`, which server.js puts on `app.locals`. It uses Hawaii time. Railway runs in UTC, where `toLocaleDateString()` shows tomorrow's date after 2 PM in Hawaii, and `test/unit/utils-dates_test.js` fails if a view calls it. Tests that render a view directly pass `formatDate` themselves.
 - Listing queries use `.lean()`, so results have `_id` but no `.id`.
 - The listing form's category options come from `Auction.CATEGORIES` (passed as `categories`). Users without a photo get `/images/avatarPlaceholder.svg`.
 - Listing photos go through `photoUrl(url, size)` from `utils/photos.js`. It asks Cloudinary for a copy sized for where the photo is shown (`card`, `main`, `thumb`, `full`); anything new that shows a listing photo should use it too.

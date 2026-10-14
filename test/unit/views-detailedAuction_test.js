@@ -2,6 +2,7 @@ const path = require('path');
 const ejs = require('ejs');
 const { formatMoney, AMOUNT_LIMITS } = require('../../utils/bidding');
 const { photoUrl } = require('../../utils/photos');
+const { formatDate } = require('../../utils/dates');
 
 /**
  * Deleting an account removes the user but keeps their comments, so each of
@@ -40,6 +41,7 @@ function renderListingPage(comments, overrides = {}) {
         auctionLive: false,
         minNextBid: 0,
         formatMoney,
+        formatDate,
         photoUrl,
         conversation: null,
         amountLimits: AMOUNT_LIMITS,
@@ -81,6 +83,19 @@ describe('comments from deleted accounts', () => {
         expect(html).toContain('Kai');
         expect(html).toContain('https://res.cloudinary.com/demo/kai.jpg');
     });
+});
+
+// Railway runs the server in UTC, where 1:30 AM on Oct 13 would show as
+// 10/13. In Hawaii it's still the afternoon of Oct 12.
+test('dates show the Hawaii date, not the server\'s', async () => {
+    const afternoon = new Date('2026-10-13T01:30:00Z');
+    const html = await renderListingPage([{ user: null, body: 'Still available?', createdAt: afternoon }], {
+        listing: { ...LISTING, createdAt: afternoon, user: { ...LISTING.user, createdAt: new Date('2026-01-01T03:00:00Z') } },
+    });
+
+    expect(html).toContain('<span class="comment-date">10/12/2026</span>');
+    expect(html).toContain('<span class="info-value">10/12/2026</span>');
+    expect(html).toMatch(/Member since Dec 2025/);
 });
 
 test("the page title is the listing's title", async () => {
