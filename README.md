@@ -45,13 +45,25 @@ AstroAuction web app - https://astroauction.up.railway.app/
 * ~~Nodemailer for contact form~~
 * ~~Multer/cloudinary~~
 * ~~Unit tests~~
-* Integration tests
+* ~~Integration tests~~
 * E2E tests
 
 ## Technologies
 <img src="https://img.shields.io/badge/html5%20-%23E34F26.svg?&style=for-the-badge&logo=html5&logoColor=white" alt="HTML" height="50"/><img src="https://img.shields.io/badge/css3%20-%231572B6.svg?&style=for-the-badge&logo=css3&logoColor=white" alt="CSS" height="50"/><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" height="50"/><img src="https://img.shields.io/badge/node.js%20-3F873F.svg?&style=for-the-badge&logo=node.js&logoColor=white" alt="Node" height="50"/><img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express" height="50"/><img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" height="50"/><img src="https://img.shields.io/badge/Mongoose.js-8A0403?style=for-the-badge&logoColor=white" alt="Mongoose" />
 
 ## Version History
+# 🛠️ AstroAuction Patch 1.1.7
+📅 **Release Date:** October 21st, 2026
+
+## 📢 Developer's Notes - A new flash middleware
+
+- Replaced connect-flash with a small flash middleware of our own
+  - connect-flash was last released in 2013 & uses a function Node 24 has deprecated
+  - Messages work the same, & visitors still don't get a session cookie
+- Ticked "Integration tests" on the roadmap: the real-database test suites cover it
+- 478/478 tests passing
+
+---------------------------------------------------------------------------------------------------------------------------
 # 🛠️ AstroAuction Patch 1.1.6
 📅 **Release Date:** October 21st, 2026
 
