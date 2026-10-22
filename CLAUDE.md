@@ -6,7 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Two sites for The Lost And Found LLC, a reuse store in Wahiawa, HI:
 
-- **AstroAuction**, the Express app: a local marketplace with fixed-price listings and timed auctions. The store owner livestreams sales and "spotlights" the listing being sold, which puts a Live Now banner across the site. Live at https://astroauction.up.railway.app, built by Railway with Nixpacks on Node 24 (pinned through `engines` in package.json).
+- **AstroAuction**, the Express app: a local marketplace with fixed-price listings and timed auctions. The store owner livestreams sales and "spotlights" the listing being sold, which puts a Live Now banner across the site. Live at https://astroauction.up.railway.app.
+  - Railway builds it on the exact Node version in package.json's `engines` (24.22.1, the Oct 21 2026 security release). The service's builder must be Railpack, a setting in Railway's dashboard: Nixpacks only honours the major version.
+  - When Node ships a security release, bump the pin; don't loosen it back to a range. `test/unit/server-config_test.js` fails on a range.
+  - The startup log line prints the running Node version, so Railway's deploy log confirms it.
 - **The Lost And Found page**, a static site: `index.html`, `public/css/stylesstatic.css` and `public/js/mainstatic.js`. Live at https://astroauction.netlify.app. Netlify publishes the repo root, so this page links `/public/...` paths, while the Express app serves `public/` at `/` (for example `/css/styles.css`).
 
 Both sites redeploy on every merge to `master`. Changes go through a branch and a pull request to `master`, one at a time: start the next branch from `master` after the previous PR has merged, never on top of an open PR.
@@ -41,7 +44,7 @@ On multipart forms, multer must come before the validators, because multer is wh
 **server.js** sets up, in order:
 1. dotenv, then `trust proxy` (Railway's proxy; secure cookies and per-IP rate limits depend on it)
 2. helmet with an explicit CSP, then morgan
-3. `urlencoded({ extended: false })` (there's no JSON parser), static files, `method-override`
+3. `urlencoded({ extended: false, inflate: false })`, static files, `method-override`. There's no JSON parser. `inflate: false` refuses compressed request bodies with a 415: no browser sends one, and decompressing them put Node's Brotli decoder within reach of anyone (the Oct 2026 security release). Keep it on any body parser added later.
 4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, connect-flash
 5. a locals middleware (`user`, `currentPath` without the query string, flash messages), then one that gives GET requests the spotlighted listing for the banner, cached for 10 s in `services/highlightCache.js`
 6. routes, the 404 page, and `middleware/errorHandler.js`
