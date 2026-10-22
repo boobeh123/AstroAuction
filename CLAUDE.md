@@ -45,14 +45,18 @@ On multipart forms, multer must come before the validators, because multer is wh
 1. dotenv, then `trust proxy` (Railway's proxy; secure cookies and per-IP rate limits depend on it)
 2. helmet with an explicit CSP, then morgan
 3. `urlencoded({ extended: false, inflate: false })`, static files, `method-override`. There's no JSON parser. `inflate: false` refuses compressed request bodies with a 415: no browser sends one, and decompressing them put Node's Brotli decoder within reach of anyone (the Oct 2026 security release). Keep it on any body parser added later.
-4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, connect-flash
+4. sessions stored in MongoDB (connect-mongo over Mongoose's client), Passport, `endStaleSessions`, the flash middleware (`middleware/flash.js`)
 5. a locals middleware (`user`, `currentPath` without the query string, flash messages), then one that gives GET requests the spotlighted listing for the banner, cached for 10 s in `services/highlightCache.js`
 6. routes, the 404 page, and `middleware/errorHandler.js`
 
 It starts listening only after MongoDB connects, then starts the auction closer.
 
 - Forms delete and edit with `method="POST"` plus `?_method=DELETE` or `?_method=PUT` in the action URL; method-override reads the query string.
-- The locals middleware calls `req.flash()` only when `req.session.flash` exists. Calling it every time would give every visitor a session cookie and a database row.
+- `req.flash()` comes from `middleware/flash.js`, which replaced connect-flash (last released in 2013; it calls Node's deprecated `util.isArray`). It keeps the two calls the app uses:
+  - `req.flash(type, message)` queues a message, or each item of a list.
+  - `req.flash(type)` returns that type's messages and clears them.
+  - There's no `req.flash()` without a type, and no `%s` formatting.
+- Reading messages never writes to the session, so the locals middleware reads all four types on every request and a visitor still gets no session cookie or database row. Keep it that way: connect-flash wrote on every read. `flash.js` looks up `req.session` on each call, because passport replaces the session at login and logout.
 - `user` is `null` for visitors, so views check it before reading its fields. `app.locals.currentPath` defaults to `''`, so error pages still render when a request fails before the locals middleware.
 - Any outside resource (script, stylesheet, font, image host, iframe) needs the matching CSP directive in server.js. `script-src` is `'self'` only: no inline scripts and no `onclick`-style attributes. `style-src` doesn't allow `'unsafe-inline'`: no `style=""` attributes or `<style>` tags. Setting styles from JavaScript is fine.
 

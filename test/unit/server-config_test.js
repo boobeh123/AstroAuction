@@ -50,3 +50,10 @@ test("the Content-Security-Policy doesn't allow inline styles", () => {
 test("there's no JSON body parser", () => {
     expect(SERVER).not.toContain('express.json(');
 });
+
+// connect-flash (2013) calls Node's deprecated util.isArray.
+// middleware/flash.js has the same API.
+test('flash messages come from middleware/flash.js, not connect-flash', () => {
+    expect(SERVER).not.toContain("require('connect-flash')");
+    expect(SERVER).toContain("require('./middleware/flash')");
+});

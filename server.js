@@ -9,7 +9,7 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
-const flash = require('connect-flash');
+const flash = require('./middleware/flash');
 const homeRoutes = require('./routes/homeRoutes');
 const authRoutes = require('./routes/authRoutes');
 const onboardRoutes = require('./routes/onboardRoutes');
@@ -143,19 +143,17 @@ app.use(passport.session())
 // Signs out any session that logged in before the account's last password reset
 app.use(endStaleSessions)
 
-app.use(flash());
+app.use(flash);
 
 // Flash Available to all Views
 app.use((req, res, next) => {
-  // Calling req.flash() saves an empty message box into the session, which
-  // gave every visitor (bots included) a session cookie and a database row.
-  // Only read messages when the session already has some. req.session is
-  // missing when the session store can't be reached, so check for it too.
-  const readFlash = (type) => (req.session?.flash ? req.flash(type) : [])
-  res.locals.success = readFlash('success')
-  res.locals.errors  = readFlash('errors')
-  res.locals.error   = readFlash('error')
-  res.locals.info    = readFlash('info')
+  // Reading messages never writes to the session (middleware/flash.js), so
+  // a visitor with nothing queued still gets no session cookie and no
+  // database row, and a request without a session reads empty lists
+  res.locals.success = req.flash('success')
+  res.locals.errors  = req.flash('errors')
+  res.locals.error   = req.flash('error')
+  res.locals.info    = req.flash('info')
   // The path without the query string, so /auction?page=2 still counts as
   // the auction page in the navigation, the banner and the tutorial
   res.locals.currentPath = req.path
