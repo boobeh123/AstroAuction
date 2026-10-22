@@ -111,7 +111,11 @@ app.use(logger(isProduction ? 'combined' : 'dev'));
 // database operators get smuggled into queries.
 // There's no JSON parser: every form posts urlencoded data, and the one
 // fetch() in main.js sends no body.
-app.use(express.urlencoded({ extended: false }));
+// inflate: false refuses a compressed request body with a 415. Otherwise
+// body-parser decompresses gzip and Brotli bodies through Node's zlib, where
+// the Oct 21 2026 Node security release fixed a Brotli bug that let a crafted
+// body run code. No browser compresses a form post.
+app.use(express.urlencoded({ extended: false, inflate: false }));
 app.use(express.static('public'));
 //Use forms for put / delete
 app.use(methodOverride("_method"));
@@ -199,7 +203,9 @@ app.use(errorHandler)
 clientPromise
   .then(() => {
     app.listen(PORT, () => {
-      console.log('Server is running, you better catch it!')
+      // The Node version shows in Railway's deploy log, to confirm the pin in
+      // package.json's engines took effect
+      console.log(`Server is running on Node ${process.version}, you better catch it!`)
 
       // Sweeps for auctions whose time is up and closes them. Runs once
       // immediately to catch anything that expired while the app was down,
